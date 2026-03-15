@@ -1,0 +1,7 @@
+.git
+.gitignore
+.vscode
+vendor
+DATABASE FILE/backups
+gym-system-deploy.zip
+*.log
