@@ -1,0 +1,376 @@
+/* Shared login polish for admin/staff/customer pages */
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0 !important;
+  padding: 28px 14px !important;
+  background:
+    radial-gradient(900px 380px at -10% -10%, rgba(56, 189, 248, 0.18), transparent 60%),
+    radial-gradient(820px 360px at 110% 10%, rgba(16, 185, 129, 0.14), transparent 55%),
+    linear-gradient(180deg, #eef4ff 0%, #f6f9ff 44%, #edf3fb 100%) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-x: hidden;
+  font-family: "Open Sans", sans-serif;
+}
+
+#loginbox {
+  width: min(460px, 95vw) !important;
+  display: block !important;
+  float: none !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+  margin: 0 auto !important;
+  border-radius: 18px;
+  overflow: hidden !important;
+  border: 1px solid #dbe7f7;
+  background: #ffffff !important;
+  box-shadow: 0 22px 52px rgba(15, 23, 42, 0.16);
+  position: relative;
+}
+
+#loginbox::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0) 38%);
+}
+
+#loginbox > .pull-left,
+#loginbox > .pull-right,
+#loginbox > .g {
+  padding: 0 16px 14px;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  max-height: calc(100vh - 28px);
+
+#loginbox > .pull-left,
+#loginbox > .pull-right {
+  width: 50%;
+  box-sizing: border-box;
+}
+
+#loginbox form {
+  background: transparent !important;
+}
+
+#loginbox .normal_text {
+  background: linear-gradient(135deg, #0f3d72 0%, #14508f 62%, #1c67ad 100%) !important;
+  color: #ffffff !important;
+  padding: 22px 18px 16px;
+  border-bottom: 1px solid #cfe2f7;
+}
+
+#loginbox .normal_text h3 {
+  margin: 0;
+  color: #ffffff;
+  text-align: center;
+}
+
+#loginbox .normal_text h3 img {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  display: block;
+  margin: 0 auto;
+}
+
+  
+    #recoverform .normal_text {
+      text-align: left;
+      line-height: 1.5;
+    }
+#loginbox .normal_text h3 .login-title {
+  display: block;
+  margin-top: 10px;
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+#loginbox .controls {
+  padding: 0 18px !important;
+}
+
+#loginbox .control-group {
+  padding: 11px 0 !important;
+  margin-bottom: 0;
+}
+
+#loginbox .main_input_box {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  border: 1px solid #c9d9ef;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f8fbff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#loginbox .main_input_box:focus-within {
+  border-color: #2f6db0;
+  box-shadow: 0 0 0 3px rgba(47, 109, 176, 0.14);
+}
+
+#loginbox .main_input_box .add-on {
+  width: 42px !important;
+  min-width: 42px;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#loginbox .main_input_box input,
+#loginbox .main_input_box select {
+  width: 100% !important;
+  border: 0 !important;
+  margin: 0 !important;
+  min-height: 44px !important;
+  line-height: 44px !important;
+  padding: 0 12px !important;
+  font-size: 14px;
+  color: #0f172a;
+  background: transparent;
+  box-shadow: none !important;
+}
+
+#loginbox .main_input_box input:focus,
+#loginbox .main_input_box select:focus {
+  outline: none;
+}
+
+#loginbox .form-actions {
+  border-top: 1px solid #e2ecf8 !important;
+  background: #f8fbff;
+  padding: 14px 18px !important;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#loginbox .form-actions .pull-left,
+#loginbox .form-actions .pull-right {
+  float: none !important;
+}
+
+#loginbox .form-actions .pull-right {
+  margin-left: auto;
+}
+
+#loginbox .form-actions .btn {
+  border-radius: 10px;
+  min-height: 42px;
+  font-weight: 700;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+#loginbox .pull-left h6,
+#loginbox .pull-right h6,
+#loginbox .g h6 {
+  margin: 8px 0 0;
+  color: #334155;
+  font-weight: 700;
+}
+
+#loginbox .pull-left a:hover h6,
+#loginbox .pull-right a:hover h6,
+#loginbox .g a:hover h6 {
+  color: #14508f;
+}
+
+#loginbox .alert {
+  margin: 12px 16px 4px;
+  border-radius: 10px;
+}
+
+@media (min-width: 601px) and (max-width: 991px) {
+  body {
+    padding: 24px 16px !important;
+  }
+
+  #loginbox {
+    width: min(560px, calc(100vw - 34px)) !important;
+    border-radius: 22px;
+    box-shadow: 0 24px 58px rgba(15, 23, 42, 0.18);
+  }
+
+  #loginbox .normal_text {
+    padding: 24px 18px 18px;
+  }
+
+  #loginbox .normal_text h3 img {
+    width: 92px;
+    height: 92px;
+  }
+
+  #loginbox .normal_text h3 .login-title {
+    font-size: 22px;
+    margin-top: 10px;
+  }
+
+  #loginbox .main_input_box input,
+  #loginbox .main_input_box select {
+    min-height: 46px !important;
+    line-height: 46px !important;
+    font-size: 15px;
+  }
+
+  #loginbox .form-actions .btn {
+    min-height: 44px;
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 992px) {
+  body {
+    padding: 38px 18px !important;
+  }
+
+  #loginbox {
+    width: min(600px, calc(100vw - 44px)) !important;
+    border-radius: 24px;
+    box-shadow: 0 32px 70px rgba(15, 23, 42, 0.2);
+  }
+
+  #loginbox .normal_text {
+    padding: 26px 20px 18px;
+  }
+
+  #loginbox .normal_text h3 img {
+    width: 100px;
+    height: 100px;
+  }
+
+  #loginbox .normal_text h3 .login-title {
+    font-size: 24px;
+    margin-top: 12px;
+  }
+
+  #loginbox .controls {
+    padding: 0 22px !important;
+  }
+
+  #loginbox .form-actions {
+    padding: 16px 22px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  body {
+    align-items: center;
+    padding: 12px 8px !important;
+    min-height: 100vh;
+  }
+
+  #loginbox {
+    width: min(430px, calc(100vw - 16px)) !important;
+    max-width: calc(100vw - 16px) !important;
+    border-radius: 18px;
+    margin: 0 auto !important;
+    position: static !important;
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+    border: 1px solid #ccdcf3;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18);
+  }
+
+  #loginbox .normal_text {
+    padding: 16px 12px 12px;
+  }
+
+  #loginbox .normal_text h3 {
+    font-size: 24px;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+
+  #loginbox .normal_text h3 img {
+    width: 86px;
+    height: 86px;
+    max-width: 86px;
+    display: block;
+    margin: 0 auto;
+  }
+
+  #loginbox .normal_text h3 .login-title {
+    margin-top: 8px;
+    font-size: 18px;
+  }
+
+  #loginbox .controls {
+    padding: 0 12px !important;
+  }
+
+  #loginbox .control-group {
+    padding: 8px 0 !important;
+  }
+
+  #loginbox .main_input_box {
+    border-radius: 14px;
+    border-color: #bfd4f1;
+    background: #f7fbff;
+  }
+
+  #loginbox .main_input_box .add-on {
+    width: 44px !important;
+    min-width: 44px;
+    background: linear-gradient(180deg, #eff5ff 0%, #e8f0ff 100%);
+    color: #24548d !important;
+  }
+
+  #loginbox .form-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px !important;
+  }
+
+  #loginbox .form-actions .pull-left,
+  #loginbox .form-actions .pull-right {
+    float: none !important;
+    width: 100%;
+  }
+
+  #loginbox .form-actions .btn {
+    width: 100%;
+    min-height: 44px;
+    border-radius: 12px;
+    font-size: 15px;
+    letter-spacing: 0.01em;
+  }
+
+  #loginbox .main_input_box input,
+  #loginbox .main_input_box select {
+    font-size: 16px;
+  }
+
+  #loginbox > .pull-left,
+  #loginbox > .pull-right,
+  #loginbox > .g {
+    float: none !important;
+    width: 100% !important;
+    text-align: center;
+    padding: 0 12px 12px;
+  }
+
+  #loginbox .pull-left h6,
+  #loginbox .pull-right h6,
+  #loginbox .g h6 {
+    margin: 2px 0;
+    font-size: 12px;
+    color: #1f3e68;
+  }
+}

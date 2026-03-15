@@ -1,0 +1,17 @@
+# Secrets
+.env
+
+# Build/deploy artifacts
+gym-system-deploy.zip
+*.zip
+
+# Local tooling/cache
+.vscode/
+*.log
+
+# Composer local binaries/cache
+composer.phar
+vendor/
+
+# Database backups
+DATABASE FILE/backups/

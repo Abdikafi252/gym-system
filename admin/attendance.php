@@ -1,0 +1,541 @@
+<?php
+session_start();
+//the isset function to check username is already loged in and stored on the session
+if (!isset($_SESSION['user_id'])) {
+  header('location:../index.php');
+}
+include "dbcon.php";
+
+date_default_timezone_set('Africa/Nairobi');
+$todays_date = date('Y-m-d');
+$curr_time = date('h:i A');
+
+// Month/Year filter (default current month)
+$selected_year = isset($_GET['year']) ? (int)$_GET['year'] : (int)date('Y');
+$selected_month = isset($_GET['month']) ? (int)$_GET['month'] : (int)date('m');
+if ($selected_month < 1 || $selected_month > 12) {
+  $selected_month = (int)date('m');
+}
+if ($selected_year < 2000 || $selected_year > 2100) {
+  $selected_year = (int)date('Y');
+}
+$selected_month_padded = str_pad((string)$selected_month, 2, '0', STR_PAD_LEFT);
+$num_of_days = cal_days_in_month(CAL_GREGORIAN, $selected_month, $selected_year);
+$end_of_selected_month = "$selected_year-$selected_month_padded-$num_of_days";
+
+// Fetch all active members
+$members_qry = "SELECT user_id, fullname, contact, services, dor, paid_date, expiry_date FROM members WHERE status = 'Active' AND dor <= '$end_of_selected_month' ORDER BY fullname ASC";
+$members_res = mysqli_query($con, $members_qry);
+
+if (!$members_res) {
+  die("Error fetching members: " . mysqli_error($con));
+}
+
+// Pre-fetch all attendance records for active members to avoid query in loop
+$attendance_data = [];
+$att_qry = "SELECT a.user_id, a.curr_time, a.check_out, a.curr_date, m.dor 
+            FROM attendance a 
+            JOIN members m ON a.user_id = m.user_id 
+            WHERE m.status = 'Active' AND a.present = 1
+            AND MONTH(a.curr_date) = '$selected_month_padded' AND YEAR(a.curr_date) = '$selected_year'";
+$att_res = mysqli_query($con, $att_qry);
+
+if (!$att_res) {
+  die("Error fetching attendance: " . mysqli_error($con));
+}
+
+while ($att_row = mysqli_fetch_array($att_res)) {
+  $uid = $att_row['user_id'];
+  $att_date = $att_row['curr_date'];
+  $day_number = (int)date('d', strtotime($att_date));
+  $attendance_data[$uid][$day_number] = [
+    'check_in' => $att_row['curr_time'],
+    'check_out' => $att_row['check_out'],
+    'full_date' => $att_date
+  ];
+}
+
+// Build period map per member for selected month (latest payment period overlapping this month)
+$month_start = "$selected_year-$selected_month_padded-01";
+$period_map = [];
+$period_qry = "SELECT user_id, paid_date, expiry_date FROM payment_history
+               WHERE paid_date <= '$end_of_selected_month' AND expiry_date >= '$month_start'
+               ORDER BY user_id ASC, paid_date DESC";
+$period_res = mysqli_query($con, $period_qry);
+if ($period_res) {
+  while ($period_row = mysqli_fetch_assoc($period_res)) {
+    $uid = $period_row['user_id'];
+    if (!isset($period_map[$uid])) {
+      $period_map[$uid] = [
+        'start' => $period_row['paid_date'],
+        'end' => $period_row['expiry_date']
+      ];
+    }
+  }
+}
+
+$has_members = mysqli_num_rows($members_res) > 0;
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>M * A GYM System</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../css/bootstrap.min.css" />
+  <link rel="stylesheet" href="../css/bootstrap-responsive.min.css" />
+  <link rel="stylesheet" href="../css/matrix-style.css" />
+  <link rel="stylesheet" href="../css/matrix-media.css" />
+  <link href="../font-awesome/css/all.css" rel="stylesheet" />
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,800' rel='stylesheet' type='text/css'>
+
+  <style>
+    .report-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      padding: 25px;
+      margin-bottom: 30px;
+    }
+
+    .report-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .report-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #2d3748;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .report-filters {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .report-filters select {
+      padding: 8px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      background: #fff;
+      min-width: 130px;
+    }
+
+    .legend-container {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #4a5568;
+    }
+
+    .status-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+    }
+
+    .status-present {
+      background-color: #10b981;
+    }
+
+    .status-absent {
+      background-color: #ef4444;
+    }
+
+    .status-incomplete {
+      background-color: #f59e0b;
+    }
+
+    .attendance-table-wrapper {
+      overflow-x: auto;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+    }
+
+    .attendance-table {
+      width: 100%;
+      border-collapse: collapse;
+      white-space: nowrap;
+    }
+
+    .attendance-table th,
+    .attendance-table td {
+      padding: 12px 6px;
+      text-align: center;
+      border-bottom: 1px solid #edf2f7;
+      font-size: 13px;
+    }
+
+    .attendance-table th {
+      background-color: #6b46c1;
+      color: white;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 11px;
+    }
+
+    .col-name {
+      text-align: left;
+      min-width: 140px;
+      padding-left: 12px;
+      background-color: #fff !important;
+      position: sticky;
+      left: 0;
+      z-index: 10;
+      border-right: 2px solid #edf2f7;
+      box-shadow: 4px 0 8px -4px rgba(0, 0, 0, 0.1);
+    }
+
+    th.col-name {
+      background-color: #6b46c1 !important;
+      color: white;
+      border: none;
+      box-shadow: 4px 0 8px -4px rgba(0, 0, 0, 0.2);
+    }
+
+    .attendance-table tbody tr:hover {
+      background-color: #f7fafc;
+    }
+
+    .attendance-table tbody tr:hover .col-name {
+      background-color: #f7fafc;
+    }
+
+    .icon-cell {
+      display: flex;
+      justify-content: center;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.1s;
+      border-radius: 4px;
+    }
+
+    .icon-cell:active {
+      transform: scale(0.9);
+    }
+
+    .icon-cell.future-day {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    .cell-loading {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #6b46c1;
+    }
+
+    .tooltip-info {
+      visibility: hidden;
+      width: 130px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px 0;
+      position: absolute;
+      z-index: 100;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -65px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 11px;
+      pointer-events: none;
+    }
+
+    .icon-cell:hover .tooltip-info {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .page-tabs {
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .page-tab {
+      padding: 8px 20px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      color: #4a5568;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .page-tab.active {
+      background: #6b46c1;
+      color: #fff;
+      border-color: #6b46c1;
+    }
+
+    /* Highlight today's column */
+    .today-col {
+      background-color: #ebf4ff !important;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <?php include 'includes/header-content.php'; ?>
+  <?php include 'includes/topheader.php' ?>
+  <?php $page = "attendance";
+  include 'includes/sidebar.php' ?>
+
+  <div id="content">
+    <div id="content-header">
+      <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="fas fa-home"></i> Bogga Hore</a> <a href="attendance.php" class="current">Maamul Imaanshaha</a> </div>
+    </div>
+
+    <div class="container-fluid">
+      <div class="page-tabs" style="margin-top:20px;">
+        <a href="#" class="page-tab active">Imaanshaha Bilaha (Monthly Attendance)</a>
+      </div>
+
+      <div class="report-card">
+        <div class="report-header">
+          <h2 class="report-title"><i class="fas fa-calendar-check" style="color:#6b46c1;"></i> Jadwalka Imaanshaha (Tab Cell to Change)</h2>
+          <form method="GET" class="report-filters" id="filterForm">
+            <select name="month">
+              <?php
+              $monthsText = ["01" => "January", "02" => "February", "03" => "March", "04" => "April", "05" => "May", "06" => "June", "07" => "July", "08" => "August", "09" => "September", "10" => "October", "11" => "November", "12" => "December"];
+              foreach ($monthsText as $m_num => $m_name) {
+                $sel = ($m_num == $selected_month_padded) ? 'selected' : '';
+                echo "<option value='$m_num' $sel>$m_name</option>";
+              }
+              ?>
+            </select>
+            <select name="year">
+              <?php
+              $curr_y = date('Y');
+              for ($y = $curr_y - 2; $y <= $curr_y + 1; $y++) {
+                $sel = ($y == $selected_year) ? 'selected' : '';
+                echo "<option value='$y' $sel>$y</option>";
+              }
+              ?>
+            </select>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
+          </form>
+        </div>
+
+        <div class="legend-container">
+          <div class="legend-item">
+            <div class="status-icon status-present"><i class="fas fa-check"></i></div> Soo Galay (Present/Checked Out)
+          </div>
+          <div class="legend-item">
+            <div class="status-icon status-absent"><i class="fas fa-times"></i></div> Maqane (Absent)
+          </div>
+          <div class="legend-item">
+            <div class="status-icon status-incomplete"><i class="fas fa-clock"></i></div> Wuu Joogaa Hadda (Incomplete)
+          </div>
+        </div>
+
+        <div class="attendance-table-wrapper">
+          <table class="attendance-table">
+            <thead>
+              <tr>
+                <th class="col-name">MAGACA XUBINTA</th>
+                <?php for ($d = 1; $d <= $num_of_days; $d++): ?>
+                  <th><?php echo str_pad($d, 2, '0', STR_PAD_LEFT); ?></th>
+                <?php endfor; ?>
+                <th>TOTAL PRE.</th>
+                <th>TOTAL ABS.</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php
+              if (!$has_members):
+              ?>
+                <tr>
+                  <td colspan="<?php echo $num_of_days + 3; ?>" style="text-align:center; padding:20px;">Lama helin xubno firfircoon (No active members found)</td>
+                </tr>
+                <?php
+              else:
+                while ($member = mysqli_fetch_assoc($members_res)):
+                  $uid = $member['user_id'];
+                  $start_date = $member['dor']; // Date of Registration/Subscription start
+                  $period_start = isset($period_map[$uid]) ? $period_map[$uid]['start'] : (!empty($member['paid_date']) ? $member['paid_date'] : $member['dor']);
+                  $period_end = isset($period_map[$uid]) ? $period_map[$uid]['end'] : (!empty($member['expiry_date']) ? $member['expiry_date'] : $todays_date);
+                  $present_count = 0;
+                  $absent_count = 0;
+                ?>
+                  <tr>
+                    <td class="col-name">
+                      <strong><?php echo htmlspecialchars($member['fullname']); ?></strong><br>
+                      <span style="font-size:11px; color:#718096;">Diiwaangelin: <?php echo date('d M Y', strtotime($member['dor'])); ?></span><br>
+                      <?php if (!empty($period_start) && $period_start !== $member['dor']): ?>
+                        <span style="font-size:11px; color:#4c51bf;">Period Start (Renewal): <?php echo date('d M Y', strtotime($period_start)); ?></span>
+                      <?php else: ?>
+                        <span style="font-size:11px; color:#718096;">Period Start: <?php echo date('d M Y', strtotime($period_start)); ?></span>
+                      <?php endif; ?>
+                    </td>
+
+                    <?php for ($d = 1; $d <= $num_of_days; $d++):
+                      $cell_date = "$selected_year-$selected_month_padded-" . str_pad($d, 2, '0', STR_PAD_LEFT);
+                      $is_future = (strtotime($cell_date) > strtotime($todays_date));
+                      $is_before_member_start = (strtotime($cell_date) < strtotime($period_start));
+                      $is_after_period_end = (!empty($period_end) && strtotime($cell_date) > strtotime($period_end));
+                      $is_today = ($cell_date == $todays_date);
+                    ?>
+                      <td class="<?php echo $is_today ? 'today-col' : ''; ?>">
+                        <div class="icon-cell <?php echo ($is_future || $is_before_member_start || $is_after_period_end) ? 'future-day' : 'toggle-attendance'; ?>"
+                          data-uid="<?php echo $uid; ?>"
+                          data-date="<?php echo $cell_date; ?>">
+
+                          <?php
+                          if ($is_future || $is_before_member_start || $is_after_period_end) {
+                            echo "<div style='width:24px; height:24px;'></div>";
+                            if ($is_future) {
+                              echo "<span class='tooltip-info'>{$cell_date} (Future)</span>";
+                            }
+                          } else {
+                            if (isset($attendance_data[$uid][$d])) {
+                              $data = $attendance_data[$uid][$d];
+                              $is_incomplete = empty($data['check_out']) || strpos($data['check_out'], '0000') !== false;
+
+                              // Present but hasn't checked out
+                              if ($is_incomplete) {
+                                echo '<div class="status-icon status-incomplete"><i class="fas fa-clock"></i></div>';
+                                echo "<span class='tooltip-info'>Date: {$cell_date}<br>In: {$data['check_in']}</span>";
+                              } else {
+                                echo '<div class="status-icon status-present"><i class="fas fa-check"></i></div>';
+                                $out_time = $data['check_out'] ? date('h:i A', strtotime($data['check_out'])) : 'No Checkout';
+                                echo "<span class='tooltip-info'>Date: {$cell_date}<br>In: {$data['check_in']}<br>Out: {$out_time}</span>";
+                              }
+                              $present_count++;
+                            } else {
+                              echo '<div class="status-icon status-absent"><i class="fas fa-times"></i></div>';
+                              echo "<span class='tooltip-info'>Date: {$cell_date}<br>Absent</span>";
+                              $absent_count++;
+                            }
+                          }
+                          ?>
+                        </div>
+                      </td>
+                    <?php endfor; ?>
+
+                    <td><strong style="color:#10b981;" class="total-pre"><?php echo $present_count; ?></strong></td>
+                    <td><strong style="color:#ef4444;" class="total-abs"><?php echo $absent_count; ?></strong></td>
+                  </tr>
+              <?php endwhile;
+              endif; ?>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="row-fluid">
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi </div>
+  </div>
+
+  <style>
+    #footer {
+      color: white;
+      text-align: center;
+      padding: 10px;
+    }
+  </style>
+
+  <script src="../js/jquery.min.js"></script>
+  <script src="../js/bootstrap.min.js"></script>
+  <script src="../js/matrix.js"></script>
+
+  <script>
+    $(document).ready(function() {
+      $('.toggle-attendance').click(function() {
+        var cell = $(this);
+        if (cell.hasClass('future-day')) {
+          alert("Ma taaban kartid maalin aan wali la gaarin! (Cannot mark future days)");
+          return;
+        }
+
+        var uid = cell.data('uid');
+        var date = cell.data('date');
+
+        // Find current counts inside this row
+        var tr = cell.closest('tr');
+        var preCell = tr.find('.total-pre');
+        var absCell = tr.find('.total-abs');
+        var curPre = parseInt(preCell.text());
+        var curAbs = parseInt(absCell.text());
+
+        // Loading state
+        var originalHtml = cell.html();
+        cell.html('<div class="cell-loading"><i class="fas fa-spinner fa-spin"></i></div>');
+        cell.css('pointer-events', 'none'); // prevent double click
+
+        $.ajax({
+          url: 'actions/toggle-attendance.php',
+          type: 'GET',
+          data: {
+            id: uid,
+            date: date
+          },
+          dataType: 'json',
+          success: function(response) {
+            if (response.status === 'success') {
+              if (response.state === 'incomplete') {
+                cell.html('<div class="status-icon status-incomplete"><i class="fas fa-clock"></i></div><span class="tooltip-info">Date: ' + date + '<br>In: ' + response.check_in + '</span>');
+                // Absent -> Present (Incomplete)
+                preCell.text(curPre + 1);
+                absCell.text(Math.max(0, curAbs - 1));
+              } else if (response.state === 'complete') {
+                cell.html('<div class="status-icon status-present"><i class="fas fa-check"></i></div><span class="tooltip-info">Date: ' + date + '<br>In: ' + response.check_in + '<br>Out: ' + response.check_out + '</span>');
+                // Incomplete -> Complete (counts stay same)
+              } else if (response.state === 'absent') {
+                cell.html('<div class="status-icon status-absent"><i class="fas fa-times"></i></div><span class="tooltip-info">Date: ' + date + '<br>Absent</span>');
+                // Complete -> Absent 
+                preCell.text(Math.max(0, curPre - 1));
+                absCell.text(curAbs + 1);
+              }
+            } else {
+              alert(response.message || "Error updating attendance");
+              cell.html(originalHtml);
+            }
+          },
+          error: function() {
+            alert("Network Error");
+            cell.html(originalHtml);
+          },
+          complete: function() {
+            cell.css('pointer-events', 'auto'); // Re-enable click
+          }
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,411 @@
+/* Desktop-only polish for login pages without changing mobile behavior */
+@media (min-width: 992px) {
+  body {
+    margin-top: 0 !important;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      radial-gradient(900px 420px at -10% -10%, rgba(34, 197, 94, 0.2), transparent 60%),
+      radial-gradient(840px 380px at 110% 10%, rgba(14, 165, 233, 0.24), transparent 58%),
+      linear-gradient(155deg, #0f172a 0%, #1e293b 42%, #0b1220 100%) !important;
+  }
+
+  #loginbox {
+    width: 540px !important;
+    max-width: calc(100vw - 48px);
+    margin: 0 auto !important;
+    border-radius: 22px;
+    overflow: hidden !important;
+    box-shadow: 0 28px 72px rgba(2, 6, 23, 0.55);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(8px);
+    position: relative;
+  }
+
+  #loginbox::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 35%);
+  }
+
+  #loginbox .normal_text {
+    padding: 22px 14px 18px;
+    background: linear-gradient(135deg, #0f766e 0%, #0e7490 52%, #1d4ed8 100%) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  #loginbox .normal_text h3 img {
+    width: 104px;
+    height: 104px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 12px 28px rgba(2, 6, 23, 0.35);
+  }
+
+  #loginbox form {
+    background: transparent !important;
+  }
+
+  #loginbox .main_input_box {
+    display: flex;
+    align-items: center;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f8fafc;
+    border: 1px solid #cfdced;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  #loginbox .main_input_box:focus-within {
+    border-color: #0284c7;
+    box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.18);
+    transform: translateY(-1px);
+  }
+
+  #loginbox .main_input_box input,
+  #loginbox .main_input_box select {
+    height: 44px !important;
+    line-height: 44px !important;
+    font-size: 15px;
+    color: #0f172a;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 14px !important;
+  }
+
+  #loginbox .main_input_box .add-on {
+    width: 48px !important;
+    min-width: 48px;
+    height: 44px;
+    line-height: 44px;
+    padding: 0 !important;
+    margin: 0 !important;
+    text-align: center;
+    background: linear-gradient(180deg, #e2ecf9 0%, #d5e4f6 100%);
+    color: #1d4ed8 !important;
+    border-right: 1px solid #c9d7ea;
+  }
+
+  #loginbox .main_input_box .add-on i {
+    font-size: 16px;
+    line-height: 44px;
+    vertical-align: middle;
+  }
+
+  #loginbox .form-actions {
+    padding: 16px 20px 18px !important;
+    border-top: 1px solid rgba(148, 163, 184, 0.2) !important;
+    background: rgba(248, 250, 252, 0.92) !important;
+  }
+
+  #loginbox .form-actions .pull-right,
+  #loginbox .form-actions .pull-left {
+    float: none !important;
+    width: 100%;
+    display: block;
+  }
+
+  #loginbox .form-actions.customer-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  #loginbox .form-actions.customer-actions .pull-left,
+  #loginbox .form-actions.customer-actions .pull-right {
+    width: auto;
+    display: inline-flex;
+  }
+
+  #loginbox .form-actions.customer-actions .btn {
+    width: auto;
+    min-width: 170px;
+  }
+
+  #loginbox .btn {
+    border-radius: 12px;
+    font-weight: 700;
+    min-height: 42px;
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    box-shadow: 0 8px 16px rgba(15, 23, 42, 0.14);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  #loginbox .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.18);
+  }
+
+  #loginbox .btn-success,
+  #loginbox .btn-warning {
+    background: linear-gradient(135deg, #0f766e 0%, #0e7490 100%);
+    color: #ffffff;
+  }
+
+  #loginbox .btn-info {
+    background: linear-gradient(135deg, #475569 0%, #334155 100%);
+    color: #ffffff;
+  }
+
+  #loginbox .g h6 {
+    color: #e2e8f0;
+    font-weight: 700;
+  }
+
+  #loginbox .g a:hover h6 {
+    color: #a5f3fc;
+  }
+}
+
+@media (min-width: 601px) and (max-width: 991px) {
+  body {
+    margin-top: 0 !important;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 16px !important;
+    background:
+      radial-gradient(680px 300px at -5% -8%, rgba(34, 197, 94, 0.16), transparent 60%),
+      radial-gradient(700px 320px at 105% 10%, rgba(14, 165, 233, 0.2), transparent 58%),
+      linear-gradient(155deg, #0f172a 0%, #1e293b 42%, #0b1220 100%) !important;
+  }
+
+  #loginbox {
+    width: min(560px, calc(100vw - 32px)) !important;
+    margin: 0 auto !important;
+    transform: translateY(-14px);
+    border-radius: 18px;
+    overflow: hidden !important;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    box-shadow: 0 20px 48px rgba(2, 6, 23, 0.42);
+    background: rgba(15, 23, 42, 0.52);
+  }
+
+  #loginbox .normal_text {
+    background: linear-gradient(135deg, #0f766e 0%, #0e7490 52%, #1d4ed8 100%) !important;
+    padding: 18px 12px 14px;
+  }
+
+  #loginbox .normal_text h3 img {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.9);
+    object-fit: cover;
+  }
+
+  #loginbox .controls {
+    padding: 0 14px !important;
+  }
+
+  #loginbox .control-group {
+    padding: 9px 0 !important;
+  }
+
+  #loginbox .main_input_box {
+    display: flex;
+    align-items: center;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f8fafc;
+    border: 1px solid #cfdced;
+  }
+
+  #loginbox .main_input_box .add-on {
+    width: 46px !important;
+    min-width: 46px;
+    height: 42px;
+    line-height: 42px;
+    padding: 0 !important;
+    margin: 0 !important;
+    text-align: center;
+    color: #1d4ed8 !important;
+    background: linear-gradient(180deg, #e2ecf9 0%, #d5e4f6 100%);
+    border-right: 1px solid #c9d7ea;
+  }
+
+  #loginbox .main_input_box .add-on i {
+    line-height: 42px;
+  }
+
+  #loginbox .main_input_box input,
+  #loginbox .main_input_box select {
+    height: 42px !important;
+    line-height: 42px !important;
+    border: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    padding: 0 12px !important;
+    font-size: 14px;
+  }
+
+  #loginbox .form-actions {
+    padding: 14px !important;
+    border-top: 1px solid rgba(148, 163, 184, 0.2) !important;
+    background: rgba(248, 250, 252, 0.92) !important;
+  }
+
+  #loginbox .btn {
+    border-radius: 10px;
+    min-height: 40px;
+    font-weight: 700;
+  }
+
+  #loginbox .form-actions.customer-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  #loginbox .form-actions.customer-actions .pull-left,
+  #loginbox .form-actions.customer-actions .pull-right {
+    float: none !important;
+    width: 100%;
+    display: block;
+  }
+
+  #loginbox .form-actions.customer-actions .btn {
+    width: 100%;
+    display: block;
+  }
+}
+
+@media (max-width: 600px) {
+  body {
+    margin-top: 0 !important;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px !important;
+    background:
+      radial-gradient(540px 260px at -8% -8%, rgba(34, 197, 94, 0.14), transparent 60%),
+      radial-gradient(560px 280px at 108% 10%, rgba(14, 165, 233, 0.18), transparent 58%),
+      linear-gradient(155deg, #0f172a 0%, #1e293b 42%, #0b1220 100%) !important;
+  }
+
+  #loginbox {
+    width: min(420px, calc(100vw - 16px)) !important;
+    margin: 0 auto !important;
+    transform: translateY(-44px);
+    border-radius: 16px;
+    overflow: hidden !important;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    box-shadow: 0 16px 36px rgba(2, 6, 23, 0.4);
+    background: rgba(15, 23, 42, 0.55);
+  }
+
+  #loginbox .normal_text {
+    background: linear-gradient(135deg, #0f766e 0%, #0e7490 52%, #1d4ed8 100%) !important;
+    padding: 14px 10px 10px;
+  }
+
+  #loginbox .normal_text h3 img {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.9);
+    object-fit: cover;
+  }
+
+  #loginbox .controls {
+    padding: 0 10px !important;
+  }
+
+  #loginbox .control-group {
+    padding: 7px 0 !important;
+  }
+
+  #loginbox .main_input_box {
+    display: flex;
+    align-items: center;
+    border-radius: 11px;
+    overflow: hidden;
+    background: #f8fafc;
+    border: 1px solid #cfdced;
+  }
+
+  #loginbox .main_input_box .add-on {
+    width: 42px !important;
+    min-width: 42px;
+    height: 40px;
+    line-height: 40px;
+    padding: 0 !important;
+    margin: 0 !important;
+    text-align: center;
+    color: #1d4ed8 !important;
+    background: linear-gradient(180deg, #e2ecf9 0%, #d5e4f6 100%);
+    border-right: 1px solid #c9d7ea;
+  }
+
+  #loginbox .main_input_box .add-on i {
+    line-height: 40px;
+  }
+
+  #loginbox .main_input_box input,
+  #loginbox .main_input_box select {
+    height: 40px !important;
+    line-height: 40px !important;
+    border: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    padding: 0 10px !important;
+    font-size: 14px;
+  }
+
+  #loginbox .form-actions {
+    padding: 10px !important;
+    border-top: 1px solid rgba(148, 163, 184, 0.2) !important;
+    background: rgba(248, 250, 252, 0.92) !important;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  #loginbox .form-actions .pull-left,
+  #loginbox .form-actions .pull-right {
+    float: none !important;
+    width: 100%;
+    display: block;
+  }
+
+  #loginbox .form-actions .btn {
+    width: 100%;
+    display: block;
+    border-radius: 10px;
+    min-height: 40px;
+    font-weight: 700;
+  }
+
+  #loginbox .g {
+    padding: 6px 10px 10px;
+  }
+
+  #loginbox .g h6 {
+    margin: 0;
+    color: #e2e8f0;
+  }
+}
+
+@media (max-width: 380px) {
+  #loginbox {
+    transform: translateY(-28px);
+  }
+}
