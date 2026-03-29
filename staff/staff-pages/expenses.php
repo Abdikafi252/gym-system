@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -52,89 +52,25 @@ if (!isset($_SESSION['user_id'])) {
                 <div class="span12">
 
                     <div class='widget-box'>
+                        <?php if ($_SESSION['designation'] == 'Cashier'): ?>
+                        <div class='widget-title'> <span class='icon'> <i class='fas fa-th'></i> </span>
+                            <h5>Add New Expense</h5>
+                        </div>
+                        <div class='widget-content nopadding text-center' style='padding: 24px;'>
+                            <div class='alert alert-info'>
+                                <i class='fas fa-info-circle'></i> <strong>View Only:</strong> Cashier role cannot add new expenses.
+                            </div>
+                        </div>
+                        <?php else: ?>
                         <div class='widget-title'> <span class='icon'> <i class='fas fa-th'></i> </span>
                             <h5>Add New Expense</h5>
                         </div>
                         <div class='widget-content nopadding'>
                             <form action='expenses.php' method='POST' class='form-horizontal'>
-                                <div class='control-group'>
-                                    <label class='control-label'>Expense Name :</label>
-                                    <div class='controls'>
-                                        <select name="name" class="span11" required>
-                                            <option value="" disabled selected>Select Expense</option>
-                                            <optgroup label="Bills">
-                                                <option value="Electricity Bill">Electricity Bill</option>
-                                                <option value="Water Bill">Water Bill</option>
-                                                <option value="Internet Bill">Internet Bill</option>
-                                                <option value="Rent Payment">Rent Payment</option>
-                                                <option value="Generator Fuel">Generator Fuel</option>
-                                                <option value="Waste Collection Fee">Waste Collection Fee</option>
-                                            </optgroup>
-                                            <optgroup label="Salaries">
-                                                <option value="Gym Trainer Salary">Gym Trainer Salary</option>
-                                                <option value="Receptionist Salary">Receptionist Salary</option>
-                                                <option value="Cleaner Salary">Cleaner Salary</option>
-                                                <option value="Security Guard Salary">Security Guard Salary</option>
-                                                <option value="Manager Salary">Manager Salary</option>
-                                            </optgroup>
-                                            <optgroup label="Maintenance">
-                                                <option value="Equipment Maintenance">Equipment Maintenance</option>
-                                                <option value="Air Conditioner Repair">Air Conditioner Repair</option>
-                                                <option value="Plumbing Repair">Plumbing Repair</option>
-                                                <option value="Painting & Renovation">Painting & Renovation</option>
-                                            </optgroup>
-                                            <optgroup label="Equipment">
-                                                <option value="Dumbbells Purchase">Dumbbells Purchase</option>
-                                            </optgroup>
-                                            <optgroup label="Marketing">
-                                                <option value="Facebook Ads">Facebook Ads</option>
-                                                <option value="Banner Printing">Banner Printing</option>
-                                                <option value="Promotional T-Shirts">Promotional T-Shirts</option>
-                                                <option value="Social Media Promotion">Social Media Promotion</option>
-                                            </optgroup>
-                                            <optgroup label="Administration">
-                                                <option value="Software Subscription">Software Subscription</option>
-                                                <option value="License Renewal">License Renewal</option>
-                                                <option value="Printing Costs">Printing Costs</option>
-                                                <option value="Bank Charges">Bank Charges</option>
-                                            </optgroup>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class='control-group'>
-                                    <label class='control-label'>Category :</label>
-                                    <div class='controls'>
-                                        <select name="category" class="span11" required>
-                                            <option value="" disabled selected>Select Category</option>
-                                            <option value="Bills">Bills</option>
-                                            <option value="Salaries">Salaries</option>
-                                            <option value="Maintenance">Maintenance</option>
-                                            <option value="Equipment">Equipment</option>
-                                            <option value="Marketing">Marketing</option>
-                                            <option value="Administration">Administration</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class='control-group'>
-                                    <label class='control-label'>Amount :</label>
-                                    <div class='controls'>
-                                        <div class='input-append'>
-                                            <span class='add-on'>$</span>
-                                            <input type='number' placeholder='100' name='amount' class='span11' required>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class='control-group'>
-                                    <label class='control-label'>Date :</label>
-                                    <div class='controls'>
-                                        <input type='date' class='span11' name='date' value="<?php echo date('Y-m-d'); ?>" required />
-                                    </div>
-                                </div>
-                                <div class='form-actions text-center'>
-                                    <button type='submit' name='submit' class='btn btn-success'>Add Expense</button>
-                                </div>
+                                ...existing code...
                             </form>
                         </div>
+                        <?php endif; ?>
                         <?php
                         if (isset($_POST['submit'])) {
                             include 'dbcon.php';
@@ -198,7 +134,11 @@ if (!isset($_SESSION['user_id'])) {
                                         echo "<td><span class='label label-info'>" . $row['category'] . "</span></td>";
                                         echo "<td>" . $row['date'] . "</td>";
                                         echo "<td>$" . $row['amount'] . "</td>";
-                                        echo "<td><div class='text-center'><a href='remove-expense.php?id=" . $row['id'] . "' style='color:#F66;' onclick='return confirm(\"Are you sure?\")'><i class='fas fa-trash'></i> Remove</a></div></td>";
+                                        if ($_SESSION['designation'] == 'Cashier') {
+                                            echo "<td><div class='text-center'><span class='text-muted'>View Only</span></div></td>";
+                                        } else {
+                                            echo "<td><div class='text-center'><a href='remove-expense.php?id=" . $row['id'] . "' style='color:#F66;' onclick='return confirm(\"Are you sure?\")'><i class='fas fa-trash'></i> Remove</a></div></td>";
+                                        }
                                         echo "</tr>";
                                         $cnt++;
                                     }
@@ -215,7 +155,7 @@ if (!isset($_SESSION['user_id'])) {
 
     <!--Footer-part-->
     <div class="row-fluid">
-        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</div>
+        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</div>
     </div>
 
     <style>

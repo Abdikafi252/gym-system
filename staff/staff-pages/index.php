@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -16,7 +16,7 @@ $result3 = mysqli_query($con, "SELECT gender, count(*) as enumber FROM members W
 $qry = "SELECT designation, count(*) as snumber FROM staffs WHERE branch_id = '$branch_id' GROUP BY designation";
 $result5 = mysqli_query($con, $qry);
 
-$ann_count_row = mysqli_fetch_assoc(mysqli_query($con, "SELECT COUNT(*) AS c FROM announcements"));
+$ann_count_row = mysqli_fetch_assoc(mysqli_query($con, "SELECT COUNT(*) AS c FROM announcements WHERE branch_id='$branch_id'"));
 $todo_count_row = mysqli_fetch_assoc(mysqli_query($con, "SELECT COUNT(*) AS c FROM todo t LEFT JOIN members m ON m.user_id=t.user_id WHERE m.branch_id='$branch_id' AND t.task_status='Pending'"));
 $ann_total = (int)($ann_count_row['c'] ?? 0);
 $todo_pending_total = (int)($todo_count_row['c'] ?? 0);
@@ -30,7 +30,7 @@ include '../../api/auto_sms_expiry.php';
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../../css/bootstrap.min.css" />
@@ -315,7 +315,7 @@ include '../../api/auto_sms_expiry.php';
   <div id="content">
     <!--breadcrumbs-->
     <div id="content-header">
-      <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="fas fa-home"></i> Bogga Hore</a></div>
+      <div id="breadcrumb"> <a href="index.php" title="Go to Home Page" class="tip-bottom"><i class="fas fa-home"></i> Home</a></div>
     </div>
     <!--End-breadcrumbs-->
 
@@ -347,7 +347,7 @@ include '../../api/auto_sms_expiry.php';
         <div class="row-fluid">
           <div class="widget-box">
             <div class="widget-title bg_lg"><span class="icon"><i class="fas fa-file"></i></span>
-              <h5>Warbixinta Dakhliga iyo Kharashyada</h5>
+              <h5>Income and Expenses Report</h5>
             </div>
             <div class="widget-content">
               <div class="row-fluid">
@@ -369,7 +369,7 @@ include '../../api/auto_sms_expiry.php';
           <div class="span6">
             <div class="widget-box">
               <div class="widget-title bg_ly" data-toggle="collapse" href="#collapseGender"><span class="icon"><i class="fas fa-chevron-down"></i></span>
-                <h5>Xubnaha Diiwaangashan marka loo eego Jinsiga</h5>
+                <h5>Registered Members by Gender</h5>
               </div>
               <div class="widget-content nopadding collapse in" id="collapseGender">
                 <ul class="recent-posts">
@@ -382,7 +382,7 @@ include '../../api/auto_sms_expiry.php';
           <div class="span6">
             <div class="widget-box">
               <div class="widget-title bg_ly" data-toggle="collapse" href="#collapseStaff"><span class="icon"><i class="fas fa-chevron-down"></i></span>
-                <h5>Shaqaalaha marka loo eego Xilka</h5>
+                <h5>Staff by Designation</h5>
               </div>
               <div class="widget-content nopadding collapse in" id="collapseStaff">
                 <ul class="recent-posts">
@@ -400,8 +400,8 @@ include '../../api/auto_sms_expiry.php';
                 <h5>Dashboard Overview</h5>
               </div>
               <div class="widget-content" style="text-align: center; padding: 40px;">
-                <h3>Ku soo dhawoow Dashboard-ka!</h3>
-                <p>Fadlan isticmaal menu-ga bidix si aad u bilowdo shaqadaada.</p>
+                <h3>Welcome to the Dashboard!</h3>
+                <p>Please use the left menu to start your work.</p>
               </div>
             </div>
           </div>
@@ -414,27 +414,28 @@ include '../../api/auto_sms_expiry.php';
         <div class="span6">
           <div class="widget-box">
             <div class="widget-title bg_ly" data-toggle="collapse" href="#collapseG2"><span class="icon"><i class="icon-chevron-down"></i></span>
-              <h5>Ogeysiisyada Gym-ka</h5>
+              <h5>Gym Announcements</h5>
             </div>
             <div class="widget-content nopadding collapse in" id="collapseG2">
               <ul class="recent-posts">
                 <li>
                   <?php
-                  $qry = "SELECT * FROM announcements ORDER BY id DESC LIMIT 5";
+                  $branch_id = $_SESSION['branch_id'];
+                  $qry = "SELECT * FROM announcements WHERE branch_id='$branch_id' ORDER BY id DESC LIMIT 5";
                   $result = mysqli_query($con, $qry);
                   if ($result && mysqli_num_rows($result) > 0) {
                     while ($row = mysqli_fetch_array($result)) {
                       echo "<div class='dash-card'>";
-                      echo "<span class='user-info'>W/Q: Admin / Taariikhda: " . htmlspecialchars($row['date']) . "</span>";
+                      echo "<span class='user-info'>By: Admin / Date: " . htmlspecialchars($row['date']) . "</span>";
                       echo "<p style='margin:6px 0 0;'><a href='#'>" . htmlspecialchars($row['message']) . "</a></p>";
                       echo "</div>";
                     }
                   } else {
-                    echo "<div class='empty-mini'>Ogeysiis lama helin.</div>";
+                    echo "<div class='empty-mini'>No announcements found.</div>";
                   }
                   ?>
                   <span class="dash-pill">Total Announcements: <?php echo $ann_total; ?></span><br>
-                  <a href="announcement.php"><button class="btn btn-warning btn-mini">Eeg Dhammaan</button></a>
+                  <a href="announcement.php"><button class="btn btn-warning btn-mini">View All</button></a>
                 </li>
               </ul>
             </div>
@@ -446,7 +447,7 @@ include '../../api/auto_sms_expiry.php';
           <div class="span6">
             <div class="widget-box">
               <div class="widget-title"> <span class="icon"><i class="fas fa-history"></i></span>
-                <h5>Dhaqdhaqaaqyada U Dambeeyay</h5>
+                <h5>Recent Activities</h5>
               </div>
               <div class="widget-content nopadding">
                 <ul class="recent-posts">
@@ -454,25 +455,25 @@ include '../../api/auto_sms_expiry.php';
                   // Recent Registrations and Payments combined
                   $branch_id = $_SESSION['branch_id'];
                   $query_activity = "
-                  (SELECT fullname as member_name, dor as activity_date, 'Xubin Cusub' as activity_type FROM members WHERE branch_id = '$branch_id')
+                  (SELECT fullname as member_name, dor as activity_date, 'New Member' as activity_type FROM members WHERE branch_id = '$branch_id')
                   UNION ALL
-                  (SELECT fullname as member_name, paid_date as activity_date, 'Lacag-bixin' as activity_type FROM payment_history WHERE branch_id = '$branch_id' AND paid_date IS NOT NULL)
+                  (SELECT fullname as member_name, paid_date as activity_date, 'Payment' as activity_type FROM payment_history WHERE branch_id = '$branch_id' AND paid_date IS NOT NULL)
                   UNION ALL
-                  (SELECT m.fullname as member_name, a.curr_date as activity_date, 'Imaansho' as activity_type FROM attendance a JOIN members m ON m.user_id=a.user_id WHERE m.branch_id='$branch_id')
+                  (SELECT m.fullname as member_name, a.curr_date as activity_date, 'Attendance' as activity_type FROM attendance a JOIN members m ON m.user_id=a.user_id WHERE m.branch_id='$branch_id')
                   ORDER BY activity_date DESC LIMIT 6";
                   $res_activity = mysqli_query($con, $query_activity);
                   if ($res_activity && mysqli_num_rows($res_activity) > 0) {
                   while ($activity = mysqli_fetch_array($res_activity)) { ?>
                     <li>
-                      <div class="user-thumb"> <i class="fas <?php echo ($activity['activity_type'] == 'Xubin Cusub') ? 'fa-user-plus' : (($activity['activity_type'] == 'Imaansho') ? 'fa-calendar-check' : 'fa-money-bill-wave'); ?>" style="font-size: 1.5em; color: <?php echo ($activity['activity_type'] == 'Xubin Cusub') ? '#28b779' : (($activity['activity_type'] == 'Imaansho') ? '#7c3aed' : '#0284c7'); ?>; margin-top: 10px;"></i> </div>
+                      <div class="user-thumb"> <i class="fas <?php echo ($activity['activity_type'] == 'New Member') ? 'fa-user-plus' : (($activity['activity_type'] == 'Attendance') ? 'fa-calendar-check' : 'fa-money-bill-wave'); ?>" style="font-size: 1.5em; color: <?php echo ($activity['activity_type'] == 'New Member') ? '#28b779' : (($activity['activity_type'] == 'Attendance') ? '#7c3aed' : '#0284c7'); ?>; margin-top: 10px;"></i> </div>
                       <div class="article-post">
-                        <span class="user-info"> <?php echo $activity['activity_type']; ?> / Taariikhda: <?php echo $activity['activity_date']; ?> </span>
-                        <p><strong><?php echo $activity['member_name']; ?></strong> ayaa sameeyay <?php echo strtolower($activity['activity_type']); ?>. </p>
+                        <span class="user-info"> <?php echo $activity['activity_type']; ?> / Date: <?php echo $activity['activity_date']; ?> </span>
+                        <p><strong><?php echo $activity['member_name']; ?></strong> has performed <?php echo strtolower($activity['activity_type']); ?>. </p>
                       </div>
                     </li>
                   <?php }
                   } else {
-                    echo "<li><div class='empty-mini'>Dhaqdhaqaaq dhaw lama helin.</div></li>";
+                    echo "<li><div class='empty-mini'>No recent activities found.</div></li>";
                   }
                   ?>
                 </ul>
@@ -483,7 +484,7 @@ include '../../api/auto_sms_expiry.php';
           <div class="span6">
             <div class="widget-box">
               <div class="widget-title"> <span class="icon"><i class="fas fa-tasks"></i></span>
-                <h5>Liiska Shaqooyinka Macamiisha</h5>
+                <h5>Customer To-Do List</h5>
               </div>
               <div class="widget-content">
                 <div class="todo">
@@ -496,16 +497,16 @@ include '../../api/auto_sms_expiry.php';
                     while ($row = mysqli_fetch_array($result)) { ?>
                       <li class='clearfix'>
                         <div class='txt'> <?php echo htmlspecialchars($row["task_desc"]) ?> <?php if ($row["task_status"] == "Pending") {
-                                                                            echo '<span class="by label label-info">Sugaya</span>';
+                                                                            echo '<span class="by label label-info">Pending</span>';
                                                                           } else {
-                                                                            echo '<span class="by label label-success">Waa Socda</span>';
+                                                                            echo '<span class="by label label-success">In Progress</span>';
                                                                           } ?>
-                          <?php if (!empty($row['fullname'])) { ?><small style="display:block;color:#6b7280;">Xubin: <?php echo htmlspecialchars($row['fullname']); ?></small><?php } ?>
+                          <?php if (!empty($row['fullname'])) { ?><small style="display:block;color:#6b7280;">Member: <?php echo htmlspecialchars($row['fullname']); ?></small><?php } ?>
                         </div>
                       </li>
                     <?php }
                     } else {
-                      echo "<li><div class='empty-mini'>Shaqooyin lama helin.</div></li>";
+                      echo "<li><div class='empty-mini'>No tasks found.</div></li>";
                     }
                     ?>
                   </ul>
@@ -523,7 +524,7 @@ include '../../api/auto_sms_expiry.php';
   <!--Footer-part-->
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi </div>
   </div>
 
   <style>

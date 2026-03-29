@@ -43,13 +43,10 @@
           <li class="<?php if ($page == 'members') {
                         echo 'active';
                       } ?>"><a href="members.php"><i class="fas fa-arrow-right"></i> List Members</a></li>
-          <?php if (in_array($_SESSION['designation'], ['Manager', 'Cashier'])): ?>
+          <?php if ($_SESSION['designation'] == 'Cashier'): ?>
             <li class="<?php if ($page == 'member-entry') {
                           echo 'active';
                         } ?>"><a href="member-entry.php"><i class="fas fa-arrow-right"></i> Member Entry Form</a></li>
-            <li class="<?php if ($page == 'pending-members') {
-                          echo 'active';
-                        } ?>"><a href="pending-members.php"><i class="fas fa-arrow-right"></i> Pending Members</a></li>
           <?php endif; ?>
         </ul>
       </li>
@@ -91,7 +88,7 @@
                       } ?>"><a href="attendance.php"><i class="fas fa-arrow-right"></i> Check In/Out</a></li>
           <li class="<?php if ($page == 'view-attendance') {
                         echo 'active';
-                      } ?>"><a href="view-attendance.php"><i class="fas fa-arrow-right"></i> View</a></li>
+                      } ?>"><a href="view-attendance.php"><i class="fas fa-arrow-right"></i> View History</a></li>
         </ul>
       </li>
     <?php endif; ?>
@@ -112,6 +109,38 @@
       <li class="<?php if ($page == 'payment') {
                     echo 'active';
                   } ?>"><a href="payment.php"><i class="fas fa-hand-holding-usd"></i> <span>Payments</span></a></li>
+    <?php endif; ?>
+
+    <?php if ($_SESSION['designation'] == 'Manager'): ?>
+      <li class="<?php if (in_array($page, ['payment', 'expenses', 'accounting', 'liabilities'])) {
+                    echo 'submenu active';
+                  } else {
+                    echo 'submenu';
+                  } ?>">
+        <a href="#"><i class="fas fa-calculator"></i> <span>Finance</span></a>
+        <ul>
+          <li class="<?php if ($page == 'payment') {
+                        echo 'active';
+                      } ?>"><a href="payment.php"><i class="fas fa-arrow-right"></i> Payments</a></li>
+          <li class="<?php if ($page == 'expenses') {
+                        echo 'active';
+                      } ?>"><a href="expenses.php"><i class="fas fa-arrow-right"></i> Expenses</a></li>
+          <li><a href="../../admin/accounting-owner-capital.php"><i class="fas fa-arrow-right"></i> Owner Capital</a></li>
+          <li><a href="../../admin/accounting-cycle.php"><i class="fas fa-arrow-right"></i> Accounting Cycle</a></li>
+          <li><a href="../../admin/accounting-sync.php"><i class="fas fa-arrow-right"></i> Historical Sync</a></li>
+          <li><a href="../../admin/accounting-transactions.php"><i class="fas fa-arrow-right"></i> Analyze Transactions</a></li>
+          <li><a href="../../admin/accounting-journal.php"><i class="fas fa-arrow-right"></i> Journal</a></li>
+          <li><a href="../../admin/accounting-ledger.php"><i class="fas fa-arrow-right"></i> Ledger</a></li>
+          <li><a href="../../admin/accounting-trial-balance.php"><i class="fas fa-arrow-right"></i> Trial Balance</a></li>
+          <li><a href="../../admin/accounting-statements.php"><i class="fas fa-file-invoice-dollar"></i> Statements</a></li>
+          <li><a href="../../admin/accounting-history.php"><i class="fas fa-history"></i> Accounting History</a></li>
+          <li><a href="../../admin/accounting-closing.php"><i class="fas fa-door-closed"></i> Closing Entries</a></li>
+          <li><a href="../../admin/liabilities.php"><i class="fas fa-arrow-right"></i> Liabilities</a></li>
+        </ul>
+      </li>
+      <li class="<?php if ($page == 'manage-branches') {
+                    echo 'active';
+                  } ?>"><a href="../../admin/manage-branches.php"><i class="fas fa-building"></i> <span>Manage Branches</span></a></li>
     <?php endif; ?>
 
     <?php if (in_array($_SESSION['designation'], ['Manager'])): ?>
@@ -144,6 +173,25 @@
                     echo 'active';
                   } ?>"><a href="renewal-due-report.php"><i class="fas fa-calendar-alt"></i> <span>Renewal Due Report</span></a></li>
     <?php endif; ?>
+        <?php if ($_SESSION['designation'] == 'Cashier'): ?>
+          <li class="submenu"> <a href="#"><i class="fas fa-calculator"></i> <span>Finance</span></a>
+            <ul>
+              <li class="<?php if ($page == 'payment') { echo 'active'; } ?>"><a href="payment.php"><i class="fas fa-arrow-right"></i> Payments (View Only)</a></li>
+              <li class="<?php if ($page == 'expenses') { echo 'active'; } ?>"><a href="expenses.php"><i class="fas fa-arrow-right"></i> Expenses (View Only)</a></li>
+              <li><a href="../../admin/accounting-owner-capital.php"><i class="fas fa-arrow-right"></i> Owner Capital (View Only)</a></li>
+              <li><a href="../../admin/accounting-cycle.php"><i class="fas fa-arrow-right"></i> Accounting Cycle (View Only)</a></li>
+              <li><a href="../../admin/accounting-sync.php"><i class="fas fa-arrow-right"></i> Historical Sync (View Only)</a></li>
+              <li><a href="../../admin/accounting-transactions.php"><i class="fas fa-arrow-right"></i> Analyze Transactions (View Only)</a></li>
+              <li><a href="../../admin/accounting-journal.php"><i class="fas fa-arrow-right"></i> Journal (View Only)</a></li>
+              <li><a href="../../admin/accounting-ledger.php"><i class="fas fa-arrow-right"></i> Ledger (View Only)</a></li>
+              <li><a href="../../admin/accounting-trial-balance.php"><i class="fas fa-arrow-right"></i> Trial Balance (View Only)</a></li>
+              <li><a href="../../admin/accounting-statements.php"><i class="fas fa-file-invoice-dollar"></i> Statements (View Only)</a></li>
+              <li><a href="../../admin/accounting-history.php"><i class="fas fa-history"></i> Accounting History (View Only)</a></li>
+              <li><a href="../../admin/accounting-closing.php"><i class="fas fa-door-closed"></i> Closing Entries (View Only)</a></li>
+              <li><a href="../../admin/liabilities.php"><i class="fas fa-arrow-right"></i> Liabilities (View Only)</a></li>
+            </ul>
+          </li>
+        <?php endif; ?>
 
     <?php if (in_array($_SESSION['designation'], ['Manager', 'Cashier', 'Trainer', 'Trainer Assistant'])): ?>
       <li class="submenu <?php if ($page == 'announcement') {
@@ -177,6 +225,7 @@
           <li class="<?php if ($page == 'attendance-report') {
                         echo 'active';
                       } ?>"><a href="attendance-report.php"><i class="fas fa-arrow-right"></i> Attendance Report</a></li>
+          <li class="<?php if ($page == 'ai-assistant') { echo 'active'; } ?>"><a href="../../admin/ai-assistant.php"><i class="fas fa-robot"></i> AI Assistant</a></li>
           <li class="<?php if ($page == 'analytics') {
                         echo 'active';
                       } ?>"><a href="analytics.php"><i class="fas fa-chart-line"></i> Analytics</a></li>

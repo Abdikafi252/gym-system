@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id'])) {
     header('location:../index.php');
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <?php
 
 if (isset($_POST['fullname'])) {
@@ -20,7 +20,7 @@ if (isset($_POST['fullname'])) {
     $address = $_POST["address"];
     $designation = $_POST["designation"];
     $id = $_POST["id"];
-    // <!-- Visit codeastro.com for more projects -->
+    // 
     include 'dbcon.php';
 
     // Handle Photo Update
@@ -45,7 +45,7 @@ if (isset($_POST['fullname'])) {
     //code after connection is successfull
     //update query
     $branch_id = $_SESSION['branch_id'];
-    $qry = "update staffs set fullname='$fullname', username='$username', gender='$gender', contact='$contact', address='$address', designation='$designation', photo='$photo', branch_id='$branch_id' where user_id='$id'";
+    $qry = "update staffs set fullname='$fullname', username='$username', gender='$gender', contact='$contact', address='$address', designation='$designation', photo='$photo', updated_at=NOW() where user_id='$id' AND branch_id='$branch_id'";
     $result = mysqli_query($con, $qry); //query executes
 
     if (!$result) {

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -50,8 +50,8 @@ if (!isset($_SESSION['user_id'])) {
 
   <div id="content">
     <div id="content-header">
-      <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="icon-home"></i> Bogga Hore</a> <a href="payment.php">Lacag Bixinta</a> <a href="#" class="current">Natiijooyinka Raadinta</a> </div>
-      <h1 class="text-center">Lacag Bixinta Xubnaha Diiwaangashan <i class="icon icon-group"></i></h1>
+      <div id="breadcrumb"> <a href="index.php" title="Go to Home" class="tip-bottom"><i class="icon-home"></i> Home</a> <a href="payment.php">Payments</a> <a href="#" class="current">Search Results</a> </div>
+      <h1 class="text-center">Registered Member Payments <i class="icon icon-group"></i></h1>
     </div>
     <div class="container-fluid">
       <hr>
@@ -60,10 +60,10 @@ if (!isset($_SESSION['user_id'])) {
 
           <div class='widget-box'>
             <div class='widget-title'> <span class='icon'> <i class='icon-th'></i> </span>
-              <h5>Jadwalka Lacag Bixinta Xubnaha</h5>
+              <h5>Member Payment Table</h5>
               <form id="custom-search-form" role="search" method="POST" action="search-result.php" class="form-search form-horizontal pull-right">
                 <div class="input-append span12">
-                  <input type="text" class="search-query" placeholder="Raadi" name="search" required>
+                  <input type="text" class="search-query" placeholder="Search" name="search" required>
                   <button type="submit" class="btn"><i class="icon-search"></i></button>
                 </div>
               </form>
@@ -96,14 +96,14 @@ if (!isset($_SESSION['user_id'])) {
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>Sawirka</th>
-                    <th>Magaca Buuxa</th>
-                    <th>Taariikhda Lacagta u dambaysay</th>
-                    <th>Lacagta</th>
-                    <th>Adeegga La Doortay</th>
-                    <th>Qorshaha</th>
-                    <th>Cinwaanka Macmiilka</th>
-                    <th>Falka</th>
+                    <th>Photo</th>
+                    <th>Full Name</th>
+                    <th>Last Payment Date</th>
+                    <th>Amount</th>
+                    <th>Selected Service</th>
+                    <th>Plan</th>
+                    <th>Customer Address</th>
+                    <th>Action</th>
                   </tr>
                 </thead>";
 
@@ -127,9 +127,9 @@ if (!isset($_SESSION['user_id'])) {
                       <td><div class='text-center'>" . htmlspecialchars($row['paid_date']) . "</div></td>
                       <td><div class='text-center'>$" . htmlspecialchars($row['paid_amount']) . "</div></td>
                       <td><div class='text-center'>" . htmlspecialchars($row['services']) . "</div></td>
-                      <td><div class='text-center'>" . htmlspecialchars($row['plan']) . " Bilood</div></td>
+                      <td><div class='text-center'>" . htmlspecialchars($row['plan']) . " Months</div></td>
                       <td><div class='text-center'>" . htmlspecialchars($row['address'] ?? '') . "</div></td>
-                      <td><div class='text-center'><a href='user-payment.php?id=" . $row['user_id'] . "'><button class='btn btn-success btn-mini'><i class='icon icon-money'></i> Bixi Lacagta</button></a></div></td>
+                      <td><div class='text-center'><a href='user-payment.php?id=" . $row['user_id'] . "'><button class='btn btn-success btn-mini'><i class='icon icon-money'></i> Pay Now</button></a></div></td>
                     </tr>
                   </tbody>";
 
@@ -139,9 +139,9 @@ if (!isset($_SESSION['user_id'])) {
                 echo "</table>";
               } else {
                 echo "<div class='error_ex'>
-                  <h3>Opps, Natiijooyin lama helin!!</h3>
-                  <p>Waxaa u muuqata inaanay jirin rikoor noocaas ah oo laga heli karo keydka macluumaadkayaga.</p>
-                  <a class='btn btn-danger btn-big' href='payment.php'>Dib u Noqo</a>
+                  <h3>Oops, No results found!!</h3>
+                  <p>It seems there are no such records in our database.</p>
+                  <a class='btn btn-danger btn-big' href='payment.php'>Go Back</a>
                 </div>";
               }
               ?>
@@ -160,7 +160,7 @@ if (!isset($_SESSION['user_id'])) {
   <!--Footer-part-->
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
   </div>
 
   <style>

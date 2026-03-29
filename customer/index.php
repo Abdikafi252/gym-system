@@ -5,10 +5,10 @@ ensure_security_tables($con);
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<!-- Visit codeastro.com for more projects -->
+
 
 <head>
-    <title>M * A GYM System</title>
+    <title>M*A GYM System</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="css/bootstrap.min.css" />
@@ -16,9 +16,10 @@ ensure_security_tables($con);
     <link rel="stylesheet" href="css/matrix-style.css" />
     <link rel="stylesheet" href="css/matrix-login.css" />
     <link rel="stylesheet" href="../css/login-desktop.css" />
-    <link href="font-awesome/css/font-awesome.css" rel="stylesheet" />
+    <link href="font-awesome/css/fontawesome.css" rel="stylesheet" />
+    <link href="font-awesome/css/all.css" rel="stylesheet" />
 
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,800' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700,800' rel='stylesheet' type='text/css'>
 
 </head>
 
@@ -35,23 +36,23 @@ ensure_security_tables($con);
             <div class="control-group">
                 <div class="controls">
                     <div class="main_input_box">
-                        <span class="add-on bg_lg"><i class="fas fa-user"></i></span><input type="text" name="user" placeholder="Magaca Isticmaalaha" />
+                        <span class="add-on bg_lg"><i class="fas fa-user"></i></span><input type="text" name="user" placeholder="Username" />
                     </div>
                 </div>
             </div>
             <div class="control-group">
                 <div class="controls">
                     <div class="main_input_box">
-                        <span class="add-on bg_ly"><i class="fas fa-lock"></i></span><input type="password" name="pass" placeholder="Lambarka Sirta" />
+                        <span class="add-on bg_ly"><i class="fas fa-lock"></i></span><input type="password" name="pass" placeholder="Password" />
                     </div>
                 </div>
             </div>
             <div class="form-actions customer-actions">
-                <span class="pull-right"><button type="submit" name="login" class="btn btn-success">Gal (Macaamiil)</button></span>
+                <span class="pull-right"><button type="submit" name="login" class="btn btn-success">Login (Customer)</button></span>
             </div>
             <div class="g">
                 <a href="../index.php">
-                    <h6>Dib u laabo</h6>
+                    <h6>Go Back</h6>
                 </a>
             </div>
 
@@ -59,7 +60,7 @@ ensure_security_tables($con);
             if (isset($_POST['login'])) {
                 if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
                     echo "<div class='alert alert-danger alert-dismissible' role='alert'>
-                                Session-kaaga wuu dhacay. Fadlan dib isku day.
+                                 Your session has expired. Please try again.
                                 <button type='button' class='close' data-dismiss='alert' aria-label='Close'>
                                     <span aria-hidden='true'>&times;</span>
                                 </button>
@@ -72,7 +73,7 @@ ensure_security_tables($con);
 
                 if (is_rate_limited($con, $attemptKey, 5, 15)) {
                     echo "<div class='alert alert-danger alert-dismissible' role='alert'>
-                                Isku dayo badan ayaa dhacay. Sug 15 daqiiqo kadibna mar kale isku day.
+                                 Too many attempts. Please wait 15 minutes and try again.
                                 <button type='button' class='close' data-dismiss='alert' aria-label='Close'>
                                     <span aria-hidden='true'>&times;</span>
                                 </button>
@@ -113,7 +114,7 @@ ensure_security_tables($con);
                             record_login_attempt($con, $attemptKey, 0);
                             // Invalid Password
                             echo "<div class='alert alert-danger alert-dismissible' role='alert'>
-                                        Magaca ama Lambarka Sirta waa qalad ama akoonkaagu wuu dhacay!
+                             Invalid Username or Password or your account has expired!
                                         <button type='button' class='close' data-dismiss='alert' aria-label='Close'>
                                             <span aria-hidden='true'>&times;</span>
                                         </button>
@@ -122,7 +123,7 @@ ensure_security_tables($con);
                     } else {
                         // Inactive Account
                         echo "<div class='alert alert-danger alert-dismissible' role='alert'>
-                                    Magaca ama Lambarka Sirta waa qalad ama akoonkaagu wuu dhacay!
+                                    Invalid Username or Password or your account has expired!
                                     <button type='button' class='close' data-dismiss='alert' aria-label='Close'>
                                         <span aria-hidden='true'>&times;</span>
                                     </button>
@@ -132,7 +133,7 @@ ensure_security_tables($con);
                     record_login_attempt($con, $attemptKey, 0);
                     // User not found
                     echo "<div class='alert alert-danger alert-dismissible' role='alert'>
-                                Magaca ama Lambarka Sirta waa qalad ama akoonkaagu wuu dhacay!
+                                Invalid Username or Password or your account has expired!
                                 <button type='button' class='close' data-dismiss='alert' aria-label='Close'>
                                     <span aria-hidden='true'>&times;</span>
                                 </button>

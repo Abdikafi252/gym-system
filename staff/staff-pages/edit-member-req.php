@@ -14,7 +14,7 @@ if (!isset($_SESSION['user_id'])) {
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../../css/bootstrap.min.css" />
@@ -53,8 +53,8 @@ if (!isset($_SESSION['user_id'])) {
   <!--sidebar-menu-->
   <div id="content">
     <div id="content-header">
-      <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="icon-home"></i> Bogga Hore</a> <a href="#" class="tip-bottom">Maamul Xubnaha</a> <a href="#" class="current">Cusboonaysii Xubinta</a> </div>
-      <h1>Cusboonaysii Faahfaahinta Xubinta</h1>
+      <div id="breadcrumb"> <a href="index.php" title="Go to Home" class="tip-bottom"><i class="icon-home"></i> Home</a> <a href="#" class="tip-bottom">Manage Members</a> <a href="#" class="current">Update Member</a> </div>
+      <h1>Update Member Details</h1>
     </div>
     <form role="form" action="index.php" method="POST">
       <?php
@@ -70,6 +70,7 @@ if (!isset($_SESSION['user_id'])) {
         $address = $_POST["address"];
         $contact = $_POST["contact"];
         $id = $_POST["id"];
+        $biometric_id = isset($_POST["biometric_id"]) ? $_POST["biometric_id"] : '';
 
         $batch = isset($_POST["batch"]) ? $_POST["batch"] : '';
         $email = isset($_POST["email"]) ? $_POST["email"] : '';
@@ -87,25 +88,43 @@ if (!isset($_SESSION['user_id'])) {
         include 'dbcon.php';
         if (!isset($conn) && isset($con)) $conn = $con;
 
-        // Handle Photo Update
+        // Handle Photo Update (File or Webcam)
         $photo_query_part = "";
-        if (isset($_FILES['photo']) && $_FILES['photo']['error'] == 0) {
-          // Get biometric_id first for naming
+        $target_dir = "../../img/members/";
+
+        if ((isset($_FILES['photo']) && $_FILES['photo']['error'] == 0) || !empty($_POST['webcam_image'])) {
+          // Get biometric_id and old photo first
           $bio_qry = mysqli_query($conn, "SELECT biometric_id, photo FROM members WHERE user_id='$id'");
           $bio_row = mysqli_fetch_array($bio_qry);
           $biometric_id = $bio_row['biometric_id'];
           $old_photo = $bio_row['photo'];
 
-          $target_dir = "../../img/members/";
-          $file_ext = pathinfo($_FILES["photo"]["name"], PATHINFO_EXTENSION);
-          $photo_name = "member_" . time() . "_" . $biometric_id . "." . $file_ext;
-          $target_file = $target_dir . $photo_name;
-
-          if (move_uploaded_file($_FILES["photo"]["tmp_name"], $target_file)) {
-            $photo_query_part = ", photo='$photo_name'";
-            // Delete old photo file if it exists
-            if (!empty($old_photo) && file_exists($target_dir . $old_photo)) {
-              unlink($target_dir . $old_photo);
+          if (isset($_FILES['photo']) && $_FILES['photo']['error'] == 0) {
+            // File Upload
+            $file_ext = pathinfo($_FILES["photo"]["name"], PATHINFO_EXTENSION);
+            $photo_name = "member_" . time() . "_" . $biometric_id . "." . $file_ext;
+            $target_file = $target_dir . $photo_name;
+            if (move_uploaded_file($_FILES["photo"]["tmp_name"], $target_file)) {
+              $photo_query_part = ", photo='$photo_name'";
+              if (!empty($old_photo) && file_exists($target_dir . $old_photo)) {
+                unlink($target_dir . $old_photo);
+              }
+            }
+          } elseif (!empty($_POST['webcam_image'])) {
+            // Webcam Capture
+            $base64_img = $_POST['webcam_image'];
+            if (strpos($base64_img, 'data:image/jpeg;base64,') === 0) {
+              $base64_img = str_replace('data:image/jpeg;base64,', '', $base64_img);
+              $base64_img = str_replace(' ', '+', $base64_img);
+              $data = base64_decode($base64_img);
+              $photo_name = "member_cam_" . time() . "_" . $biometric_id . ".jpg";
+              $file_path = $target_dir . $photo_name;
+              if (file_put_contents($file_path, $data)) {
+                $photo_query_part = ", photo='$photo_name'";
+                if (!empty($old_photo) && file_exists($target_dir . $old_photo)) {
+                  unlink($target_dir . $old_photo);
+                }
+              }
             }
           }
         }
@@ -146,43 +165,64 @@ if (!isset($_SESSION['user_id'])) {
           }
         }
 
-        $qry = "update members set fullname='$fullname', username='$username',dor='$dor', gender='$gender', services='$services', amount='$totalamount', plan='$plan', address='$address', contact='$contact', batch='$batch', email='$email', aadhar='$aadhar', pan='$pan', discount_type='$discount_type', discount_amount='$discount_amount', paid_amount='$paid_amount', comments='$comments', trainer_type='$trainer_type', branch_id='$branch_id' $photo_query_part $id_doc_query_part where user_id='$id'";
+        $qry = "update members set fullname='$fullname', username='$username',dor='$dor', gender='$gender', services='$services', amount='$totalamount', plan='$plan', address='$address', contact='$contact', biometric_id='$biometric_id', batch='$batch', email='$email', aadhar='$aadhar', pan='$pan', discount_type='$discount_type', discount_amount='$discount_amount', paid_amount='$paid_amount', comments='$comments', trainer_type='$trainer_type', branch_id='$branch_id' $photo_query_part $id_doc_query_part where user_id='$id'";
         $result = mysqli_query($conn, $qry); //query executes
 
+        // Sync to payment history to keep Ledger and UI aligned
+        if ($result) {
+            $upQ = "UPDATE payment_history 
+                    SET amount='$totalamount', plan='$plan', paid_amount='$paid_amount', discount_amount='$discount_amount', discount_type='$discount_type'
+                    WHERE user_id='$id' ORDER BY id DESC LIMIT 1";
+            mysqli_query($conn, $upQ);
+        }
         if (!$result) {
           echo "<div class='container-fluid'>";
           echo "<div class='row-fluid'>";
           echo "<div class='span12'>";
           echo "<div class='widget-box'>";
           echo "<div class='widget-title'> <span class='icon'> <i class='icon-info-sign'></i> </span>";
-          echo "<h5>Dhambaal Khalad ah</h5>";
+          echo "<h5>Error Message</h5>";
           echo "</div>";
           echo "<div class='widget-content'>";
           echo "<div class='error_ex'>";
-          echo "<h1 style='color:maroon;'>Khalad 404</h1>";
-          echo "<h3>Khalad ayaa dhacay intii lagu guda jiray cusboonaysiinta faahfaahintaada</h3>";
-          echo "<p>Fadlan isku day markale</p>";
-          echo "<a class='btn btn-warning btn-big'  href='edit-member.php'>Dib u noqo</a> </div>";
+          echo "<h1 style='color:maroon;'>Error 404</h1>";
+          echo "<h3>An error occurred while updating your details</h3>";
+          echo "<p>Please try again</p>";
+          echo "<a class='btn btn-warning btn-big'  href='edit-member.php'>Go Back</a> </div>";
           echo "</div>";
           echo "</div>";
           echo "</div>";
           echo "</div>";
           echo "</div>";
         } else {
+            // Face Terminal Sync (DA-T12 / WL-P72)
+            if (!empty($photo_query_part)) { // Only sync if photo was updated or requested
+                require_once __DIR__ . '/../../includes/FaceTerminal.php';
+                $ft = new FaceTerminal($con);
+                if ($ft->isEnabled()) {
+                    $photo_to_sync = !empty($photo_name) ? $target_dir . $photo_name : '';
+                    if ($photo_to_sync && file_exists($photo_to_sync)) {
+                        $sync_res = $ft->syncPerson($biometric_id, $fullname, $photo_to_sync);
+                        if (isset($sync_res['status']) && $sync_res['status'] === 'success') {
+                            echo "<div class='alert alert-info' style='margin: 20px;'><strong>Terminal Sync:</strong> Face Terminal updated successfully.</div>";
+                        }
+                    }
+                }
+            }
 
           echo "<div class='container-fluid'>";
           echo "<div class='row-fluid'>";
           echo "<div class='span12'>";
           echo "<div class='widget-box'>";
           echo "<div class='widget-title'> <span class='icon'> <i class='icon-info-sign'></i> </span>";
-          echo "<h5>Dhambaal</h5>";
+          echo "<h5>Message</h5>";
           echo "</div>";
           echo "<div class='widget-content'>";
           echo "<div class='error_ex'>";
-          echo "<h1>Guul</h1>";
-          echo "<h3>Faahfaahinta xubinta waa la cusboonaysiiyay!</h3>";
-          echo "<p>Faahfaahintii la codsaday waa la cusboonaysiiyay. Fadlan guji badhanka si aad dib ugu noqoto.</p>";
-          echo "<a class='btn btn-inverse btn-big'  href='members.php'>Dib u noqo</a> </div>";
+          echo "<h1>Success</h1>";
+          echo "<h3>Member details have been updated!</h3>";
+          echo "<p>The requested details have been updated. Please click the button to go back.</p>";
+          echo "<a class='btn btn-inverse btn-big'  href='members.php'>Go Back</a> </div>";
           echo "</div>";
           echo "</div>";
           echo "</div>";
@@ -190,7 +230,7 @@ if (!isset($_SESSION['user_id'])) {
           echo "</div>";
         }
       } else {
-        echo "<h3>MA ADID FASAXAAD INAAD BOGGAN RAACDO. DIB U NOQO <a href='index.php'> DASHBOARD-KA </a></h3>";
+        echo "<h3>YOU ARE NOT AUTHORIZED TO ACCESS THIS PAGE. GO BACK TO <a href='index.php'> DASHBOARD </a></h3>";
       }
       ?>
 
@@ -206,7 +246,7 @@ if (!isset($_SESSION['user_id'])) {
   <!--Footer-part-->
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
   </div>
 
   <style>

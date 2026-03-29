@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 http_response_code(403);
 echo "<h3 style='color:#b91c1c; text-align:center; margin-top:40px;'>Diiwaangelinta tooska ah waa la xiray. Fadlan la xiriir Cashier ama Manager.</h3>";
 echo "<p style='text-align:center;'><a href='../index.php'>Ku laabo login-ka</a></p>";
@@ -8,7 +8,7 @@ exit();
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>M * A GYM System</title>
+<title>M*A GYM System</title>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="stylesheet" href="../css/bootstrap.min.css" />

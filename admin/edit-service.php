@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user_id'])) {
     header('location:../index.php');
@@ -111,7 +111,7 @@ if (!isset($_SESSION['user_id'])) {
     ?>
 
     <div class="row-fluid">
-        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</div>
+        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</div>
     </div>
 
     <style>

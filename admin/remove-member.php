@@ -1,16 +1,16 @@
-<?php
+﻿<?php
 session_start();
 //the isset function to check username is already loged in and stored on the session
 if (!isset($_SESSION['user_id'])) {
   header('location:../index.php');
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
-<html lang="so">
+<html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -42,8 +42,8 @@ if (!isset($_SESSION['user_id'])) {
 
   <div id="content">
     <div id="content-header">
-      <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="fas fa-home"></i> Bogga Hore</a> <a href="remove-member.php" class="current">Ka Saar Xubnaha (Remove Members)</a> </div>
-      <h1 class="text-center">Tirtir Xubnaha (Remove Members) <i class="fas fa-group"></i></h1>
+      <div id="breadcrumb"> <a href="index.php" title="Go to Home" class="tip-bottom"><i class="fas fa-home"></i> Home</a> <a href="remove-member.php" class="current">Remove Members</a> </div>
+      <h1 class="text-center">Remove Members <i class="fas fa-group"></i></h1>
     </div>
     <div class="container-fluid">
       <hr>
@@ -52,7 +52,7 @@ if (!isset($_SESSION['user_id'])) {
 
           <div class='widget-box'>
             <div class='widget-title'> <span class='icon'> <i class='fas fa-th'></i> </span>
-              <h5>Ka Saar Xubnaha (Remove Members)</h5>
+              <h5>Remove Members</h5>
             </div>
 
             <style>
@@ -207,7 +207,7 @@ if (!isset($_SESSION['user_id'])) {
               <?php
               include "dbcon.php";
               $today = date('Y-m-d');
-              $qry = "SELECT * FROM members ORDER BY dor DESC";
+              $qry = "SELECT * FROM members WHERE status != 'Deleted' ORDER BY dor DESC";
               $result = mysqli_query($conn, $qry);
 
               while ($row = mysqli_fetch_array($result)) {
@@ -232,9 +232,9 @@ if (!isset($_SESSION['user_id'])) {
                 <!-- Single Card -->
                 <div class="member-card">
                   <?php if ($is_expired): ?>
-                    <div class="card-badge">Qorshihii Wuu Dhacay</div>
+                    <div class="card-badge">Plan Expired</div>
                   <?php else: ?>
-                    <div class="card-badge active">Wuu Shaqaynayaa</div>
+                    <div class="card-badge active">Active</div>
                   <?php endif; ?>
 
                   <div class="card-header-row">
@@ -255,23 +255,23 @@ if (!isset($_SESSION['user_id'])) {
                       <span class="detail-val"><?php echo $contact; ?></span>
                     </div>
                     <div class="detail-box">
-                      <span class="detail-label">Taariikhda (D.O.R)</span>
+                      <span class="detail-label">Date of Registration (D.O.R)</span>
                       <span class="detail-val"><?php echo htmlspecialchars($row['dor'], ENT_QUOTES, 'UTF-8'); ?></span>
                     </div>
                     <div class="detail-box">
-                      <span class="detail-label">Adeegga (Service)</span>
+                      <span class="detail-label">Service</span>
                       <span class="detail-val"><?php echo htmlspecialchars($row['services'], ENT_QUOTES, 'UTF-8'); ?></span>
                     </div>
                     <div class="detail-box">
-                      <span class="detail-label">Qorshaha (Plan)</span>
-                      <span class="detail-val"><?php echo $plan_months; ?> Bilood</span>
+                      <span class="detail-label">Plan</span>
+                      <span class="detail-val"><?php echo $plan_months; ?> Month/s</span>
                     </div>
                   </div>
 
                   <div class="card-actions">
-                    <a href="actions/delete-member.php?id=<?php echo $id; ?>" class="action-btn red-btn" onclick="return confirm('Miyaad hubtaa inaad tirtirto xubintan? (Are you sure you want to remove this member?)')">
+                    <a href="actions/delete-member.php?id=<?php echo $id; ?>" class="action-btn red-btn" onclick="return confirm('Are you sure you want to remove this member?')">
                       <i class="fas fa-trash-alt"></i>
-                      Tirtir (Remove)
+                      Remove
                     </a>
                   </div>
                 </div>
@@ -290,7 +290,7 @@ if (!isset($_SESSION['user_id'])) {
   <!--Footer-part-->
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi </div>
   </div>
 
   <style>

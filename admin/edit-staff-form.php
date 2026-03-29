@@ -1,16 +1,16 @@
-<?php
+﻿<?php
 session_start();
 //the isset function to check username is already loged in and stored on the session
 if (!isset($_SESSION['user_id'])) {
   header('location:../index.php');
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -30,7 +30,7 @@ if (!isset($_SESSION['user_id'])) {
   <?php include 'includes/header-content.php'; ?>
   <!--close-Header-part-->
 
-  <!-- Visit codeastro.com for more projects -->
+  
   <!--top-Header-menu-->
   <?php include 'includes/topheader.php' ?>
   <!--close-top-Header-menu-->
@@ -48,10 +48,10 @@ if (!isset($_SESSION['user_id'])) {
 
   <?php
   include 'dbcon.php';
+  require_once 'includes/db_helper.php';
   $id = $_GET['id'];
-  $qry = "select * from staffs where user_id='$id'";
-  $result = mysqli_query($con, $qry);
-  while ($row = mysqli_fetch_array($result)) {
+  $row = safe_fetch_assoc($con, "SELECT * FROM staffs WHERE user_id=?", "i", [$id]);
+  if ($row) {
   ?>
 
     <div id="content">
@@ -174,7 +174,16 @@ if (!isset($_SESSION['user_id'])) {
                   <div class="control-group">
                     <label class="control-label">Gender :</label>
                     <div class="controls">
-                      <input type="text" class="span11" name="gender" value='<?php echo $row['gender']; ?>' />
+                      <select name="gender" class="span11">
+                        <option value="Male" <?php if ($row['gender'] == 'Male') echo 'selected'; ?>>Male</option>
+                        <option value="Female" <?php if ($row['gender'] == 'Female') echo 'selected'; ?>>Female</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="control-group">
+                    <label class="control-label">Monthly Salary ($) :</label>
+                    <div class="controls">
+                      <input type="number" step="0.01" class="span11" name="salary" value='<?php echo $row['salary']; ?>' required />
                     </div>
                   </div>
 
@@ -185,7 +194,7 @@ if (!isset($_SESSION['user_id'])) {
 
               <div class="widget-content nopadding">
                 <div class="form-horizontal">
-                  <!-- Visit codeastro.com for more projects -->
+                  
                 </div>
                 <div class="widget-content nopadding">
 
@@ -236,11 +245,10 @@ if (!isset($_SESSION['user_id'])) {
                     <div class="controls">
                       <select name="branch_id" id="branch_id">
                         <?php
-                        $branch_qry = "SELECT * FROM branches";
-                        $branch_res = mysqli_query($con, $branch_qry);
-                        while ($branch_row = mysqli_fetch_array($branch_res)) {
+                        $branch_res = safe_query($con, "SELECT * FROM branches");
+                        while ($branch_row = mysqli_fetch_assoc($branch_res)) {
                           $selected = ($branch_row['id'] == $row['branch_id']) ? 'selected' : '';
-                          echo "<option value='" . $branch_row['id'] . "' $selected>" . $branch_row['branch_name'] . "</option>";
+                          echo "<option value='" . $branch_row['id'] . "' $selected>" . htmlspecialchars($branch_row['branch_name']) . "</option>";
                         }
                         ?>
                       </select>
@@ -251,9 +259,9 @@ if (!isset($_SESSION['user_id'])) {
                 </div>
 
 
-                <!-- Visit codeastro.com for more projects -->
+                
                 <div class="form-actions text-center">
-                  <!-- user's ID is hidden here --><!-- Visit codeastro.com for more projects -->
+                  <!-- user's ID is hidden here -->
                   <input type="hidden" name="id" value="<?php echo $row['user_id']; ?>">
                   <button type="submit" class="btn btn-success">Update Staff Details</button>
                 </div>
@@ -279,13 +287,13 @@ if (!isset($_SESSION['user_id'])) {
       </div>
     </div>
 
-    <!-- Visit codeastro.com for more projects -->
+    
     <!--end-main-container-part-->
 
     <!--Footer-part-->
 
     <div class="row-fluid">
-      <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+      <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
     </div>
 
 

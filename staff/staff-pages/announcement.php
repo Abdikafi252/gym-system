@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -13,7 +13,7 @@ if (!isset($_SESSION['user_id'])) {
 <html lang="en">
 
 <head>
-    <title>M * A GYM System</title>
+    <title>M*A GYM System</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="../../css/bootstrap.min.css" />
@@ -43,30 +43,30 @@ if (!isset($_SESSION['user_id'])) {
     <!--sidebar-menu-->
     <div id="content">
         <div id="content-header">
-            <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="fas fa-home"></i> Bogga Hore</a><a href="announcement.php" class="current">Ogeysiisyada</a> </div>
-            <h1>Ogeysiiska</h1>
+            <div id="breadcrumb"> <a href="index.php" title="Go to Home" class="tip-bottom"><i class="fas fa-home"></i> Home</a><a href="announcement.php" class="current">Announcements</a> </div>
+            <h1>Announcements</h1>
         </div>
         <div class="container-fluid">
             <hr>
             <?php if (in_array($_SESSION['designation'], ['Manager', 'Cashier', 'Trainer', 'Trainer Assistant'])) { ?>
-                <a href="manage-announcement.php"><button class="btn btn-danger" type="button">Maamul Ogeysiisyadaada</button></a>
+                <a href="manage-announcement.php"><button class="btn btn-danger" type="button">Manage Your Announcements</button></a>
                 <div class="row-fluid">
                     <div class="widget-box">
                         <div class="widget-title"> <span class="icon"> <i class="fas fa-align-justify"></i> </span>
-                            <h5>Samee Ogeysiisyo</h5>
+                            <h5>Create Announcements</h5>
                         </div>
                         <div class="widget-content">
                             <div class="control-group">
                                 <form action="post-announcement.php" method="POST">
                                     <div class="controls">
-                                        <textarea class="span12" name="message" rows="6" placeholder="Halkan ku qor qoraalka ..."></textarea>
+                                        <textarea class="span12" name="message" rows="6" placeholder="Write message here ..."></textarea>
                                     </div>
                                     <div class="controls">
-                                        <h5><label for="Announce Date">Taariikhda:
+                                        <h5><label for="Announce Date">Date:
                                                 <input type="date" name="date" value="<?php echo date('Y-m-d'); ?>"></h5> </label>
                                     </div>
                                     <div class="text-center">
-                                        <button type="submit" class="btn btn-info btn-large">Faafi Hadda</button>
+                                        <button type="submit" class="btn btn-info btn-large">Post Now</button>
                                     </div>
                                 </form>
                             </div>
@@ -79,15 +79,15 @@ if (!isset($_SESSION['user_id'])) {
                 <div class="span12">
                     <div class="widget-box">
                         <div class="widget-title"> <span class="icon"> <i class="fas fa-bullhorn"></i> </span>
-                            <h5>Ogeysiisyada Xarunta</h5>
+                            <h5>Center Announcements</h5>
                         </div>
                         <div class="widget-content nopadding">
                             <table class="table table-bordered table-striped">
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Taariikhda</th>
-                                        <th>Fariinta</th>
+                                        <th>Date</th>
+                                        <th>Message</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -123,7 +123,7 @@ if (!isset($_SESSION['user_id'])) {
     <!--Footer-part-->
 
     <div class="row-fluid">
-        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi </div>
+        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi </div>
     </div>
 
     <style>

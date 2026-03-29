@@ -5,10 +5,10 @@ ensure_security_tables($con);
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<!-- Visit codeastro.com for more projects -->
+
 
 <head>
-    <title>M * A GYM System</title>
+    <title>M*A GYM System</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="css/bootstrap.min.css" />
@@ -16,8 +16,9 @@ ensure_security_tables($con);
     <link rel="stylesheet" href="css/matrix-style.css" />
     <link rel="stylesheet" href="css/matrix-login.css" />
     <link rel="stylesheet" href="../css/login-desktop.css" />
-    <link href="font-awesome/css/font-awesome.css" rel="stylesheet" />
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,800' rel='stylesheet' type='text/css'>
+    <link href="font-awesome/css/fontawesome.css" rel="stylesheet" />
+    <link href="font-awesome/css/all.css" rel="stylesheet" />
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700,800' rel='stylesheet' type='text/css'>
 
 </head>
 
@@ -69,7 +70,7 @@ ensure_security_tables($con);
         if (isset($_POST['login'])) {
             if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
                 echo "<div class='alert alert-danger alert-dismissible' role='alert'>
-                            Session-kaaga wuu dhacay. Fadlan dib isku day.
+                            Your session has expired. Please try again.
                             <button type='button' class='close' data-dismiss='alert' aria-label='Close'>
                                 <span aria-hidden='true'>&times;</span>
                             </button>
@@ -83,7 +84,7 @@ ensure_security_tables($con);
 
             if (is_rate_limited($con, $attemptKey, 5, 15)) {
                 echo "<div class='alert alert-danger alert-dismissible' role='alert'>
-                            Isku dayo badan ayaa dhacay. Sug 15 daqiiqo kadibna mar kale isku day.
+                            Too many attempts. Please wait 15 minutes and try again.
                             <button type='button' class='close' data-dismiss='alert' aria-label='Close'>
                                 <span aria-hidden='true'>&times;</span>
                             </button>
@@ -101,7 +102,7 @@ ensure_security_tables($con);
             if (!empty($db_password)) {
                 if ($db_branch_id != $selected_branch) {
                     echo "<div class='alert alert-danger alert-dismissible' role='alert'>
-                            Branch-ka aad dooratay maahan midkaaga saxda ah.
+                            The selected branch is not your correct branch.
                             <button type='button' class='close' data-dismiss='alert' aria-label='Close'>
                                 <span aria-hidden='true'>&times;</span>
                             </button>
@@ -136,7 +137,7 @@ ensure_security_tables($con);
                     record_login_attempt($con, $attemptKey, 0);
                     // Invalid Password
                     echo "<div class='alert alert-danger alert-dismissible' role='alert'>
-                                    Magaca ama Lambarka Sirta waa qalad
+                                    Incorrect Username or Password
                                     <button type='button' class='close' data-dismiss='alert' aria-label='Close'>
                                         <span aria-hidden='true'>&times;</span>
                                     </button>
@@ -146,7 +147,7 @@ ensure_security_tables($con);
                 record_login_attempt($con, $attemptKey, 0);
                 // User not found
                 echo "<div class='alert alert-danger alert-dismissible' role='alert'>
-                                Magaca ama Lambarka Sirta waa qalad
+                                Incorrect Username or Password
                                 <button type='button' class='close' data-dismiss='alert' aria-label='Close'>
                                     <span aria-hidden='true'>&times;</span>
                                 </button>
@@ -156,15 +157,15 @@ ensure_security_tables($con);
             }
         }
         ?>
-        <div class="pull-left"><!-- Visit codeastro.com for more projects -->
+        <div class="pull-left">
             <a href="../index.php">
-                <h6>Gelitaanka Maamulaha</h6>
+                <h6>Admin Login</h6>
             </a>
         </div>
 
         <div class="pull-right">
             <a href="../customer">
-                <h6>Gelitaanka Macaamiisha</h6>
+                <h6>Customer Login</h6>
             </a>
         </div>
 

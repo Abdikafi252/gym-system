@@ -19,21 +19,21 @@ if (isset($_GET['id'])) {
     $contact = $mem_row['contact'];
     $fullname = $mem_row['fullname'];
 
-    // 1. Insert into notifications table (System Notification)
+    // English Reward Message
     $message = "Dear Member,
 
-Waxaan halkaan kugu ogeysiinaynaa in barnaamijkaaga xubinimo (Membership Program) uu dhawaan dhamaanayo. Fadlan hubi inaad bixiso dhammaan lacagaha kugu waajiba ka hor taariikhda kama dambaysta ah.
+We are writing to inform you that your membership program is nearing its expiration. Please ensure that you make all necessary payments before the final due date.
 
-Waa arrin aad muhiim u ah inaad waqtigeeda ku bixiso lacagta si looga fogaado hakad ama joojin ku timaada adeegyada aad ka faa’iideysato.
+It is very important to make your payments on time to avoid any interruptions or suspensions of the services you enjoy.
 
-Waxaan si weyn kuu qadarinaynaa macaamiil ahaan, waxaana rajeyneynaa inaan sii wadno ku adeegidda mustaqbalka.
+We greatly value you as a customer and look forward to continuing to serve you in the future.
 
-Haddii aad qabto wax su’aalo ah, fadlan nala soo xiriir.
+If you have any questions, please feel free to contact us.
 
-Mahadsanid,
+Thank you,
 
 Abdikafi Abdikadir Ali
-Maamulka GYM";
+GYM Management";
 
     // Escape message for DB
     $msg_db = mysqli_real_escape_string($con, $message);
@@ -48,9 +48,6 @@ Maamulka GYM";
 
     if ($result1 && $result2) {
         // Redirect to WhatsApp
-        // Format number: remove leading 0 if present, add country code if missing. Assuming Somalia 252.
-        // Implementation note: Ideally, we should validate the number format.
-        // For this snippet, we'll try a basic clean up.
         $wa_number = preg_replace('/[^0-9]/', '', $contact);
         if (substr($wa_number, 0, 3) != '252') {
             if (strlen($wa_number) == 9) { // e.g. 615xxxxxx
@@ -58,7 +55,6 @@ Maamulka GYM";
             }
         }
 
-        $wa_message = urlencode($message);
         $wa_message = urlencode($message);
 
         // Auto-redirect to WhatsApp immediately
@@ -69,3 +65,4 @@ Maamulka GYM";
         echo "<script>alert('Error Sending Reminder'); window.location='reminders.php';</script>";
     }
 }
+?>

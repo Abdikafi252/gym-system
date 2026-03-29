@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user_id'])) {
     header('location:../index.php');
@@ -70,9 +70,11 @@ if (!isset($_SESSION['user_id'])) {
                                     $target_date = date('Y-m-d', strtotime('+5 days'));
 
                                     // Select members expiring within 5 days
+                                    $branch_id = isset($_SESSION['branch_id']) ? (int)$_SESSION['branch_id'] : 0;
+                                    $branch_where = $branch_id > 0 ? " AND branch_id = " . $branch_id : "";
                                     $qry = "SELECT user_id, fullname, contact, expiry_date, registered_by, DATEDIFF(expiry_date, '$current_date') as days_left 
                         FROM members 
-                        WHERE status='Active' AND expiry_date BETWEEN '$current_date' AND '$target_date'
+                        WHERE status='Active' AND expiry_date BETWEEN '$current_date' AND '$target_date'" . $branch_where . "
                         ORDER BY expiry_date ASC";
 
                                     $result = mysqli_query($con, $qry);
@@ -117,9 +119,11 @@ if (!isset($_SESSION['user_id'])) {
                                 <tbody>
                                     <?php
                                     // Select expired members
+                                    $branch_id = isset($_SESSION['branch_id']) ? (int)$_SESSION['branch_id'] : 0;
+                                    $branch_where = $branch_id > 0 ? " AND branch_id = " . $branch_id : "";
                                     $qry = "SELECT user_id, fullname, contact, expiry_date, registered_by
                         FROM members 
-                        WHERE status='Expired' OR expiry_date < '$current_date'
+                        WHERE (status='Expired' OR expiry_date < '$current_date')" . $branch_where . "
                         ORDER BY expiry_date DESC";
 
                                     $result = mysqli_query($con, $qry);
@@ -151,7 +155,7 @@ if (!isset($_SESSION['user_id'])) {
 
     <!--Footer-part-->
     <div class="row-fluid">
-        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</div>
+        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</div>
     </div>
 
     <style>

@@ -7,7 +7,18 @@ gym-system-deploy.zip
 
 # Local tooling/cache
 .vscode/
+# Local logs/temp
 *.log
+*.txt
+api/*.txt
+api/*.log
+
+# Audio/Bluetooth scripts
+*.ps1
+
+# Temporary verify scripts
+tmp_*
+.agent.md
 
 # Composer local binaries/cache
 composer.phar

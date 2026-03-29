@@ -1,15 +1,15 @@
-<?php
+﻿<?php
 session_start();
 //the isset function to check username is already loged in and stored on the session
 if(!isset($_SESSION['user_id'])){
 header('location:../index.php');	
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>M * A GYM System</title>
+<title>M*A GYM System</title>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -62,7 +62,7 @@ header('location:../index.php');
 
       include "dbcon.php";
       $search=$_POST['search'];
-      $qry="select * from members where fullname like '%$search%' or username like '%$search%'";
+      $qry="select * from members where (fullname like '%$search%' or username like '%$search%') and status != 'Deleted'";
       $cnt = 1;
         $result=mysqli_query($con,$qry);
 
@@ -120,11 +120,11 @@ header('location:../index.php');
 </div>
 
 <!--end-main-container-part-->
-<!-- Visit codeastro.com for more projects -->
+
 <!--Footer-part-->
 
 <div class="row-fluid">
-  <div id="footer" class="span12"> <?php echo date("Y");?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+  <div id="footer" class="span12"> <?php echo date("Y");?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
 </div>
 
 <style>

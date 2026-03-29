@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -9,12 +9,12 @@ if (!isset($_SESSION['user_id'])) {
     header('location:../index.php');
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <title>M * A GYM System</title>
+    <title>M*A GYM System</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="../../css/bootstrap.min.css" />
@@ -33,7 +33,7 @@ if (!isset($_SESSION['user_id'])) {
     <!--Header-part-->
   <?php include '../includes/header-content.php'; ?>
   <!--close-Header-part-->
-    <!-- Visit codeastro.com for more projects -->
+    
 
     <!--top-Header-menu-->
     <?php include '../includes/header.php' ?>
@@ -44,7 +44,7 @@ if (!isset($_SESSION['user_id'])) {
   <button type="submit" class="tip-bottom" title="Search"><i class="icon-search icon-white"></i></button>
 </div> -->
     <!--close-top-serch-->
-    <!-- Visit codeastro.com for more projects -->
+    
     <!--sidebar-menu-->
     <?php $page = 'manage-customer-progress';
     include '../includes/sidebar.php' ?>
@@ -145,7 +145,7 @@ if (!isset($_SESSION['user_id'])) {
     <!--Footer-part-->
 
     <div class="row-fluid">
-        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
     </div>
 
     <style>

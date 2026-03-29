@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -9,12 +9,12 @@ if (!isset($_SESSION['user_id'])) {
   header('location:../index.php');
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../../css/bootstrap.min.css" />
@@ -35,7 +35,7 @@ if (!isset($_SESSION['user_id'])) {
   <?php include '../includes/header-content.php'; ?>
   <!--close-Header-part-->
 
-  <!-- Visit codeastro.com for more projects -->
+  
   <!--top-Header-menu-->
   <?php include '../includes/header.php' ?>
   <!--close-top-Header-menu-->
@@ -54,7 +54,8 @@ if (!isset($_SESSION['user_id'])) {
   <?php
   include '../dbcon.php';
   $id = $_GET['id'];
-  $qry = "select * from staffs where user_id='$id'";
+  $branch_id = $_SESSION['branch_id'];
+  $qry = "select * from staffs where user_id='$id' AND branch_id='$branch_id'";
   $result = mysqli_query($con, $qry);
   while ($row = mysqli_fetch_array($result)) {
   ?>
@@ -190,7 +191,7 @@ if (!isset($_SESSION['user_id'])) {
 
               <div class="widget-content nopadding">
                 <div class="form-horizontal">
-                  <!-- Visit codeastro.com for more projects -->
+                  
                 </div>
                 <div class="widget-content nopadding">
 
@@ -240,9 +241,9 @@ if (!isset($_SESSION['user_id'])) {
                 </div>
 
 
-                <!-- Visit codeastro.com for more projects -->
+                
                 <div class="form-actions text-center">
-                  <!-- user's ID is hidden here --><!-- Visit codeastro.com for more projects -->
+                  <!-- user's ID is hidden here -->
                   <input type="hidden" name="id" value="<?php echo $row['user_id']; ?>">
                   <button type="submit" class="btn btn-success">Update Staff Details</button>
                 </div>
@@ -268,13 +269,13 @@ if (!isset($_SESSION['user_id'])) {
       </div>
     </div>
 
-    <!-- Visit codeastro.com for more projects -->
+    
     <!--end-main-container-part-->
 
     <!--Footer-part-->
 
     <div class="row-fluid">
-      <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+      <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
     </div>
 
 

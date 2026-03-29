@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 header('Cache-Control: post-check=0, pre-check=0', false);
@@ -9,12 +9,12 @@ if (!isset($_SESSION['user_id'])) {
   header('location:../index.php');
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -52,7 +52,7 @@ if (!isset($_SESSION['user_id'])) {
   <?php include 'includes/header-content.php'; ?>
   <!--close-Header-part-->
 
-  <!-- Visit codeastro.com for more projects -->
+  
   <!--top-Header-menu-->
   <?php include 'includes/topheader.php' ?>
   <!--close-top-Header-menu-->
@@ -64,8 +64,18 @@ if (!isset($_SESSION['user_id'])) {
 
   <div id="content">
     <div id="content-header">
-      <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="fas fa-home"></i> Bogga Hore</a> <a href="#" class="current">Xubnaha Diiwaangashan</a> </div>
-      <h1 class="text-center">Liiska Xubnaha Diiwaangashan <i class="fas fa-group"></i></h1>
+      <div id="breadcrumb"> <a href="index.php" title="Go to Home Page" class="tip-bottom"><i class="fas fa-home"></i> Home</a> <a href="#" class="current">Registered Members</a> </div>
+      <h1 class="text-center">Registered Member List <i class="fas fa-group"></i></h1>
+      <!-- Search/Filter Bar for Members -->
+      <div class="row-fluid">
+        <div class="span8 offset2">
+          <form id="memberSearchForm" class="form-inline" method="get" style="margin-bottom: 18px; display: flex; gap: 10px; align-items: center;">
+            <input type="text" id="memberSearchInput" name="search" class="form-control" placeholder="Search by name, phone, or service..." style="flex: 1; min-width: 180px;" value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>" />
+            <button type="submit" class="btn btn-info"><i class="fas fa-search"></i> Search</button>
+            <button type="button" class="btn btn-secondary" onclick="window.location.href='members.php';"><i class="fas fa-undo"></i> Reset</button>
+          </form>
+        </div>
+      </div>
     </div>
     <div class="container-fluid">
       <hr>
@@ -74,7 +84,7 @@ if (!isset($_SESSION['user_id'])) {
 
           <div class='widget-box'>
             <div class='widget-title'> <span class='icon'> <i class='fas fa-th'></i> </span>
-              <h5>Jadwalka Xubnaha</h5>
+              <h5>Member Schedule</h5>
             </div>
             <style>
               .members-grid {
@@ -633,37 +643,34 @@ if (!isset($_SESSION['user_id'])) {
               }
             </style>
 
-            <div class="members-grid">
+            <div class="members-grid" id="membersGrid">
               <?php
               include "dbcon.php";
               $today = date('Y-m-d');
-              $qry = "SELECT * FROM members ORDER BY dor ASC, user_id ASC";
+              // Use global branch filter from session
+              $where = "status != 'Deleted'";
+              $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+              $branch_id = isset($_SESSION['branch_id']) ? trim($_SESSION['branch_id']) : '';
+              if ($branch_id !== '' && $branch_id !== '0') {
+                $where .= " AND branch_id = '" . mysqli_real_escape_string($con, $branch_id) . "'";
+              }
+              if ($search !== '') {
+                $search_esc = mysqli_real_escape_string($con, $search);
+                $where .= " AND (fullname LIKE '%$search_esc%' OR contact LIKE '%$search_esc%' OR services LIKE '%$search_esc%')";
+              }
+              $qry = "SELECT * FROM members WHERE $where ORDER BY dor ASC, user_id ASC";
               $result = mysqli_query($con, $qry);
               $m_id_counter = 1;
               $memberDetailMap = [];
+              $allMembers = [];
+              $errorMsg = '';
 
-              // Latest payment history map for fallback calculations
-              $paymentHistoryMap = [];
-              $hist_q = mysqli_query($con, "
-                SELECT ph.user_id, ph.amount, ph.paid_amount, ph.discount_amount, ph.discount_type
-                FROM payment_history ph
-                INNER JOIN (
-                  SELECT user_id, MAX(id) AS max_id
-                  FROM payment_history
-                  GROUP BY user_id
-                ) latest ON latest.max_id = ph.id
-              ");
-              if ($hist_q) {
-                while ($hist_row = mysqli_fetch_assoc($hist_q)) {
-                  $paymentHistoryMap[(int)$hist_row['user_id']] = [
-                    'amount' => (float)($hist_row['amount'] ?? 0),
-                    'paid_amount' => (float)($hist_row['paid_amount'] ?? 0),
-                    'discount_amount' => (float)($hist_row['discount_amount'] ?? 0),
-                    'discount_type' => (string)($hist_row['discount_type'] ?? 'amount')
-                  ];
-                }
+              // Server-side error handling
+              if (!$result) {
+                $errorMsg = 'Error loading members: ' . htmlspecialchars(mysqli_error($con));
               }
 
+              // Loop through members
               while ($row = mysqli_fetch_array($result)) {
                 // Basic Details
                 $name = htmlspecialchars($row['fullname'], ENT_QUOTES, 'UTF-8');
@@ -719,14 +726,14 @@ if (!isset($_SESSION['user_id'])) {
 
                 // Fee status
                 $fee_paid   = $paid_amount > 0;
-                $fee_status = $fee_paid ? 'Lacag La Bixiyay ✓' : 'Lacag Ma Bixin ✗';
+                $fee_status = $fee_paid ? 'Fee Paid ✓' : 'Fee Not Paid ✗';
 
                 // Registered-by display (Self vs Staff)
                 $registered_by_raw = trim((string)($row['registered_by'] ?? ''));
                 $registered_by_lc = strtolower($registered_by_raw);
                 $is_cashier_or_manager = $registered_by_lc !== '' && (strpos($registered_by_lc, 'cashier') !== false || strpos($registered_by_lc, 'manager') !== false);
                 if ($registered_by_raw === '') {
-                  $registered_by_display = 'Lama cayimin';
+                  $registered_by_display = 'Not specified';
                 } else {
                   $registered_by_display = $registered_by_raw;
                 }
@@ -779,9 +786,9 @@ if (!isset($_SESSION['user_id'])) {
                 <!-- Single Card -->
                 <div class="member-card">
                   <?php if ($is_expired): ?>
-                    <div class="card-badge">Qorshihii wuu dhacay</div>
+                    <div class="card-badge">Plan Expired</div>
                   <?php else: ?>
-                    <div class="card-badge active">Wuu Shaqaynayaa</div>
+                    <div class="card-badge active">Active</div>
                   <?php endif; ?>
 
                   <div class="card-header-row">
@@ -798,7 +805,7 @@ if (!isset($_SESSION['user_id'])) {
 
                   <div class="card-details-grid">
                     <div class="detail-box" style="grid-column: span 2;">
-                      <span class="detail-label">Adeegga (Service)</span>
+                      <span class="detail-label">Service</span>
                       <span class="detail-val" style="color: #3b82f6;"><?php echo htmlspecialchars($row['services'], ENT_QUOTES, 'UTF-8'); ?></span>
                     </div>
                     <div class="detail-box">
@@ -806,27 +813,27 @@ if (!isset($_SESSION['user_id'])) {
                       <span class="detail-val"><?php echo $contact; ?></span>
                     </div>
                     <div class="detail-box">
-                      <span class="detail-label">Wadarta Guud</span>
+                      <span class="detail-label">Total Amount</span>
                       <span class="detail-val amount">$<?php echo $is_expired ? '0' : number_format($base_amount, 2); ?></span>
                     </div>
                     <div class="detail-box">
-                      <span class="detail-label">La Bixiyay</span>
+                      <span class="detail-label">Paid</span>
                       <span class="detail-val" style="color: #10b981;">$<?php echo number_format($paid_amount, 2); ?></span>
                     </div>
                     <div class="detail-box">
-                      <span class="detail-label">Haraaga</span>
+                      <span class="detail-label">Remaining</span>
                       <span class="detail-val" style="color: #ef4444;">$<?php echo number_format(max(0, $amount - $paid_amount), 2); ?></span>
                     </div>
                     <div class="detail-box">
-                      <span class="detail-label">Qorshaha</span>
-                      <span class="detail-val"><?php echo $plan_months; ?> Bilood</span>
+                      <span class="detail-label">Plan</span>
+                      <span class="detail-val"><?php echo $plan_months; ?> Months</span>
                     </div>
                     <div class="detail-box" style="grid-column: span 2;">
                       <span class="detail-label">Registered By</span>
                       <span class="detail-val"><?php echo htmlspecialchars($registered_by_display, ENT_QUOTES, 'UTF-8'); ?></span>
                     </div>
                     <div class="detail-box">
-                      <span class="detail-label">Dhicitaanka</span>
+                      <span class="detail-label">Expiry</span>
                       <span class="detail-val expiry <?php echo $is_expired ? 'expired' : ''; ?>"><?php echo $expiry; ?></span>
                     </div>
                   </div>
@@ -835,7 +842,7 @@ if (!isset($_SESSION['user_id'])) {
                   <div class="card-actions">
                     <button type="button" class="action-btn view-btn" data-member-id="<?php echo htmlspecialchars($detailKey, ENT_QUOTES, 'UTF-8'); ?>" onclick="viewMemberDetails(this)">
                       <i class="fas fa-eye"></i>
-                      Faahfaahin
+                      Details
                     </button>
                     <?php if ($contact_digits !== ''): ?>
                       <a class="action-btn whatsapp-btn" href="https://wa.me/<?php echo $contact_digits; ?>" target="_blank" rel="noopener noreferrer">
@@ -844,24 +851,29 @@ if (!isset($_SESSION['user_id'])) {
                       </a>
                       <a class="action-btn call-btn" href="tel:<?php echo $contact_digits; ?>">
                         <i class="fas fa-phone"></i>
-                        Wac
+                        Call
                       </a>
                     <?php endif; ?>
-                    <a class="action-btn renew-btn" href="user-payment.php?id=<?php echo (int)$row['user_id']; ?>">
-                      <i class="fas fa-redo"></i>
-                      Cusboonaysii
-                    </a>
-                    <a class="action-btn edit-btn" href="edit-memberform.php?id=<?php echo (int)$row['user_id']; ?>">
-                      <i class="fas fa-edit"></i>
-                      Tafatir
-                    </a>
-                    <a class="action-btn delete-btn" href="remove-member.php?id=<?php echo (int)$row['user_id']; ?>" onclick="return confirm('Ma hubtaa inaad tirtirayso xubintan?');">
-                      <i class="fas fa-trash"></i>
-                      Tirtir
-                    </a>
+                    <?php if (isset($_SESSION['designation']) && strtolower($_SESSION['designation']) === 'cashier'): ?>
+                      <a class="action-btn renew-btn" href="user-payment.php?id=<?php echo (int)$row['user_id']; ?>">
+                        <i class="fas fa-redo"></i>
+                        Renew
+                      </a>
+                      <a class="action-btn edit-btn" href="edit-memberform.php?id=<?php echo (int)$row['user_id']; ?>">
+                        <i class="fas fa-edit"></i>
+                        Edit
+                      </a>
+                      <a class="action-btn delete-btn" href="remove-member.php?id=<?php echo (int)$row['user_id']; ?>" onclick="return confirm('Are you sure you want to delete this member?');">
+                        <i class="fas fa-trash"></i>
+                        Delete
+                      </a>
+                    <?php endif; ?>
                   </div>
                 </div>
               <?php } ?>
+              <?php if ($errorMsg): ?>
+                <div class="alert alert-danger" style="grid-column: 1/-1;"> <?php echo $errorMsg; ?> </div>
+              <?php endif; ?>
             </div>
           </div>
 
@@ -877,7 +889,7 @@ if (!isset($_SESSION['user_id'])) {
       <!-- Header Bar -->
       <div style="background:linear-gradient(135deg,#1e293b,#334155); padding:16px 20px; display:flex; justify-content:space-between; align-items:center;">
         <span style="color:#fff; font-size:16px; font-weight:700; display:flex; align-items:center; gap:8px;"><i class="fas fa-id-card"></i> Member Profile</span>
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="color:#fff; opacity:0.8; font-size:22px; margin:0; padding:0; line-height:1;">×</button>
+        <button type="button" class="close" id="modalCloseBtn" aria-hidden="true" style="color:#fff; opacity:0.8; font-size:22px; margin:0; padding:0; line-height:1;">×</button>
       </div>
 
       <div style="max-height:580px; overflow-y:auto; background:#f1f5f9; padding:16px; display:flex; flex-direction:column; gap:12px;">
@@ -899,17 +911,17 @@ if (!isset($_SESSION['user_id'])) {
               </div>
             </div>
             <div style="text-align:right; min-width:140px;">
-              <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; font-weight:600;">Jinsiga</div>
+              <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; font-weight:600;">Gender</div>
               <div id="mdl_gender" style="font-size:14px; color:#1e293b; font-weight:600; margin-bottom:8px;"></div>
-              <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; font-weight:600;">Telefoon</div>
+              <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; font-weight:600;">Phone</div>
               <div id="mdl_contact" style="font-size:14px; color:#1e293b; font-weight:600; margin-bottom:8px;"></div>
-              <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; font-weight:600;">Laanta</div>
+              <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; font-weight:600;">Branch</div>
               <div id="mdl_branch" style="font-size:13px; color:#166534; font-weight:700;"></div>
             </div>
           </div>
           <div style="margin-top:14px; padding-top:14px; border-top:1px solid #f1f5f9; display:grid; grid-template-columns:1fr 1fr; gap:10px;">
             <div>
-              <div style="font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase;">Cinwaanka</div>
+              <div style="font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase;">Address</div>
               <div id="mdl_address" style="font-size:13px; color:#334155;"></div>
             </div>
             <div>
@@ -921,7 +933,7 @@ if (!isset($_SESSION['user_id'])) {
               <div id="mdl_bio_id" style="font-size:13px; color:#334155; font-weight:600;"></div>
             </div>
             <div>
-              <div style="font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase;">Fasalka</div>
+              <div style="font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase;">Batch</div>
               <div id="mdl_batch_val" style="font-size:13px; color:#334155; font-weight:600;"></div>
             </div>
             <div>
@@ -933,11 +945,11 @@ if (!isset($_SESSION['user_id'])) {
               <div id="mdl_pan" style="font-size:13px; color:#334155; font-weight:600;"></div>
             </div>
             <div>
-              <div style="font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase;">Diiwaangeliyey</div>
+              <div style="font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase;">Registered By</div>
               <div id="mdl_reg_by" style="font-size:13px; color:#6d28d9; font-weight:700;"></div>
             </div>
             <div>
-              <div style="font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase;">Nooca Tababarka</div>
+              <div style="font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase;">Trainer Type</div>
               <div id="mdl_trainer" style="font-size:13px; color:#334155; font-weight:600;"></div>
             </div>
           </div>
@@ -946,7 +958,7 @@ if (!isset($_SESSION['user_id'])) {
         <!-- MEMBERSHIP CARD -->
         <div style="background:#fff; border-radius:12px; padding:20px; box-shadow:0 1px 4px rgba(0,0,0,0.07);">
           <div style="font-size:15px; font-weight:800; color:#0f172a; margin-bottom:14px; display:flex; align-items:center; gap:8px; border-bottom:1px solid #f1f5f9; padding-bottom:10px;">
-            <i class="fas fa-layer-group" style="color:#0284c7;"></i> Qorshaha Xubinnimada
+            <i class="fas fa-layer-group" style="color:#0284c7;"></i> Membership Plan
           </div>
           <div style="background:#f8fafc; border-radius:10px; padding:14px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
             <div>
@@ -955,7 +967,7 @@ if (!isset($_SESSION['user_id'])) {
             </div>
             <div style="text-align:right;">
               <div id="mdl_days_right" style="font-size:20px; font-weight:800; color:#0284c7;"></div>
-              <div style="font-size:11px; color:#64748b;">Maalmood Haray</div>
+              <div style="font-size:11px; color:#64748b;">Days Remaining</div>
               <span id="mdl_status_right" style="padding:3px 12px; border-radius:20px; font-size:11px; font-weight:700; display:inline-block; margin-top:4px;"></span>
             </div>
           </div>
@@ -965,36 +977,36 @@ if (!isset($_SESSION['user_id'])) {
           </div>
           <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px; background:#f8fafc; border-radius:10px; padding:14px;">
             <div style="text-align:center;">
-              <div style="font-size:11px; color:#64748b; font-weight:600; margin-bottom:4px;">Lacagta Guud</div>
+              <div style="font-size:11px; color:#64748b; font-weight:600; margin-bottom:4px;">Total Amount</div>
               <div id="mdl_total_amt" style="font-size:15px; font-weight:800; color:#1e293b;"></div>
             </div>
             <div style="text-align:center; border-left:1px solid #e2e8f0;">
-              <div style="font-size:11px; color:#64748b; font-weight:600; margin-bottom:4px;">Sicir-dhimis</div>
+              <div style="font-size:11px; color:#64748b; font-weight:600; margin-bottom:4px;">Discount</div>
               <div id="mdl_disc_amt" style="font-size:15px; font-weight:800; color:#ea580c;"></div>
             </div>
             <div style="text-align:center; border-left:1px solid #e2e8f0;">
-              <div style="font-size:11px; color:#64748b; font-weight:600; margin-bottom:4px;">La Bixiyay</div>
+              <div style="font-size:11px; color:#64748b; font-weight:600; margin-bottom:4px;">Paid</div>
               <div id="mdl_paid_amt" style="font-size:15px; font-weight:800; color:#059669;"></div>
             </div>
             <div style="text-align:center; border-left:1px solid #e2e8f0;">
-              <div style="font-size:11px; color:#64748b; font-weight:600; margin-bottom:4px;">Haraaga</div>
+              <div style="font-size:11px; color:#64748b; font-weight:600; margin-bottom:4px;">Remaining</div>
               <div id="mdl_remaining_amt" style="font-size:15px; font-weight:800; color:#dc2626;"></div>
             </div>
           </div>
           <div id="mdl_comments_wrap" style="margin-top:12px; background:#fffbeb; border-radius:8px; padding:10px 14px; display:none;">
-            <div style="font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase; margin-bottom:3px;">Faahfaahin</div>
+            <div style="font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase; margin-bottom:3px;">Details</div>
             <div id="mdl_comments" style="font-size:13px; color:#475569;"></div>
           </div>
           <div id="mdl_document_wrap" style="margin-top:12px; display:none; text-align:center;">
             <a id="mdl_document_link" href="#" target="_blank" class="btn btn-info" style="border-radius:20px; font-weight:600; font-size:13px; padding:8px 20px;">
-              <i class="fas fa-file-pdf"></i> Cadeenta Documentiga (View Document)
+              <i class="fas fa-file-pdf"></i> View Document
             </a>
           </div>
         </div>
 
         <div style="background:#fff; border-radius:12px; padding:20px; box-shadow:0 1px 4px rgba(0,0,0,0.07);">
           <div style="font-size:15px; font-weight:800; color:#0f172a; margin-bottom:14px; display:flex; align-items:center; gap:8px; border-bottom:1px solid #f1f5f9; padding-bottom:10px;">
-            <i class="fas fa-info-circle" style="color:#0f766e;"></i> Xog Dheeraad Ah
+            <i class="fas fa-info-circle" style="color:#0f766e;"></i> Additional Info
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
             <div>
@@ -1014,7 +1026,7 @@ if (!isset($_SESSION['user_id'])) {
               <div id="mdl_extra_pan" style="font-size:13px; color:#334155; font-weight:600;"></div>
             </div>
             <div>
-              <div style="font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase;">Taariikhda Diiwaangelinta</div>
+              <div style="font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase;">Registration Date</div>
               <div id="mdl_joined_on" style="font-size:13px; color:#334155; font-weight:600;"></div>
             </div>
             <div>
@@ -1026,7 +1038,25 @@ if (!isset($_SESSION['user_id'])) {
 
       </div>
       <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding:12px 20px; display:flex; justify-content:flex-end;">
-        <button class="btn" data-dismiss="modal" aria-hidden="true" style="background:#e2e8f0; color:#475569; border:none; padding:8px 22px; border-radius:6px; font-weight:700; font-size:13px;">Xir ✕</button>
+        <button class="btn" id="modalCloseBtnFooter" aria-hidden="true" style="background:#e2e8f0; color:#475569; border:none; padding:8px 22px; border-radius:6px; font-weight:700; font-size:13px;">Close ✕</button>
+        <script>
+          // Modal close handler for both 'X' and 'Xir' buttons
+          function closeMemberModal() {
+            var modal = document.getElementById('memberDetailsModal');
+            if (modal) {
+              modal.style.display = 'none';
+              modal.classList.remove('in');
+              modal.classList.remove('show');
+              modal.setAttribute('aria-hidden', 'true');
+            }
+            document.body.classList.remove('modal-open');
+          }
+          document.getElementById('modalCloseBtn').onclick = closeMemberModal;
+          document.getElementById('modalCloseBtnFooter').onclick = closeMemberModal;
+          document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeMemberModal();
+          });
+        </script>
       </div>
     </div>
   </div>
@@ -1037,7 +1067,7 @@ if (!isset($_SESSION['user_id'])) {
   <!--Footer-part-->
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi </div>
   </div>
 
   <style>
@@ -1072,10 +1102,38 @@ if (!isset($_SESSION['user_id'])) {
 
   <script>
     window.memberDetailMap = <?php echo json_encode($memberDetailMap, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+    // For client-side filtering
+    window.allMembers = Object.values(window.memberDetailMap);
   </script>
 
   <script type="text/javascript">
-    function goPage(newURL) {
+    // Client-side filter for members
+    function filterMembers() {
+      var input = document.getElementById('memberSearchInput').value.toLowerCase();
+      var grid = document.getElementById('membersGrid');
+      var allCards = grid.querySelectorAll('.member-card');
+      if (!input) {
+        allCards.forEach(function(card) { card.style.display = ''; });
+        return;
+      }
+      allCards.forEach(function(card) {
+        var name = card.querySelector('.member-name')?.textContent.toLowerCase() || '';
+        var phone = card.querySelector('.detail-val')?.textContent.toLowerCase() || '';
+        var service = card.querySelector('.detail-val[style*="color: #3b82f6;"]')?.textContent.toLowerCase() || '';
+        if (name.includes(input) || phone.includes(input) || service.includes(input)) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    function resetMemberFilter() {
+      document.getElementById('memberSearchInput').value = '';
+      filterMembers();
+    }
+
+    // ...existing code...
       if (newURL != "") {
         if (newURL == "-") {
           resetMenu();
@@ -1083,7 +1141,7 @@ if (!isset($_SESSION['user_id'])) {
           document.location.href = newURL;
         }
       }
-    }
+    
 
     function resetMenu() {
       document.gomenu.selector.selectedIndex = 2;
@@ -1186,27 +1244,27 @@ if (!isset($_SESSION['user_id'])) {
           var rbLower = rawRegisteredBy.toLowerCase();
           var isCashierOrManager = rbLower !== '' && (rbLower.indexOf('cashier') !== -1 || rbLower.indexOf('manager') !== -1);
           if (rawRegisteredBy === '') {
-            registeredByText = 'Lama cayimin';
+            registeredByText = 'Not specified';
           } else {
             registeredByText = rawRegisteredBy;
           }
         }
-        setTextSafe('mdl_reg_by', registeredByText, 'Lama cayimin');
+        setTextSafe('mdl_reg_by', registeredByText, 'Not specified');
         setTextSafe('mdl_trainer', data.trainer_type);
 
         var sb = document.getElementById('mdl_status_badge');
-        sb.innerText = isExpired ? '✗ Dhacay' : '✓ Firfircoon';
+        sb.innerText = isExpired ? '✗ Expired' : '✓ Active';
         sb.style.background = isExpired ? '#fee2e2' : '#dcfce7';
         sb.style.color = isExpired ? '#dc2626' : '#16a34a';
 
         var fb = document.getElementById('mdl_fee_badge');
-        fb.innerText = data.fee_paid ? '✓ Lacag Bixiyay' : '✗ Lacag Ma Bixin';
+        fb.innerText = data.fee_paid ? '✓ Paid' : '✗ Unpaid';
         fb.style.background = data.fee_paid ? '#dcfce7' : '#fee2e2';
         fb.style.color = data.fee_paid ? '#16a34a' : '#dc2626';
 
-        setTextSafe('mdl_days_badge', (isExpired ? '0' : data.remaining_days) + ' Maalmood Haray');
+        setTextSafe('mdl_days_badge', (isExpired ? '0' : data.remaining_days) + ' Days Remaining');
         setTextSafe('mdl_service', data.services);
-        setTextSafe('mdl_plan_badge', (data.plan ? data.plan + ' Bilood' : 'N/A'));
+        setTextSafe('mdl_plan_badge', (data.plan ? data.plan + ' Months' : 'N/A'));
         setTextSafe('mdl_days_right', isExpired ? '0' : data.remaining_days, '0');
         setTextSafe('mdl_date_range', (data.dor || '?') + ' -> ' + (data.expiry_date || '?'));
 
@@ -1271,7 +1329,7 @@ if (!isset($_SESSION['user_id'])) {
         showModalSafe('memberDetailsModal');
       } catch (e) {
         console.error('Error:', e);
-        alert('Waan ka xunnahay, xogta xubinta lama soo tusi karo hadda.');
+        alert('Sorry, the member details cannot be displayed right now.');
       }
     }
   </script>

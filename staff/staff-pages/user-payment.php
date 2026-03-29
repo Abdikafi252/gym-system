@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -20,7 +20,7 @@ if (!in_array($_SESSION['designation'], ['Manager', 'Cashier'])) {
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../../css/bootstrap.min.css" />
@@ -77,18 +77,18 @@ if (!in_array($_SESSION['designation'], ['Manager', 'Cashier'])) {
       }
     }
 
-    $status_label = 'Sugaya';
+    $status_label = 'Pending';
     if ($row['status'] == 'Active') {
-      $status_label = 'Waa Socdaa (Active)';
+      $status_label = 'Active';
     } else if ($row['status'] == 'Expired') {
-      $status_label = 'Wuu Dhacay (Expired)';
+      $status_label = 'Expired';
     }
   ?>
 
     <div id="content">
       <div id="content-header">
-        <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="icon-home"></i> Bogga Hore</a> <a href="payment.php">Lacag Bixinta</a> <a href="#" class="current">Invoice</a> </div>
-        <h1>Foomka Lacag Bixinta</h1>
+        <div id="breadcrumb"> <a href="index.php" title="Go to Home Page" class="tip-bottom"><i class="icon-home"></i> Home</a> <a href="payment.php">Payments</a> <a href="#" class="current">Invoice</a> </div>
+        <h1>Payment Form</h1>
       </div>
 
 
@@ -97,7 +97,7 @@ if (!in_array($_SESSION['designation'], ['Manager', 'Cashier'])) {
           <div class="span12">
             <div class="widget-box">
               <div class="widget-title"> <span class="icon"> <i class="icon-money"></i> </span>
-                <h5>Lacag Bixinta</h5>
+                <h5>Payment</h5>
               </div>
               <div class="widget-content">
                 <div class="row-fluid">
@@ -134,39 +134,39 @@ if (!in_array($_SESSION['designation'], ['Manager', 'Cashier'])) {
                         <form action="userpay.php" method="POST">
                           <tr>
                           <tr>
-                            <td class="width30">Magaca Buuxa:</td>
+                            <td class="width30">Full Name:</td>
                             <input type="hidden" name="fullname" value="<?php echo $row['fullname']; ?>">
                             <td class="width70"><strong><?php echo $row['fullname']; ?></strong></td>
                           </tr>
                           <tr>
-                            <td>Sawirka Macmiilka:</td>
+                            <td>Customer Image:</td>
                             <td><img src="<?php echo $photo_path; ?>" alt="Member" style="width:70px;height:70px;border-radius:50%;object-fit:cover;"></td>
                           </tr>
                           <tr>
-                            <td>Xaaladda Hadda ee Xubinta:</td>
+                            <td>Current Member Status:</td>
                             <td><strong><?php echo $status_label; ?></strong></td>
                           </tr>
                           <tr>
-                            <td>Adeegga:</td>
+                            <td>Service:</td>
                             <input type="hidden" name="services" value="<?php echo $row['services']; ?>">
                             <td><strong><?php echo $row['services']; ?></strong></td>
                           </tr>
                           <tr>
-                            <td>Lacagta Bishii:</td>
+                            <td>Monthly Fee:</td>
                             <td><input id="amount" type="number" name="amount" value='<?php echo $row['amount']; ?>' /></td>
                           </tr>
 
                           <input type="hidden" name="paid_date" value="<?php echo $row['paid_date']; ?>">
 
-                          <td class="width30">Qorshaha:</td>
+                          <td class="width30">Plan:</td>
                           <td class="width70">
                             <div class="controls">
                               <select name="plan" required="required" id="planSelect">
-                                <option value="1" selected="selected">Hal Bil</option>
-                                <option value="3">Saddex Bilood</option>
-                                <option value="6">Lix Bilood</option>
-                                <option value="12">Hal Sano</option>
-                                <option value="0">Ma Dhacayo</option>
+                                <option value="1" selected="selected">One Month</option>
+                                <option value="3">Three Months</option>
+                                <option value="6">Six Months</option>
+                                <option value="12">One Year</option>
+                                <option value="0">Never Expires</option>
                               </select>
                             </div>
                           </td>
@@ -174,12 +174,12 @@ if (!in_array($_SESSION['designation'], ['Manager', 'Cashier'])) {
                           <tr>
 
                           </tr>
-                          <td class="width30">Xaaladda Xubinta:</td>
+                          <td class="width30">Member Status:</td>
                           <td class="width70">
                             <div class="controls">
                               <select name="status" required="required" id="select">
-                                <option value="Active" <?php echo ($row['status'] == 'Pending') ? 'selected="selected"' : ''; ?>>Waa Socdaa (Active - Aqbal)</option>
-                                <option value="Expired">Wuu Dhacay (Expired)</option>
+                                <option value="Active" <?php echo ($row['status'] == 'Pending') ? 'selected="selected"' : ''; ?>>Active (Accept)</option>
+                                <option value="Expired">Expired</option>
 
                               </select>
                             </div>
@@ -206,7 +206,7 @@ if (!in_array($_SESSION['designation'], ['Manager', 'Cashier'])) {
 
                       <input type="hidden" name="id" value="<?php echo $row['user_id']; ?>">
 
-                      <button class="btn btn-success btn-large" type="SUBMIT" href="">Bixi Hadda</button>
+                      <button class="btn btn-success btn-large" type="SUBMIT" href="">Pay Now</button>
 
                       </form>
                     </div><!-- span12 ends here -->
@@ -231,7 +231,7 @@ if (!in_array($_SESSION['designation'], ['Manager', 'Cashier'])) {
       <!--Footer-part-->
 
       <div class="row-fluid">
-        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
       </div>
 
       <style>

@@ -94,7 +94,7 @@ if ($period_res) {
 <html lang="en">
 
 <head>
-    <title>M * A GYM System - Attendance Report</title>
+    <title>M*A GYM System - Attendance Report</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="../../css/bootstrap.min.css" />
@@ -337,7 +337,7 @@ if ($period_res) {
 
     <div id="content">
         <div id="content-header">
-            <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="fas fa-home"></i> Bogga Hore</a> <a href="#" class="current">Warbixinta Imaatinka</a> </div>
+            <div id="breadcrumb"> <a href="index.php" title="Go to Home" class="tip-bottom"><i class="fas fa-home"></i> Home</a> <a href="#" class="current">Attendance Report</a> </div>
         </div>
         <div class="container-fluid">
 
@@ -347,7 +347,7 @@ if ($period_res) {
 
             <div class="report-card">
                 <div class="report-header">
-                    <h2 class="report-title"><i class="fas fa-users" style="color:#6b46c1;"></i> Jadwalka Imaanshaha</h2>
+                    <h2 class="report-title"><i class="fas fa-users" style="color:#6b46c1;"></i> Attendance Schedule</h2>
                     <form method="GET" class="report-filters" id="filterForm">
                         <input type="hidden" name="view_type" value="calendar">
                         <select name="month">
@@ -374,13 +374,10 @@ if ($period_res) {
 
                 <div class="legend-container">
                     <div class="legend-item">
-                        <div class="status-icon status-present"><i class="fas fa-check"></i></div> Soo Galay (Present/Checked Out)
+                        <div class="status-icon status-present"><i class="fas fa-check"></i></div> Present/Checked Out
                     </div>
                     <div class="legend-item">
-                        <div class="status-icon status-absent"><i class="fas fa-times"></i></div> Maqane (Absent)
-                    </div>
-                    <div class="legend-item">
-                        <div class="status-icon status-incomplete"><i class="fas fa-clock"></i></div> Wuu Joogaa Hadda (Incomplete)
+                        <div class="status-icon status-absent"><i class="fas fa-times"></i></div> Absent
                     </div>
                 </div>
 
@@ -388,7 +385,7 @@ if ($period_res) {
                     <table class="attendance-table">
                         <thead>
                             <tr>
-                                <th class="col-name">MAGACA XUBINTA</th>
+                                <th class="col-name">MEMBER NAME</th>
                                 <?php
                                 $cols = ($view_type == 'calendar') ? $num_of_days : 30;
                                 for ($d = 1; $d <= $cols; $d++): ?>
@@ -415,7 +412,7 @@ if ($period_res) {
                                     <tr>
                                         <td class="col-name">
                                             <strong><?php echo htmlspecialchars($member['fullname']); ?></strong><br>
-                                            <span style="font-size:11px; color:#718096;">Diiwaangelin: <?php echo date('d M Y', strtotime($start_date)); ?></span><br>
+                                            <span style="font-size:11px; color:#718096;">Registration: <?php echo date('d M Y', strtotime($start_date)); ?></span><br>
                                             <?php if (!empty($period_start) && $period_start !== $start_date): ?>
                                                 <span style="font-size:11px; color:#4c51bf;">Period Start (Renewal): <?php echo date('d M Y', strtotime($period_start)); ?></span>
                                             <?php else: ?>
@@ -448,22 +445,21 @@ if ($period_res) {
 
                                                     if ($is_future || $is_before_period_start || $is_after_period_end) {
                                                         echo "<div style='width:24px; height:24px;'></div>";
-                                                        if ($is_future) echo "<span class='tooltip-info'>Date: {$cell_date}<br>(Mustaqbal)</span>";
+                                                         if ($is_future) echo "<span class='tooltip-info'>Date: {$cell_date}<br>(Future)</span>";
                                                     } else {
                                                         if ($day_info) {
                                                             $is_incomplete = empty($day_info['check_out']) || strpos($day_info['check_out'], '0000') !== false;
+                                                            echo '<div class="status-icon status-present"><i class="fas fa-check"></i></div>';
                                                             if ($is_incomplete) {
-                                                                echo '<div class="status-icon status-incomplete"><i class="fas fa-clock"></i></div>';
                                                                 echo "<span class='tooltip-info'>Date: {$cell_date}<br>In: {$day_info['check_in']}</span>";
                                                             } else {
-                                                                echo '<div class="status-icon status-present"><i class="fas fa-check"></i></div>';
                                                                 $out_t = !empty($day_info['check_out']) ? date('h:i A', strtotime($day_info['check_out'])) : 'N/A';
                                                                 echo "<span class='tooltip-info'>Date: {$cell_date}<br>In: {$day_info['check_in']}<br>Out: {$out_t}</span>";
                                                             }
                                                             $present_count++;
                                                         } else {
                                                             echo '<div class="status-icon status-absent"><i class="fas fa-times"></i></div>';
-                                                            echo "<span class='tooltip-info'>Date: {$cell_date}<br>Absent (Maqane)</span>";
+                                                             echo "<span class='tooltip-info'>Date: {$cell_date}<br>Absent</span>";
                                                             $absent_count++;
                                                         }
                                                     }
@@ -478,7 +474,7 @@ if ($period_res) {
                             <?php
                                 endwhile;
                             } else {
-                                echo "<tr><td colspan='" . ($cols + 3) . "' style='text-align:center; padding:20px;'>Lama helin xubno (No members found)</td></tr>";
+                                 echo "<tr><td colspan='" . ($cols + 3) . "' style='text-align:center; padding:20px;'>No members found</td></tr>";
                             }
                             ?>
                         </tbody>
@@ -490,7 +486,7 @@ if ($period_res) {
     </div>
 
     <div class="row-fluid">
-        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi </div>
+        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi </div>
     </div>
 
     <style>

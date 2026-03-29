@@ -1,15 +1,15 @@
-<?php
+﻿<?php
 session_start();
 //the isset function to check username is already loged in and stored on the session
 if(!isset($_SESSION['user_id'])){
 header('location:../index.php');	
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>M * A GYM System</title>
+<title>M*A GYM System</title>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -593,6 +593,30 @@ header('location:../index.php');
                       </div>
                     </div>
                   </div>
+                  <?php
+                    include 'dbcon.php';
+                    $branch_qry = "SELECT * FROM branches";
+                    $branch_res = mysqli_query($con, $branch_qry);
+                    $isStaffManager = (isset($_SESSION['designation']) && $_SESSION['designation'] == 'Manager');
+                    $sessBranch = isset($_SESSION['branch_id']) ? (int)$_SESSION['branch_id'] : 0;
+                  ?>
+                  <div class="control-group">
+                    <label class="control-label">Branch :</label>
+                    <div class="controls">
+                      <select class="span11" name="branch_id" required <?php echo $isStaffManager ? 'disabled' : ''; ?>>
+                        <?php if (!$isStaffManager): ?>
+                        <option value="" disabled selected>Select Branch</option>
+                        <option value="0">Global / System</option>
+                        <?php endif; ?>
+                        <?php while ($b = mysqli_fetch_assoc($branch_res)) { ?>
+                        <option value="<?php echo $b['id']; ?>" <?php if ($isStaffManager && $b['id'] == $sessBranch) echo 'selected'; ?>><?php echo htmlspecialchars($b['branch_name']); ?></option>
+                        <?php } ?>
+                      </select>
+                      <?php if ($isStaffManager): ?>
+                      <input type="hidden" name="branch_id" value="<?php echo $sessBranch; ?>">
+                      <?php endif; ?>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -676,7 +700,7 @@ header('location:../index.php');
 <!--Footer-part-->
 
 <div class="row-fluid">
-  <div id="footer" class="span12"> <?php echo date("Y");?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+  <div id="footer" class="span12"> <?php echo date("Y");?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
 </div>
 
 <style>

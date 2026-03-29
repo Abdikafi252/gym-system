@@ -18,18 +18,18 @@ if (isset($_GET['id'])) {
     // 1. Insert into notifications table (System Notification)
     $message = "Dear Member,
 
-Waxaan halkaan kugu ogeysiinaynaa in barnaamijkaaga xubinimo (Membership Program) uu dhawaan dhamaanayo. Fadlan hubi inaad bixiso dhammaan lacagaha kugu waajiba ka hor taariikhda kama dambaysta ah.
+We would like to inform you that your membership program is expiring soon. Please ensure you pay any outstanding fees before the deadline.
 
-Waa arrin aad muhiim u ah inaad waqtigeeda ku bixiso lacagta si looga fogaado hakad ama joojin ku timaada adeegyada aad ka faa’iideysato.
+It is very important to pay on time to avoid any interruption or suspension of the services you benefit from.
 
-Waxaan si weyn kuu qadarinaynaa macaamiil ahaan, waxaana rajeyneynaa inaan sii wadno ku adeegidda mustaqbalka.
+We greatly appreciate you as a customer and look forward to continuing to serve you in the future.
 
-Haddii aad qabto wax su’aalo ah, fadlan nala soo xiriir.
+If you have any questions, please contact us.
 
-Mahadsanid,
+Thank you,
 
 Abdikafi Abdikadir Ali
-Maamulka GYM";
+GYM Management";
 
     // Escape message for DB
     $msg_db = mysqli_real_escape_string($con, $message);

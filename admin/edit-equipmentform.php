@@ -1,14 +1,14 @@
-<?php
+﻿<?php
 session_start();
 if(!isset($_SESSION['user_id'])){
 header('location:../index.php');	
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>M * A GYM System</title>
+<title>M*A GYM System</title>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -26,7 +26,7 @@ header('location:../index.php');
 <!--Header-part-->
 <?php include 'includes/header-content.php'; ?>
 <!--close-Header-part--> 
-<!-- Visit codeastro.com for more projects -->
+
 
 <!--top-Header-menu-->
 <?php include 'includes/topheader.php'?>
@@ -44,11 +44,19 @@ header('location:../index.php');
     <?php
         include 'dbcon.php';
         $id=$_GET['id'];
-        $qry= "select * from equipment where id='$id'";
+        $isStaffManager = (isset($_SESSION['designation']) && $_SESSION['designation'] == 'Manager');
+        $sessBranch = isset($_SESSION['branch_id']) ? (int)$_SESSION['branch_id'] : 0;
+        
+        $branch_where = ($isStaffManager && $sessBranch > 0) ? " AND branch_id = $sessBranch " : "";
+        $qry= "select * from equipment where id='$id' $branch_where";
         $result=mysqli_query($conn,$qry);
+        if (mysqli_num_rows($result) == 0) {
+            echo "<div class='container-fluid'><div class='alert alert-error'>Equipment not found or access denied.</div></div>";
+            exit;
+        }
         while($row=mysqli_fetch_array($result)){
     ?> 
-<!-- Visit codeastro.com for more projects -->
+
 <div id="content">
 <div id="content-header">
   <div id="breadcrumb"> <a href="index.php" title="Go to Home" class="tip-bottom"><i class="fas fa-home"></i> Home</a> <a href="#" class="tip-bottom">Equipments</a> <a href="#" class="current">Edit Equipments</a> </div>
@@ -89,6 +97,31 @@ header('location:../index.php');
               <label class="control-label">Quantity :</label>
               <div class="controls">
                 <input type="number" class="span4" name="quantity" value='<?php echo $row['quantity']; ?>'  required />
+              </div>
+            </div>
+            
+            <?php
+            $branch_qry = "SELECT * FROM branches";
+            $branch_res = mysqli_query($conn, $branch_qry);
+            ?>
+            <div class="control-group">
+              <label class="control-label">Branch :</label>
+              <div class="controls">
+                <select name="branch_id" class="span11" required <?php echo $isStaffManager ? 'disabled' : ''; ?>>
+                  <?php if (!$isStaffManager): ?>
+                    <option value="0" <?php if ($row['branch_id'] == 0) echo 'selected'; ?>>Global / System</option>
+                  <?php endif; ?>
+                  <?php 
+                    mysqli_data_seek($branch_res, 0);
+                    while($b = mysqli_fetch_assoc($branch_res)) { 
+                    $sel = ($b['id'] == $row['branch_id']) ? 'selected' : '';
+                  ?>
+                  <option value="<?php echo $b['id']; ?>" <?php echo $sel; ?>><?php echo htmlspecialchars($b['branch_name']); ?></option>
+                  <?php } ?>
+                </select>
+                <?php if ($isStaffManager): ?>
+                  <input type="hidden" name="branch_id" value="<?php echo $row['branch_id']; ?>">
+                <?php endif; ?>
               </div>
             </div>
             
@@ -165,7 +198,7 @@ header('location:../index.php');
                   </div>
               </div>
             </div>
-            <!-- Visit codeastro.com for more projects -->
+            
           
             
             <div class="form-actions text-center">
@@ -199,11 +232,11 @@ header('location:../index.php');
 <!--Footer-part-->
 
 <div class="row-fluid">
-  <div id="footer" class="span12"> <?php echo date("Y");?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+  <div id="footer" class="span12"> <?php echo date("Y");?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
 </div>
 
 
-<!-- Visit codeastro.com for more projects -->
+
 <!--end-Footer-part-->
 
 <script src="../js/excanvas.min.js"></script> 

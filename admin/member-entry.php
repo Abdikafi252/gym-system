@@ -5,12 +5,12 @@ if (!isset($_SESSION['user_id'])) {
   header('location:../index.php');
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
-<html lang="so">
+<html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -299,6 +299,65 @@ if (!isset($_SESSION['user_id'])) {
       margin-right: 10px;
       color: #4a5568;
     }
+
+    /* Webcam Modal Styles */
+    .webcam-modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .webcam-container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    #webcam-video {
+      width: 100%;
+      border-radius: 8px;
+      background: #000;
+      margin-bottom: 15px;
+      transform: scaleX(-1); /* Mirror view */
+    }
+
+    .webcam-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .btn-capture {
+      background: #e53e3e;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-cancel-webcam {
+      background: #edf2f7;
+      color: #4a5568;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+    }
   </style>
 </head>
 
@@ -319,7 +378,7 @@ if (!isset($_SESSION['user_id'])) {
 
   <div id="content">
     <div id="content-header">
-      <h1 class="page-title"><i class="fas fa-user-plus"></i> Diiwaangeli Xubin Cusub</h1>
+      <h1 class="page-title"><i class="fas fa-user-plus"></i> Register New Member</h1>
     </div>
 
     <div class="container-fluid">
@@ -339,14 +398,15 @@ if (!isset($_SESSION['user_id'])) {
       ?>
 
       <div class="form-card-container">
-        <a href="members.php" class="btn-close-card" title="Dib u Noqo">
+        <a href="members.php" class="btn-close-card" title="Go Back">
           <i class="fas fa-times"></i>
         </a>
         <form action="add-member-req.php" method="POST" enctype="multipart/form-data">
           <input type="file" name="photo" id="member_photo" style="display: none;" accept="image/*" onchange="previewFile()">
+          <input type="hidden" name="webcam_image" id="webcam_image">
 
           <div class="form-section">
-            <div class="form-section-title">Macluumaadka Qofka (Personal Information) :</div>
+            <div class="form-section-title">Personal Information :</div>
 
             <div style="display: flex; gap: 30px; margin-bottom: 20px; flex-wrap: wrap;">
               <!-- Photo Column -->
@@ -360,9 +420,17 @@ if (!isset($_SESSION['user_id'])) {
                     </div>
                   </label>
                   <div>
-                    <div style="font-size:15px; font-weight:700; color:#2d3748; margin-bottom:4px;">Sawir Profile</div>
-                    <div style="font-size:13px; color:#718096; margin-bottom:12px;">Riix si aad u dooratid</div>
-                    <span style="background:#fff5f5; color:#c53030; font-size:12px; font-weight:600; padding:4px 12px; border-radius:20px; display:inline-block;"><i class="fas fa-camera"></i> Dooro Sawir</span>
+                    <div style="font-size:15px; font-weight:700; color:#2d3748; margin-bottom:4px;">Profile Photo</div>
+                    <div style="font-size:13px; color:#718096; margin-bottom:12px;">Take a photo or upload</div>
+                    <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+                      <button type="button" class="btn" onclick="openWebcam()" style="background:#e53e3e; color:#fff; font-size:12px; font-weight:600; padding:6px 16px; border-radius:20px; border:none; width: fit-content;">
+                        <i class="fas fa-camera"></i> Take Photo
+                      </button>
+                      <label for="member_photo" style="background:#f1f5f9; color:#475569; font-size:11px; font-weight:600; padding:4px 12px; border-radius:20px; display:inline-block; cursor: pointer; border: 1px solid #e2e8f0;">
+                        <i class="fas fa-upload"></i> Upload File
+                      </label>
+                      <input type="hidden" name="webcam_image" id="webcam_image" value="" />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -371,16 +439,16 @@ if (!isset($_SESSION['user_id'])) {
               <div style="flex: 1; min-width: 300px;">
                 <div class="form-group-row">
                   <div class="form-col">
-                    <label class="custom-label">Magaca oo buuxa</label>
+                    <label class="custom-label">Full Name</label>
                     <div class="input-wrapper">
                       <i class="fas fa-user input-icon" style="color:#e53e3e;"></i>
-                      <input type="text" class="custom-input" name="fullname" placeholder="Gali Magaca" required />
+                      <input type="text" class="custom-input" name="fullname" placeholder="Enter Full Name" required />
                     </div>
                   </div>
                   <div class="form-col">
-                    <label class="custom-label">Member Id (Biometric Id)</label>
+                    <label class="custom-label">Face ID (Wajiga)</label>
                     <div class="input-wrapper">
-                      <i class="fas fa-id-card input-icon" style="color:#e53e3e;"></i>
+                      <i class="fas fa-user-check input-icon" style="color:#e53e3e;"></i>
                       <input type="text" class="custom-input" name="biometric_id" value="<?php echo $next_bio; ?>" required readonly />
                     </div>
                   </div>
@@ -412,35 +480,35 @@ if (!isset($_SESSION['user_id'])) {
                     </div>
                   </div>
                   <div class="form-col">
-                    <label class="custom-label">Telefoonka (Mobile)</label>
+                    <label class="custom-label">Mobile Phone</label>
                     <div class="input-wrapper">
                       <i class="fas fa-phone input-icon" style="color:#e53e3e;"></i>
-                      <input type="number" class="custom-input" name="contact" placeholder="Tusaale. 25261..." required />
+                      <input type="number" class="custom-input" name="contact" placeholder="Example: 25261..." required />
                     </div>
                   </div>
                 </div>
 
                 <div class="form-group-row">
                   <div class="form-col">
-                    <label class="custom-label">Jinsiga</label>
+                    <label class="custom-label">Gender</label>
                     <div class="input-wrapper">
                       <i class="fas fa-venus-mars input-icon" style="color:#e53e3e;"></i>
                       <select name="gender" class="custom-input" style="padding-left:35px !important;" required>
-                        <option value="Male" selected>Lab (Male)</option>
-                        <option value="Female">Dhedig (Female)</option>
+                        <option value="Male" selected>Male</option>
+                        <option value="Female">Female</option>
                       </select>
                     </div>
                   </div>
                   <div class="form-col">
-                    <label class="custom-label">Batch (Fasalka)</label>
+                    <label class="custom-label">Batch (Class)</label>
                     <div class="input-wrapper">
                       <i class="fas fa-database input-icon" style="color:#e53e3e;"></i>
                       <select name="batch" class="custom-input" style="padding-left:35px !important;">
-                        <option value="" selected>Xulo Fasalka</option>
-                        <option value="Subax">Subax (Morning)</option>
-                        <option value="Duhur">Duhur (Noon)</option>
-                        <option value="Galab">Galab (Afternoon)</option>
-                        <option value="Habeen">Habeen (Evening)</option>
+                        <option value="" selected>Select Batch</option>
+                        <option value="Subax">Morning (Subax)</option>
+                        <option value="Duhur">Noon (Duhur)</option>
+                        <option value="Galab">Afternoon (Galab)</option>
+                        <option value="Habeen">Evening (Habeen)</option>
                       </select>
                     </div>
                   </div>
@@ -448,11 +516,11 @@ if (!isset($_SESSION['user_id'])) {
 
                 <div class="form-group-row">
                   <div class="form-col">
-                    <label class="custom-label">Select Branch (Xulo Laanta)</label>
+                    <label class="custom-label">Select Branch</label>
                     <div class="input-wrapper">
                       <i class="fas fa-building input-icon" style="color:#e53e3e;"></i>
                       <select name="branch_id" class="custom-input" style="padding-left:35px !important;" required>
-                        <option value="" selected>Xulo Laanta</option>
+                        <option value="" selected>Select Branch</option>
                         <?php
                         include 'dbcon.php';
                         $branch_qry = "SELECT * FROM branches";
@@ -471,9 +539,9 @@ if (!isset($_SESSION['user_id'])) {
 
                 <div class="form-group-row">
                   <div class="form-col form-col-full">
-                    <label class="custom-label">Cinwaanka (Address)</label>
+                    <label class="custom-label">Address</label>
                     <div class="input-wrapper">
-                      <textarea name="address" class="custom-input" style="padding-left:15px !important; height:auto !important;" rows="2" placeholder="Gali Cinwaankaaga" required></textarea>
+                      <textarea name="address" class="custom-input" style="padding-left:15px !important; height:auto !important;" rows="2" placeholder="Enter your address" required></textarea>
                     </div>
                   </div>
                 </div>
@@ -483,23 +551,23 @@ if (!isset($_SESSION['user_id'])) {
 
           <!-- Document -->
           <div class="form-section">
-            <div class="form-section-title">Warqadda Aqoonsi :</div>
+            <div class="form-section-title">Identification Document :</div>
             <div class="form-group-row">
               <div class="form-col">
-                <label class="custom-label">Nooca Warqadda Aqoonsi</label>
+                <label class="custom-label">ID Document Type</label>
                 <div class="input-wrapper">
                   <i class="fas fa-file-alt input-icon" style="color:#e53e3e;"></i>
                   <select name="id_doc_type" class="custom-input" style="padding-left:35px !important;">
-                    <option value="">Xulo Nooca</option>
+                    <option value="">Select Type</option>
                     <option value="National ID">National ID</option>
                     <option value="Passport">Passport</option>
                     <option value="Driving License">Driving License</option>
-                    <option value="Other">Kale</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
               </div>
               <div class="form-col">
-                <label class="custom-label">Warqadda Aqoonsi (Upload)</label>
+                <label class="custom-label">ID Document (Upload)</label>
                 <div class="input-wrapper" style="align-items:center;">
                   <i class="fas fa-upload input-icon" style="color:#e53e3e;"></i>
                   <input type="file" name="id_document" class="custom-input" style="padding-left:35px !important; padding-top:8px;" accept=".jpg,.jpeg,.png,.pdf" />
@@ -510,37 +578,37 @@ if (!isset($_SESSION['user_id'])) {
 
           <!-- Membership Plan Details -->
           <div class="form-section">
-            <div class="form-section-title">Faahfaahinta Qorshaha Xubinnimada :</div>
+            <div class="form-section-title">Membership Plan Details :</div>
 
             <div class="form-group-row">
               <div class="form-col">
-                <label class="custom-label">Qorshaha (Plan)</label>
+                <label class="custom-label">Plan</label>
                 <div class="input-wrapper">
                   <i class="far fa-calendar input-icon" style="color:#e53e3e;"></i>
                   <select name="plan" id="plan" class="custom-input" style="padding-left:35px !important;" onchange="calculateExpiry()" required>
-                    <option value="" disabled selected>Xulo Qorshaha</option>
+                    <option value="" disabled selected>Select Plan</option>
                     <?php
                     $qry = "SELECT * FROM packages";
                     $result = mysqli_query($con, $qry);
                     while ($row = mysqli_fetch_array($result)) {
-                      echo "<option value='" . $row['duration'] . "'>" . $row['packagename'] . " (" . $row['duration'] . " Bilood)</option>";
+                      echo "<option value='" . $row['duration'] . "'>" . $row['packagename'] . " (" . $row['duration'] . " Months)</option>";
                     }
                     ?>
                   </select>
                 </div>
               </div>
               <div class="form-col">
-                <label class="custom-label">Adeegga (Service)</label>
+                <label class="custom-label">Service</label>
                 <div class="input-wrapper">
                   <i class="fas fa-dumbbell input-icon" style="color:#e53e3e;"></i>
                   <input type="hidden" id="amount" value="0">
                   <select name="services" id="services" class="custom-input" style="padding-left:35px !important;" onchange="updateAmount()" required>
-                    <option value="" disabled selected>Xulo Adeegga</option>
+                    <option value="" disabled selected>Select Service</option>
                     <?php
                     $qry = "SELECT * FROM rates";
                     $result = mysqli_query($con, $qry);
                     while ($row = mysqli_fetch_array($result)) {
-                      echo "<option value='" . $row['name'] . "' data-charge='" . $row['charge'] . "'>" . $row['name'] . " - $" . $row['charge'] . " bishiiba</option>";
+                      echo "<option value='" . $row['name'] . "' data-charge='" . $row['charge'] . "'>" . $row['name'] . " - $" . $row['charge'] . " per month</option>";
                     }
                     ?>
                   </select>
@@ -550,14 +618,14 @@ if (!isset($_SESSION['user_id'])) {
 
             <div class="form-group-row">
               <div class="form-col">
-                <label class="custom-label">Taariikhda Ku Biirista (Joining Date)</label>
+                <label class="custom-label">Joining Date</label>
                 <div class="input-wrapper">
                   <i class="far fa-calendar-check input-icon" style="color:#e53e3e;"></i>
                   <input type="date" name="dor" id="dor" class="custom-input" style="padding-left:35px !important;" value="<?php echo date('Y-m-d'); ?>" onchange="calculateExpiry()" required />
                 </div>
               </div>
               <div class="form-col">
-                <label class="custom-label">Taariikhda Dhicitaanka (Expiry Date)</label>
+                <label class="custom-label">Expiry Date</label>
                 <div class="input-wrapper">
                   <i class="far fa-calendar-times input-icon" style="color:#e53e3e;"></i>
                   <input type="date" name="expiry_date" id="expiry_date" class="custom-input" style="padding-left:35px !important;" required readonly />
@@ -567,7 +635,7 @@ if (!isset($_SESSION['user_id'])) {
 
             <div class="form-group-row">
               <div class="form-col">
-                <label class="custom-label">Taariikhda Lacag-Bixinta Bilowga (Payment Start Date)</label>
+                <label class="custom-label">Initial Payment Date</label>
                 <div class="input-wrapper">
                   <i class="fas fa-receipt input-icon" style="color:#e53e3e;"></i>
                   <input type="date" name="paid_date" class="custom-input" style="padding-left:35px !important;" value="<?php echo date('Y-m-d'); ?>" required />
@@ -578,18 +646,18 @@ if (!isset($_SESSION['user_id'])) {
 
             <div class="form-group-row">
               <div class="form-col">
-                <label class="custom-label">Nooca Sicir-dhimista (Discount Type)</label>
+                <label class="custom-label">Discount Type</label>
                 <div class="radio-group" style="padding-left:15px; height: 42px; display: flex; align-items: center; gap: 20px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px;">
                   <label class="radio-label" style="margin:0; font-size:14px; font-weight:600; color:#4a5568; cursor:pointer;">
-                    <input type="radio" name="discount_type" value="percent" checked onchange="calculateTotal()"> Boqolkiiba (%)
+                    <input type="radio" name="discount_type" value="percent" checked onchange="calculateTotal()"> Percentage (%)
                   </label>
                   <label class="radio-label" style="margin:0; font-size:14px; font-weight:600; color:#4a5568; cursor:pointer;">
-                    <input type="radio" name="discount_type" value="amount" onchange="calculateTotal()"> Lacag ahaan ($)
+                    <input type="radio" name="discount_type" value="amount" onchange="calculateTotal()"> Amount ($)
                   </label>
                 </div>
               </div>
               <div class="form-col">
-                <label class="custom-label">Sicir-dhimis (Discount Amount)</label>
+                <label class="custom-label">Discount Amount</label>
                 <div class="input-wrapper">
                   <i class="fas fa-percent input-icon" style="color:#e53e3e;" id="discount-icon"></i>
                   <input type="number" name="discount_amount" id="discount_amount" class="custom-input" style="padding-left:35px !important;" value="0" min="0" oninput="calculateTotal()" />
@@ -599,14 +667,14 @@ if (!isset($_SESSION['user_id'])) {
 
             <div class="form-group-row">
               <div class="form-col">
-                <label class="custom-label">Lacagta La Bixiyay (Paid Amount)</label>
+                <label class="custom-label">Paid Amount</label>
                 <div class="input-wrapper">
                   <i class="fas fa-money-bill-wave input-icon" style="color:#e53e3e;"></i>
                   <input type="number" name="paid_amount" id="paid_amount" class="custom-input" style="padding-left:35px !important;" placeholder="0" min="0" required />
                 </div>
               </div>
               <div class="form-col">
-                <label class="custom-label" style="color: #c53030;">Qiimaha Guud (Total Amount)</label>
+                <label class="custom-label" style="color: #c53030;">Total Amount</label>
                 <div class="input-wrapper" style="background:#fef2f2; border-radius:6px; border:1px solid #fecaca; height:42px; display:flex; align-items:center; padding:0 15px;">
                   <i class="fas fa-dollar-sign" style="color:#b91c1c; margin-right:8px; font-size:16px;"></i>
                   <span id="display_total_amount" style="font-size:18px; font-weight:700; color:#991b1b;">0.00</span>
@@ -616,10 +684,10 @@ if (!isset($_SESSION['user_id'])) {
 
             <div class="form-group-row">
               <div class="form-col form-col-full">
-                <label class="custom-label">Faahfaahin (Comments)</label>
+                <label class="custom-label">Comments</label>
                 <div class="input-wrapper">
                   <i class="far fa-comment-alt input-icon" style="color:#e53e3e; top:15px; transform:none;"></i>
-                  <textarea name="comments" class="custom-input" style="height:auto !important; padding-left:35px !important;" rows="2" placeholder="Gali Faahfaahin (Comments)"></textarea>
+                  <textarea name="comments" class="custom-input" style="height:auto !important; padding-left:35px !important;" rows="2" placeholder="Enter comments"></textarea>
                 </div>
               </div>
             </div>
@@ -630,17 +698,17 @@ if (!isset($_SESSION['user_id'])) {
 
           <!-- Trainer Details -->
           <div class="form-section">
-            <div class="form-section-title">Faahfaahinta Tababaraha :</div>
+            <div class="form-section-title">Trainer Details :</div>
             <div class="form-group-row">
               <div class="form-col">
-                <label class="custom-label">Nooca Tababarka (Trainer Type)</label>
+                <label class="custom-label">Trainer Type</label>
                 <div class="radio-group">
                   <i class="fas fa-id-card input-icon" style="color:#e53e3e; position:relative; left:0; margin-right:10px;"></i>
                   <label class="radio-label">
-                    <input type="radio" name="trainer_type" value="General Training" checked> Tababar Guud (General Training)
+                    <input type="radio" name="trainer_type" value="General Training" checked> General Training
                   </label>
                   <label class="radio-label">
-                    <input type="radio" name="trainer_type" value="Personal"> Tababarihi Gaar ah (Personal)
+                    <input type="radio" name="trainer_type" value="Personal"> Personal Trainer
                   </label>
                 </div>
               </div>
@@ -649,7 +717,7 @@ if (!isset($_SESSION['user_id'])) {
 
           <!-- Action Buttons -->
           <div class="action-buttons">
-            <button type="submit" class="btn btn-save" name="submit">DIIWAANGELI (SAVE)</button>
+            <button type="submit" class="btn btn-save" name="submit">SAVE MEMBER</button>
           </div>
 
         </form>
@@ -658,8 +726,23 @@ if (!isset($_SESSION['user_id'])) {
     </div>
   </div>
 
+  </div>
+
+  <!-- Webcam Modal -->
+  <div id="webcamModal" class="webcam-modal">
+    <div class="webcam-container">
+      <h3 style="margin-top:0; margin-bottom:15px; font-size:18px;">Capture Member Photo</h3>
+      <video id="webcam-video" autoplay playsinline></video>
+      <canvas id="webcam-canvas" style="display:none;"></canvas>
+      <div class="webcam-actions">
+        <button type="button" class="btn-cancel-webcam" onclick="closeWebcam()">Cancel</button>
+        <button type="button" class="btn-capture" onclick="capturePhoto()">Snap Photo</button>
+      </div>
+    </div>
+  </div>
+
   <div class="row-fluid">
-    <div id="footer" class="span12" style="color:white;"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi </div>
+    <div id="footer" class="span12" style="color:white;"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi </div>
   </div>
 
   <script src="../js/jquery.min.js"></script>
@@ -727,6 +810,9 @@ if (!isset($_SESSION['user_id'])) {
       var file = document.getElementById('member_photo').files[0];
       var reader = new FileReader();
 
+      // Clear webcam image if a file is manually selected
+      document.getElementById('webcam_image').value = "";
+
       reader.onloadend = function() {
         preview.src = reader.result;
         preview.style.display = 'block';
@@ -740,6 +826,68 @@ if (!isset($_SESSION['user_id'])) {
         preview.style.display = 'none';
         icon.style.display = 'block';
       }
+    }
+
+    // --- Webcam Logic ---
+    let stream = null;
+
+    async function openWebcam() {
+      const modal = document.getElementById('webcamModal');
+      const video = document.getElementById('webcam-video');
+
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            width: { ideal: 640 },
+            height: { ideal: 480 }
+          }
+        });
+        video.srcObject = stream;
+        modal.style.display = 'flex';
+      } catch (err) {
+        console.error("Webcam error:", err);
+        alert("Camaradu ma furnayso ama ogolaansho ayaad u diiday.");
+      }
+    }
+
+    function closeWebcam() {
+      const modal = document.getElementById('webcamModal');
+      const video = document.getElementById('webcam-video');
+
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+      }
+      video.srcObject = null;
+      modal.style.display = 'none';
+    }
+
+    function capturePhoto() {
+      const video = document.getElementById('webcam-video');
+      const canvas = document.getElementById('webcam-canvas');
+      const preview = document.getElementById('imagePreview');
+      const icon = document.getElementById('defaultAvatarIcon');
+      const hiddenInput = document.getElementById('webcam_image');
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const context = canvas.getContext('2d');
+
+      // Mirror capture to match video feed
+      context.translate(canvas.width, 0);
+      context.scale(-1, 1);
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+      hiddenInput.value = dataUrl;
+      preview.src = dataUrl;
+      preview.style.display = 'block';
+      icon.style.display = 'none';
+
+      // Clear file input if webcam is used
+      document.getElementById('member_photo').value = "";
+
+      closeWebcam();
     }
   </script>
 </body>

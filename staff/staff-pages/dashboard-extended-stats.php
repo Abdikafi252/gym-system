@@ -24,7 +24,7 @@ $r3 = mysqli_fetch_assoc($q3);
 $total_income = $r3['total'] ? $r3['total'] : 0;
 
 // 4. Ogeysiisyada
-$q4 = mysqli_query($con, "SELECT COUNT(*) as total FROM announcements");
+$q4 = mysqli_query($con, "SELECT COUNT(*) as total FROM announcements WHERE branch_id = '$branch_id'");
 if ($q4) {
     $r4 = mysqli_fetch_assoc($q4);
     $total_announcements = $r4['total'];
@@ -43,12 +43,12 @@ $r6 = mysqli_fetch_assoc($q6);
 $weekly_collection = $r6['total'] ? $r6['total'] : 0;
 
 // 7. Dakhliga Bishaan
-$q7 = mysqli_query($con, "SELECT SUM(paid_amount) as total FROM members WHERE paid_date >= '$first_day_of_month'");
+$q7 = mysqli_query($con, "SELECT SUM(paid_amount) as total FROM members WHERE branch_id = '$branch_id' AND paid_date >= '$first_day_of_month'");
 $r7 = mysqli_fetch_assoc($q7);
 $monthly_collection = $r7['total'] ? $r7['total'] : 0;
 
 // 8. Kharashka Bishaan
-$q8_1 = mysqli_query($con, "SELECT COALESCE(SUM(amount),0) as total FROM expenses WHERE date BETWEEN '$first_day_of_month' AND '$today'");
+$q8_1 = mysqli_query($con, "SELECT COALESCE(SUM(amount),0) as total FROM expenses WHERE branch_id = '$branch_id' AND date BETWEEN '$first_day_of_month' AND '$today'");
 $r8_1 = mysqli_fetch_assoc($q8_1);
 $monthly_expenses = isset($r8_1['total']) ? (float)$r8_1['total'] : 0;
 
@@ -109,7 +109,7 @@ if ($q16) {
     $total_staff = 0;
 }
 
-// 17. Qalabka Diyaar ah
+// 17. Equipment Ready
 $q17 = mysqli_query($con, "SELECT COUNT(*) as total FROM equipment WHERE branch_id = '$branch_id'");
 if ($q17) {
     $r17 = mysqli_fetch_assoc($q17);
@@ -366,14 +366,14 @@ if ($q20) {
     <a href="index.php" class="stat-card">
         <div class="stat-icon green"><i class="fas fa-user-check"></i></div>
         <div class="stat-content">
-            <h4 class="stat-title">Xubnaha Firfircoon</h4>
+            <h4 class="stat-title">Active Members</h4>
             <h3 class="stat-value green-text"><?php echo number_format($active_members); ?></h3>
         </div>
     </a>
     <a href="members.php" class="stat-card">
         <div class="stat-icon orange"><i class="fas fa-users"></i></div>
         <div class="stat-content">
-            <h4 class="stat-title">Xubnaha Diiwaangashan</h4>
+            <h4 class="stat-title">Registered Members</h4>
             <h3 class="stat-value orange-text"><?php echo number_format($total_members); ?></h3>
         </div>
     </a>
@@ -382,7 +382,7 @@ if ($q20) {
         <a href="payment.php" class="stat-card">
             <div class="stat-icon blue"><i class="fas fa-dollar-sign"></i></div>
             <div class="stat-content">
-                <h4 class="stat-title">Dakhliga Guud</h4>
+                <h4 class="stat-title">Total Income</h4>
                 <h3 class="stat-value blue-text">$<?php echo number_format($total_income); ?></h3>
             </div>
         </a>
@@ -391,7 +391,7 @@ if ($q20) {
     <a href="announcement.php" class="stat-card">
         <div class="stat-icon red"><i class="fas fa-bullhorn"></i></div>
         <div class="stat-content">
-            <h4 class="stat-title">Ogeysiisyada</h4>
+            <h4 class="stat-title">Announcements</h4>
             <h3 class="stat-value red-text"><?php echo number_format($total_announcements); ?></h3>
         </div>
     </a>
@@ -402,7 +402,7 @@ if ($q20) {
             <a href="equipment.php" class="stat-card">
                 <div class="stat-icon blue"><i class="fas fa-dumbbell"></i></div>
                 <div class="stat-content">
-                    <h4 class="stat-title">Qalabka Diyaar ah</h4>
+                    <h4 class="stat-title">Available Equipment</h4>
                     <h3 class="stat-value blue-text"><?php echo number_format($available_equipment); ?></h3>
                 </div>
             </a>
@@ -412,7 +412,7 @@ if ($q20) {
             <a href="expenses.php" class="stat-card">
                 <div class="stat-icon orange"><i class="fas fa-file-invoice-dollar"></i></div>
                 <div class="stat-content">
-                    <h4 class="stat-title">Wadarta Kharashyada</h4>
+                    <h4 class="stat-title">Total Expenses</h4>
                     <h3 class="stat-value orange-text">$<?php echo number_format($total_expenses); ?></h3>
                 </div>
             </a>
@@ -422,7 +422,7 @@ if ($q20) {
             <a href="reports.php" class="stat-card">
                 <div class="stat-icon green"><i class="fas fa-money-check-alt"></i></div>
                 <div class="stat-content">
-                    <h4 class="stat-title">Foydada Bishaan (Net)</h4>
+                    <h4 class="stat-title">Monthly Net Profit</h4>
                     <h3 class="stat-value green-text">$<?php echo number_format($monthly_net_profit); ?></h3>
                 </div>
             </a>
@@ -432,7 +432,7 @@ if ($q20) {
             <a href="renewal-due-report.php" class="stat-card">
                 <div class="stat-icon red"><i class="fas fa-clock"></i></div>
                 <div class="stat-content">
-                    <h4 class="stat-title">Dhicitaanka Maanta</h4>
+                    <h4 class="stat-title">Today's Expiry</h4>
                     <h3 class="stat-value red-text"><?php echo number_format($today_plan_expiry); ?></h3>
                 </div>
             </a>
@@ -442,7 +442,7 @@ if ($q20) {
             <a href="staffs.php" class="stat-card">
                 <div class="stat-icon gray"><i class="fas fa-user-ninja"></i></div>
                 <div class="stat-content">
-                    <h4 class="stat-title">Tababarayaasha</h4>
+                    <h4 class="stat-title">Trainers</h4>
                     <h3 class="stat-value"><?php echo number_format($total_trainers); ?></h3>
                 </div>
             </a>
@@ -453,21 +453,21 @@ if ($q20) {
             <a href="payment.php" class="stat-card">
                 <div class="stat-icon blue"><i class="fas fa-money-bill-wave"></i></div>
                 <div class="stat-content">
-                    <h4 class="stat-title">Dakhliga Maanta</h4>
+                    <h4 class="stat-title">Today's Collection</h4>
                     <h3 class="stat-value blue-text">$<?php echo number_format($today_collection); ?></h3>
                 </div>
             </a>
             <a href="payment.php" class="stat-card">
                 <div class="stat-icon orange"><i class="fas fa-money-bill"></i></div>
                 <div class="stat-content">
-                    <h4 class="stat-title">Dakhliga Todobaadka</h4>
+                    <h4 class="stat-title">Weekly Collection</h4>
                     <h3 class="stat-value orange-text">$<?php echo number_format($weekly_collection); ?></h3>
                 </div>
             </a>
             <a href="payment.php" class="stat-card">
                 <div class="stat-icon pink"><i class="fas fa-arrow-down"></i></div>
                 <div class="stat-content">
-                    <h4 class="stat-title">Dakhliga Bishaan</h4>
+                    <h4 class="stat-title">Monthly Collection</h4>
                     <h3 class="stat-value pink-text">$<?php echo number_format($monthly_collection); ?></h3>
                 </div>
             </a>
@@ -477,7 +477,7 @@ if ($q20) {
             <a href="expenses.php" class="stat-card">
                 <div class="stat-icon gray"><i class="fas fa-arrow-up"></i></div>
                 <div class="stat-content">
-                    <h4 class="stat-title">Kharashka Bishaan</h4>
+                    <h4 class="stat-title">Monthly Expenses</h4>
                     <h3 class="stat-value">$<?php echo number_format($monthly_expenses); ?></h3>
                 </div>
             </a>
@@ -488,28 +488,28 @@ if ($q20) {
             <a href="renewal-due-report.php" class="stat-card">
                 <div class="stat-icon purple"><i class="fas fa-sync"></i></div>
                 <div class="stat-content">
-                    <h4 class="stat-title">Cusboonaysiinta Maanta</h4>
+                    <h4 class="stat-title">Today's Renewals</h4>
                     <h3 class="stat-value purple-text"><?php echo number_format($today_renewal); ?></h3>
                 </div>
             </a>
             <a href="renewal-due-report.php" class="stat-card">
                 <div class="stat-icon pink"><i class="fas fa-sync"></i></div>
                 <div class="stat-content">
-                    <h4 class="stat-title">Cusboonaysiinta Bishaan</h4>
+                    <h4 class="stat-title">Monthly Renewals</h4>
                     <h3 class="stat-value pink-text"><?php echo number_format($monthly_renewal); ?></h3>
                 </div>
             </a>
             <a href="renewal-due-report.php" class="stat-card">
                 <div class="stat-icon blue"><i class="fas fa-sync"></i></div>
                 <div class="stat-content">
-                    <h4 class="stat-title">Cusboonaysiinta Dhiman</h4>
+                    <h4 class="stat-title">Pending Renewals</h4>
                     <h3 class="stat-value blue-text"><?php echo number_format($pending_renewal); ?></h3>
                 </div>
             </a>
             <a href="payment.php" class="stat-card">
                 <div class="stat-icon green"><i class="fas fa-credit-card"></i></div>
                 <div class="stat-content">
-                    <h4 class="stat-title">Haraaga Dhiman</h4>
+                    <h4 class="stat-title">Pending Balance</h4>
                     <h3 class="stat-value green-text">$<?php echo number_format($pending_balance); ?></h3>
                 </div>
             </a>
@@ -521,7 +521,7 @@ if ($q20) {
             <a href="attendance-report.php" class="stat-card">
                 <div class="stat-icon orange"><i class="fas fa-users-cog"></i></div>
                 <div class="stat-content">
-                    <h4 class="stat-title">Xubnaha Maanta Jooga</h4>
+                    <h4 class="stat-title">Members Present Today</h4>
                     <h3 class="stat-value orange-text"><?php echo number_format($member_present); ?></h3>
                 </div>
             </a>
@@ -531,7 +531,7 @@ if ($q20) {
             <a href="members.php" class="stat-card">
                 <div class="stat-icon yellow"><i class="fas fa-user-plus"></i></div>
                 <div class="stat-content">
-                    <h4 class="stat-title">Diiwaangelinta Cusub</h4>
+                    <h4 class="stat-title">New Registrations</h4>
                     <h3 class="stat-value yellow-text"><?php echo number_format($new_membership); ?></h3>
                 </div>
             </a>
@@ -541,7 +541,7 @@ if ($q20) {
             <a href="staffs.php" class="stat-card">
                 <div class="stat-icon gray"><i class="fas fa-id-badge"></i></div>
                 <div class="stat-content">
-                    <h4 class="stat-title">Wadarta Shaqaalaha</h4>
+                    <h4 class="stat-title">Total Staff</h4>
                     <h3 class="stat-value"><?php echo number_format($total_staff); ?></h3>
                 </div>
             </a>

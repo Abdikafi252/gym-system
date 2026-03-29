@@ -17,9 +17,9 @@ if (!isset($con) && !isset($conn)) {
 }
 
 // Check again
-if (!isset($con)) {
-    // If still not set, try manual connection (last resort)
-    $con = mysqli_connect("localhost", "root", "", "gymnsb");
+if (!isset($con) || !$con) {
+    // Attempt include one last time
+    include_once __DIR__ . '/../dbcon.php';
 }
 
 include_once __DIR__ . '/sms_helper.php';
@@ -53,8 +53,7 @@ if ($result) {
 
         // Send SMS + WhatsApp
         $sent_sms = sendExpiryAlert($name, $contact);
-        $wa_msg = "Asc $name, Xubinimadaada GYM-ka way dhacday. Fadlan cusbooneysii.\nMahadsanid.";
-        $sent_wa = sendWhatsApp($contact, $wa_msg);
+        $sent_wa = sendWhatsApp($contact, 'gym_expiry', 'en'); // Haddii aad {{1}} ku darto farriinta badal kan oo isticmaal koodhkan => sendWhatsApp($contact, 'gym_expiry', 'en', [$name]);
 
         if ($sent_sms || $sent_wa) {
             // Mark as sent for current expired cycle

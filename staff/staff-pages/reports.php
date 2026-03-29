@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 session_start();
 ini_set('display_errors', 1);
@@ -15,12 +15,12 @@ $branch_id = $_SESSION['branch_id'];
 $qry = "SELECT gender, count(*) as number FROM members WHERE branch_id = '$branch_id' GROUP BY gender";
 $result = mysqli_query($con, $qry);
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../../css/bootstrap.min.css" />
@@ -41,7 +41,7 @@ $result = mysqli_query($con, $qry);
 
     function drawChart() {
       var data = google.visualization.arrayToDataTable([
-        ['Adeegyada', 'Tirada Guud'],
+        ['Gender', 'Total Number'],
         <?php
         while ($row = mysqli_fetch_array($result)) {
           echo "['" . $row["gender"] . "', " . $row["number"] . "],";
@@ -49,7 +49,7 @@ $result = mysqli_query($con, $qry);
         ?>
       ]);
       var options = {
-        title: 'Boqolayda Xubnaha GYM marka loo eego Ragga iyo Haweenka',
+        title: 'GYM Members Percentage by Gender (Male and Female)',
         //is3D:true,  
         pieHole: 0.0
       };
@@ -66,7 +66,7 @@ $result = mysqli_query($con, $qry);
 
     function drawStuff() {
       var data = new google.visualization.arrayToDataTable([
-        ['Terms', 'Wadarta Lacagta', ],
+        ['Terms', 'Total Amount', ],
 
         <?php
         $branch_id = $_SESSION['branch_id'];
@@ -74,7 +74,7 @@ $result = mysqli_query($con, $qry);
 
         $rezz = mysqli_query($con, $query1);
         while ($data = mysqli_fetch_array($rezz)) {
-          $services = 'Dakhliga';
+          $services = 'Income';
           $numberone = $data['numberone'];
           // $numbertwo=$data['numbertwo'];
         ?>['<?php echo $services; ?>', <?php echo $numberone; ?>, ],
@@ -87,7 +87,7 @@ $result = mysqli_query($con, $qry);
         $query10 = "SELECT quantity, SUM(amount) as numbert FROM equipment WHERE branch_id = '$branch_id'";
         $res1000 = mysqli_query($con, $query10);
         while ($data = mysqli_fetch_array($res1000)) {
-          $expenses = 'Kharashyada';
+          $expenses = 'Expenses';
           $numbert = $data['numbert'];
 
         ?>['<?php echo $expenses; ?>', <?php echo $numbert; ?>, ],
@@ -132,7 +132,7 @@ $result = mysqli_query($con, $qry);
 
     function drawStuff() {
       var data = new google.visualization.arrayToDataTable([
-        ['Adeegyada', 'Tirada Guud'],
+        ['Services', 'Total Number'],
         // ["King's pawn (e4)", 44],
         // ["Queen's pawn (d4)", 31],
         // ["Knight to King 3 (Nf3)", 12],
@@ -167,7 +167,7 @@ $result = mysqli_query($con, $qry);
           x: {
             0: {
               side: 'top',
-              label: 'Wadarta'
+              label: 'Total'
             } // Top x-axis.
           }
         },
@@ -198,7 +198,7 @@ $result = mysqli_query($con, $qry);
   <button type="submit" class="tip-bottom" title="Search"><i class="icon-search icon-white"></i></button>
 </div> -->
   <!--close-top-serch-->
-  <!-- Visit codeastro.com for more projects -->
+  
   <!--sidebar-menu-->
   <?php $page = 'chart';
   include '../includes/sidebar.php' ?>
@@ -206,8 +206,8 @@ $result = mysqli_query($con, $qry);
 
   <div id="content">
     <div id="content-header">
-      <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="fas fa-home"></i> Bogga Hore</a> <a href="reports.php" class="current">Shaxda Xogta</a> </div>
-      <h1 class="text-center">Warbixinta Dakhliga iyo Kharashyada <i class="fas fa-chart-bar"></i></h1>
+      <div id="breadcrumb"> <a href="index.php" title="Go to Home Page" class="tip-bottom"><i class="fas fa-home"></i> Home</a> <a href="reports.php" class="current">Data Charts</a> </div>
+      <h1 class="text-center">Income and Expenses Report <i class="fas fa-chart-bar"></i></h1>
     </div>
     <div class="container-fluid">
 
@@ -219,7 +219,7 @@ $result = mysqli_query($con, $qry);
     </div>
 
     <div id="content-header">
-      <h1 class="text-center">Xubnaha Diiwaangashan marka loo eego Jinsiga <i class="fas fa-chart-bar"></i></h1>
+      <h1 class="text-center">Registered Members by Gender <i class="fas fa-chart-bar"></i></h1>
     </div>
     <div class="container-fluid">
 
@@ -231,7 +231,7 @@ $result = mysqli_query($con, $qry);
     </div>
 
     <div id="content-header">
-      <h1 class="text-center">Warbixinta Adeegyada <i class="fas fa-chart-bar"></i></h1>
+      <h1 class="text-center">Services Report <i class="fas fa-chart-bar"></i></h1>
     </div>
     <div class="container-fluid">
 
@@ -252,7 +252,7 @@ $result = mysqli_query($con, $qry);
   <!--Footer-part-->
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi </div>
   </div>
 
   <style>

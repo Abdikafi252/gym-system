@@ -7,6 +7,9 @@ if (!isset($_SESSION['user_id'])) {
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
     include 'dbcon.php';
+    require_once __DIR__ . '/includes/accounting_engine.php';
+    // Delete accounting records for this expense
+    acc_delete_source_postings($con, 'expense', $id);
     $qry = "DELETE FROM expenses WHERE id='$id'";
     $result = mysqli_query($con, $qry);
 

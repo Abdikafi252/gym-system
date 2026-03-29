@@ -1,18 +1,15 @@
 <?php
+include __DIR__ . '/../../dbcon.php';
 
-$servername="localhost";
-$uname="root";
-$pass="";
-$db="gymnsb";
+if (!isset($conn) && isset($con)) {
+    $conn = $con;
+}
 
-$conn=mysqli_connect($servername,$uname,$pass,$db);
-
-if(!$conn){
+if (!$conn) {
     die("Connection Failed");
 }
 
-$sql = "SELECT * FROM members WHERE status ='Active'";
-                $query = $conn->query($sql);
-
-                echo "$query->num_rows";
+$sql = "SELECT * FROM members WHERE status='Active'";
+$query = mysqli_query($conn, $sql);
+echo mysqli_num_rows($query);
 ?>

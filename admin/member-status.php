@@ -1,16 +1,16 @@
-<?php
+﻿<?php
 session_start();
 //the isset function to check username is already loged in and stored on the session
 if (!isset($_SESSION['user_id'])) {
   header('location:../index.php');
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -46,7 +46,7 @@ if (!isset($_SESSION['user_id'])) {
   <h1><a href="index.php">&nbsp;</a></h1>
   <!--close-Header-part-->
 
-  <!-- Visit codeastro.com for more projects -->
+  
   <!--top-Header-menu-->
   <?php include 'includes/topheader.php' ?>
   <!--close-top-Header-menu-->
@@ -64,8 +64,8 @@ if (!isset($_SESSION['user_id'])) {
 
   <div id="content">
     <div id="content-header">
-      <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="fas fa-home"></i> Bogga Hore</a> <a href="member-status.php" class="current">Xaaladda</a> </div>
-      <h1 class="text-center">Xaaladda Hadda ee Xubinta <i class="fas fa-eye"></i></h1>
+      <div id="breadcrumb"> <a href="index.php" title="Go to Home Page" class="tip-bottom"><i class="fas fa-home"></i> Home</a> <a href="member-status.php" class="current">Status</a> </div>
+      <h1 class="text-center">Current Member Status <i class="fas fa-eye"></i></h1>
     </div>
     <div class="container-fluid">
       <hr>
@@ -75,7 +75,7 @@ if (!isset($_SESSION['user_id'])) {
           <div class='widget-box'>
 
             <div class='widget-title'> <span class='icon'> <i class='fas fa-th'></i> </span>
-              <h5>Jadwalka Xaaladda</h5>
+              <h5>Status Schedule</h5>
             </div>
             <div class='widget-content nopadding'>
 
@@ -85,7 +85,9 @@ if (!isset($_SESSION['user_id'])) {
               // Automatically update status for members whose plan has expired
               mysqli_query($con, "UPDATE members SET status = 'Expired' WHERE expiry_date < CURDATE() AND status = 'Active'");
 
-              $qry = "SELECT * FROM members";
+              $branch_id = isset($_SESSION['branch_id']) ? (int)$_SESSION['branch_id'] : 0;
+              $branch_where = $branch_id > 0 ? " AND branch_id = " . $branch_id : "";
+              $qry = "SELECT * FROM members WHERE status != 'Deleted'" . $branch_where;
               $cnt = 1;
               $result = mysqli_query($con, $qry);
               ?>
@@ -152,11 +154,6 @@ if (!isset($_SESSION['user_id'])) {
                 .card-badge.active {
                   background: #dcfce7;
                   color: #10b981;
-                }
-
-                .card-badge.pending {
-                  background: #ffedd5;
-                  color: #ea580c;
                 }
 
                 .card-header-row {
@@ -256,17 +253,14 @@ if (!isset($_SESSION['user_id'])) {
                   $icon_class = ($gender == 'female') ? 'fas fa-female' : 'fas fa-user';
                   $status = $row['status'];
                   $badge_class = '';
-                  $status_text = 'Sugaya';
+                  $status_text = 'Pending';
 
-                  if ($status == 'Active') {
+                   if ($status == 'Active') {
                     $badge_class = 'active';
-                    $status_text = 'Waa Socdaa';
-                  } else if ($status == 'Expired') {
-                    $badge_class = '';
-                    $status_text = 'Wuu Dhacay';
+                    $status_text = 'Active';
                   } else {
-                    $badge_class = 'pending';
-                    $status_text = 'Sugaya';
+                    $badge_class = 'expired';
+                    $status_text = 'Expired';
                   }
 
                   // Handle photo path (prefer img/members, then uploads)
@@ -305,15 +299,15 @@ if (!isset($_SESSION['user_id'])) {
 
                     <div class="card-details-grid">
                       <div class="detail-box" style="grid-column: span 2;">
-                        <span class="detail-label">Adeegga (Service)</span>
+                        <span class="detail-label">Service</span>
                         <span class="detail-val" style="color: #3b82f6;"><?php echo htmlspecialchars($row['services']); ?></span>
                       </div>
                       <div class="detail-box">
-                        <span class="detail-label">Qorshaha</span>
-                        <span class="detail-val"><?php echo htmlspecialchars($row['plan']); ?> Bilood</span>
+                        <span class="detail-label">Plan</span>
+                        <span class="detail-val"><?php echo htmlspecialchars($row['plan']); ?> Months</span>
                       </div>
                       <div class="detail-box">
-                        <span class="detail-label">Xilliga Uu Dhacayo</span>
+                        <span class="detail-label">Expiry Date</span>
                         <span class="detail-val expiry <?php echo ($status == 'Expired') ? 'expired' : ''; ?>">
                           <?php echo date('d M, Y', strtotime($row['expiry_date'])); ?>
                         </span>
@@ -340,7 +334,7 @@ if (!isset($_SESSION['user_id'])) {
   <!--Footer-part-->
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
   </div>
 
   <style>

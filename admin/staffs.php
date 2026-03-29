@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 header('Cache-Control: post-check=0, pre-check=0', false);
@@ -9,12 +9,12 @@ if (!isset($_SESSION['user_id'])) {
   header('location:../index.php');
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -39,7 +39,7 @@ if (!isset($_SESSION['user_id'])) {
   <!--top-Header-menu-->
   <?php include 'includes/topheader.php' ?>
   <!--close-top-Header-menu-->
-  <!-- Visit codeastro.com for more projects -->
+  
   <!--sidebar-menu-->
   <?php $page = 'staff-management';
   include 'includes/sidebar.php' ?>
@@ -47,17 +47,27 @@ if (!isset($_SESSION['user_id'])) {
 
   <div id="content">
     <div id="content-header">
-      <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="fas fa-home"></i> Bogga Hore</a> <a href="staffs.php" class="current">Xubnaha Shaqaalaha</a> </div>
-      <h1 class="text-center">Liiska Shaqaalaha GYM <i class="fas fa-briefcase"></i></h1>
+      <div id="breadcrumb"> <a href="index.php" title="Go to Home Page" class="tip-bottom"><i class="fas fa-home"></i> Home</a> <a href="staffs.php" class="current">Staff Members</a> </div>
+      <h1 class="text-center">GYM Staff List <i class="fas fa-briefcase"></i></h1>
     </div>
     <div class="container-fluid">
       <hr>
       <div class="row-fluid">
         <div class="span12">
-          <a href="staffs-entry.php"><button class="btn btn-primary">Ku Dar Xubno Shaqaale</button></a>
+          <a href="staffs-entry.php"><button class="btn btn-primary">Add Staff Member</button></a>
+          <!-- Search/Filter Bar for Staff -->
+          <div class="row-fluid">
+            <div class="span6 offset3">
+              <form id="staffSearchForm" class="form-inline" style="margin-bottom: 18px; display: flex; gap: 10px; align-items: center;">
+                <input type="text" id="staffSearchInput" class="form-control" placeholder="Search by name, phone, or designation..." style="flex: 1; min-width: 180px;" />
+                <button type="button" class="btn btn-info" onclick="filterStaff()"><i class="fas fa-search"></i> Search</button>
+                <button type="button" class="btn btn-secondary" onclick="resetStaffFilter()"><i class="fas fa-undo"></i> Reset</button>
+              </form>
+            </div>
+          </div>
           <div class='widget-box'>
             <div class='widget-title'> <span class='icon'> <i class='fas fa-th'></i> </span>
-              <h5>Jadwalka Shaqaalaha</h5>
+              <h5>Staff Schedule</h5>
             </div>
             <style>
               .staff-grid {
@@ -167,7 +177,7 @@ if (!isset($_SESSION['user_id'])) {
 
               .staff-actions {
                 display: grid;
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
                 gap: 14px;
                 width: 100%;
                 padding-top: 22px;
@@ -343,14 +353,19 @@ if (!isset($_SESSION['user_id'])) {
               }
             </style>
 
-            <div class="staff-grid">
+            <div class="staff-grid" id="staffGrid">
 
               <?php
               include "dbcon.php";
-              $qry = "SELECT * FROM staffs WHERE username != 'admin'";
+              $branch_id = isset($_SESSION['branch_id']) ? (int)$_SESSION['branch_id'] : 0;
+              $branch_where = $branch_id > 0 ? " WHERE s.branch_id = " . $branch_id : "";
+              $qry = "SELECT s.*, b.branch_name FROM staffs s LEFT JOIN branches b ON s.branch_id = b.id" . $branch_where;
               $result = mysqli_query($con, $qry);
               $staffDetailMap = [];
-
+              $errorMsg = '';
+              if (!$result) {
+                $errorMsg = 'Error loading staff: ' . htmlspecialchars(mysqli_error($con));
+              }
               while ($row = mysqli_fetch_array($result)) {
                 $uid = $row['user_id'];
                 $photo = $row['photo'];
@@ -365,7 +380,8 @@ if (!isset($_SESSION['user_id'])) {
                   'email' => $row['email'],
                   'address' => $row['address'],
                   'contact' => $row['contact'],
-                  'photo' => $photo_path
+                  'photo' => $photo_path,
+                  'created_at' => $row['created_at'] ?? null
                 ];
                 $detailKey = (string)$uid;
                 $staffDetailMap[$detailKey] = $staffData;
@@ -391,11 +407,23 @@ if (!isset($_SESSION['user_id'])) {
 
                   <div class="staff-details-list">
                     <div class="staff-detail-row">
-                      <span class="detail-label">Telefoon:</span>
+                      <span class="detail-label">Branch:</span>
+                      <span class="detail-value text-info" style="font-weight: 800;">
+                        <?php echo htmlspecialchars($row['branch_name'] ?? 'Global / System'); ?>
+                      </span>
+                    </div>
+                    <div class="staff-detail-row">
+                      <span class="detail-label">Registered:</span>
+                      <span class="detail-value">
+                        <?php echo isset($row['created_at']) ? date('Y-m-d H:i', strtotime($row['created_at'])) : 'N/A'; ?>
+                      </span>
+                    </div>
+                    <div class="staff-detail-row">
+                      <span class="detail-label">Phone:</span>
                       <span class="detail-value"><?php echo htmlspecialchars($row['contact']); ?></span>
                     </div>
                     <div class="staff-detail-row">
-                      <span class="detail-label">Jinsi:</span>
+                      <span class="detail-label">Gender:</span>
                       <span class="detail-value"><?php echo htmlspecialchars($row['gender']); ?></span>
                     </div>
                     <div class="staff-detail-row">
@@ -403,31 +431,71 @@ if (!isset($_SESSION['user_id'])) {
                       <span class="detail-value"><?php echo htmlspecialchars((string)($row['email'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></span>
                     </div>
                     <div class="staff-detail-row">
-                      <span class="detail-label">Cinwaan:</span>
+                      <span class="detail-label">Address:</span>
                       <span class="detail-value"><?php echo htmlspecialchars((string)($row['address'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></span>
+                    </div>
+                    <div class="staff-detail-row">
+                      <span class="detail-label">Registered:</span>
+                      <span class="detail-value"><?php echo isset($row['created_at']) ? date('Y-m-d H:i', strtotime($row['created_at'])) : 'N/A'; ?></span>
+                    </div>
+                    <div class="staff-detail-row">
+                      <span class="detail-label">Last Updated:</span>
+                      <span class="detail-value"><?php echo isset($row['updated_at']) && $row['updated_at'] ? date('Y-m-d H:i', strtotime($row['updated_at'])) : 'Never'; ?></span>
                     </div>
                   </div>
 
                   <?php $staff_contact_digits = preg_replace('/\D+/', '', (string)($row['contact'] ?? '')); ?>
                   <div class="staff-actions">
-                    <button type="button" class="staff-action-btn btn-details" data-staff-id="<?php echo htmlspecialchars($detailKey, ENT_QUOTES, 'UTF-8'); ?>" onclick="viewStaffDetails(this)">
-                      <i class="fas fa-eye"></i> Faahfaahin
-                    </button>
                     <?php if ($staff_contact_digits !== ''): ?>
                       <a class="staff-action-btn btn-whatsapp" href="https://wa.me/<?php echo $staff_contact_digits; ?>" target="_blank" rel="noopener noreferrer">
                         <i class="fab fa-whatsapp"></i> WhatsApp
                       </a>
                     <?php endif; ?>
                     <a class="staff-action-btn btn-edit" href="edit-staff-form.php?id=<?php echo (int)$row['user_id']; ?>">
-                      <i class="fas fa-edit"></i> Tafatir
+                      <i class="fas fa-edit"></i> Edit
                     </a>
-                    <a class="staff-action-btn btn-delete" href="remove-staff.php?id=<?php echo (int)$row['user_id']; ?>" onclick="return confirm('Ma hubtaa inaad tirtirayso shaqaalahan?');">
-                      <i class="fas fa-trash"></i> Tirtir
+                    <a class="staff-action-btn btn-delete" href="remove-staff.php?id=<?php echo (int)$row['user_id']; ?>" onclick="return confirm('Are you sure you want to delete this staff?');">
+                      <i class="fas fa-trash"></i> Delete
                     </a>
                   </div>
                 </div>
 
               <?php } ?>
+              <?php if ($errorMsg): ?>
+                <div class="alert alert-danger" style="grid-column: 1/-1;"> <?php echo $errorMsg; ?> </div>
+              <?php endif; ?>
+  <script>
+    window.staffDetailMap = <?php echo json_encode($staffDetailMap, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+    // For client-side filtering
+    window.allStaff = Object.values(window.staffDetailMap);
+    // Client-side filter for staff
+    function filterStaff() {
+      var input = document.getElementById('staffSearchInput').value.toLowerCase();
+      var grid = document.getElementById('staffGrid');
+      var allCards = grid.querySelectorAll('.staff-card');
+      if (!input) {
+        allCards.forEach(function(card) { card.style.display = ''; });
+        return;
+      }
+      allCards.forEach(function(card) {
+        var name = card.querySelector('.staff-basic-info h4')?.textContent.toLowerCase() || '';
+        var phone = '';
+        var phoneElem = card.querySelector('.staff-detail-row .detail-value');
+        if (phoneElem) phone = phoneElem.textContent.toLowerCase();
+        var designation = card.querySelector('.designation-badge')?.textContent.toLowerCase() || '';
+        if (name.includes(input) || phone.includes(input) || designation.includes(input)) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    function resetStaffFilter() {
+      document.getElementById('staffSearchInput').value = '';
+      filterStaff();
+    }
+  </script>
 
             </div>
           </div>
@@ -444,7 +512,7 @@ if (!isset($_SESSION['user_id'])) {
   <!--Footer-part-->
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi </div>
   </div>
 
   <style>
@@ -467,7 +535,7 @@ if (!isset($_SESSION['user_id'])) {
   <div id="staffDetailsModal" class="modal hide fade staff-details-modal" tabindex="-1" role="dialog" aria-labelledby="staffDetailsLabel" aria-hidden="true">
     <div class="modal-header" style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 20px;">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-      <h3 style="margin: 0; color: #1e293b; font-size: 20px; display: flex; align-items: center; gap: 10px;"><i class="fas fa-user-shield"></i> Macluumaadka Shaqaalaha (Staff Details)</h3>
+      <h3 style="margin: 0; color: #1e293b; font-size: 20px; display: flex; align-items: center; gap: 10px;"><i class="fas fa-user-shield"></i> Staff Details</h3>
     </div>
     <div class="modal-body" style="padding: 25px;">
       <div style="display: flex; justify-content: center; margin-bottom: 25px;">
@@ -479,7 +547,7 @@ if (!isset($_SESSION['user_id'])) {
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
         <div style="display: flex; flex-direction: column;">
-          <span style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Magaca oo buuxa</span>
+          <span style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Full Name</span>
           <span id="stf_name" style="font-size: 15px; color: #1e293b; font-weight: 600;"></span>
         </div>
         <div style="display: flex; flex-direction: column;">
@@ -487,15 +555,15 @@ if (!isset($_SESSION['user_id'])) {
           <span id="stf_username" style="font-size: 15px; color: #0284c7; font-weight: 600;"></span>
         </div>
         <div style="display: flex; flex-direction: column;">
-          <span style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Xilka (Designation)</span>
+          <span style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Designation</span>
           <span id="stf_designation" style="font-size: 15px; color: #059669; font-weight: 700;"></span>
         </div>
         <div style="display: flex; flex-direction: column;">
-          <span style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Jinsiga</span>
+          <span style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Gender</span>
           <span id="stf_gender" style="font-size: 15px; color: #1e293b; font-weight: 600;"></span>
         </div>
         <div style="display: flex; flex-direction: column; grid-column: span 2;">
-          <span style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Telefoonka</span>
+          <span style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Phone</span>
           <span id="stf_contact" style="font-size: 15px; color: #1e293b; font-weight: 600;"></span>
         </div>
         <div style="display: flex; flex-direction: column; grid-column: span 2;">
@@ -503,13 +571,13 @@ if (!isset($_SESSION['user_id'])) {
           <span id="stf_email" style="font-size: 15px; color: #1e293b; font-weight: 600;"></span>
         </div>
         <div style="display: flex; flex-direction: column; grid-column: span 2;">
-          <span style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Cinwaanka</span>
+          <span style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Address</span>
           <span id="stf_address" style="font-size: 14px; color: #1e293b; font-weight: 500;"></span>
         </div>
       </div>
     </div>
     <div class="modal-footer" style="background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 15px;">
-      <button class="btn" data-dismiss="modal" aria-hidden="true" style="border-radius: 6px; font-weight: 600;">Xir (Close)</button>
+      <button class="btn" data-dismiss="modal" aria-hidden="true" style="border-radius: 6px; font-weight: 600;">Close</button>
     </div>
   </div>
 
@@ -615,7 +683,7 @@ if (!isset($_SESSION['user_id'])) {
         showModalSafe('staffDetailsModal');
       } catch (e) {
         console.error("Error parsing staff data: ", e);
-        alert("Waan ka xunnahay, xogta shaqaalaha lama soo tusi karo hadda.");
+        alert("Sorry, the staff details cannot be displayed right now.");
       }
     }
   </script>

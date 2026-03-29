@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -96,8 +96,9 @@ if (!isset($_SESSION['user_id'])) {
                             $duration = $_POST['duration'];
                             $amount = $_POST['amount'];
                             $description = $_POST['description'];
+                            $branch_id = $_SESSION['branch_id'];
 
-                            $qry = "INSERT INTO packages (packagename, duration, amount, description) VALUES ('$packagename', '$duration', '$amount', '$description')";
+                            $qry = "INSERT INTO packages (packagename, duration, amount, description, branch_id) VALUES ('$packagename', '$duration', '$amount', '$description', '$branch_id')";
                             $result = mysqli_query($con, $qry);
 
                             if ($result) {
@@ -140,7 +141,8 @@ if (!isset($_SESSION['user_id'])) {
                                 <tbody>
                                     <?php
                                     include "dbcon.php";
-                                    $qry = "SELECT * FROM packages";
+                                    $branch_id = $_SESSION['branch_id'];
+                                    $qry = "SELECT * FROM packages WHERE branch_id = '$branch_id'";
                                     $result = mysqli_query($con, $qry);
                                     $cnt = 1;
                                     while ($row = mysqli_fetch_array($result)) {
@@ -166,7 +168,7 @@ if (!isset($_SESSION['user_id'])) {
 
     <!--Footer-part-->
     <div class="row-fluid">
-        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</div>
+        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</div>
     </div>
 
     <style>

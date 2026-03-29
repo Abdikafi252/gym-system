@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -14,7 +14,7 @@ if (!isset($_SESSION['user_id'])) {
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../../css/bootstrap.min.css" />
@@ -37,12 +37,6 @@ if (!isset($_SESSION['user_id'])) {
   <!--top-Header-menu-->
   <?php include '../includes/header.php' ?>
   <!--close-top-Header-menu-->
-  <!--start-top-serch-->
-  <!-- <div id="search">
-  <input type="hidden" placeholder="Search here..."/>
-  <button type="submit" class="tip-bottom" title="Search"><i class="icon-search icon-white"></i></button>
-</div> -->
-  <!--close-top-serch-->
   <!--sidebar-menu-->
 
   <?php $page = "equipment";
@@ -51,8 +45,8 @@ if (!isset($_SESSION['user_id'])) {
 
   <div id="content">
     <div id="content-header">
-      <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="icon-home"></i> Bogga Hore</a> <a href="remove-equipment.php" class="current">Ka saar Qalabka</a> </div>
-      <h1 class="text-center">Ka saar Qalabka GYM-ka <i class="icon icon-cogs"></i></h1>
+      <div id="breadcrumb"> <a href="index.php" title="Go to Home" class="tip-bottom"><i class="icon-home"></i> Home</a> <a href="remove-equipment.php" class="current">Remove Equipment</a> </div>
+      <h1 class="text-center">Remove GYM Equipment <i class="icon icon-cogs"></i></h1>
     </div>
     <div class="container-fluid">
       <hr>
@@ -61,7 +55,7 @@ if (!isset($_SESSION['user_id'])) {
 
           <div class='widget-box'>
             <div class='widget-title'> <span class='icon'> <i class='icon-cogs'></i> </span>
-              <h5>Jadwalka Qalabka</h5>
+              <h5>Equipment Table</h5>
             </div>
             <div class='widget-content nopadding'>
 
@@ -77,13 +71,13 @@ if (!isset($_SESSION['user_id'])) {
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Qalabka</th>
-                  <th>Sharaxaadda</th>
-                  <th>Lacagta</th>
-                  <th>Iibiyaha</th>
-                  <th>Xiriirka</th>
-                  <th>Taariikhda Iibka</th>
-                  <th>Falka</th>
+                  <th>Equipment</th>
+                  <th>Description</th>
+                  <th>Amount</th>
+                  <th>Vendor</th>
+                  <th>Contact</th>
+                  <th>Purchase Date</th>
+                  <th>Action</th>
                 </tr>
               </thead>";
 
@@ -98,7 +92,7 @@ if (!isset($_SESSION['user_id'])) {
                 <td><div class='text-center'>" . $row['vendor'] . "</div></td>
                 <td><div class='text-center'>" . $row['contact'] . "</div></td>
                 <td><div class='text-center'>" . $row['date'] . "</div></td>
-                <td><div class='text-center'><a href='actions/delete-equipment.php?id=" . $row['id'] . "' style='color:#F66;'><i class='icon icon-trash'></i> Ka saar</a></div></td>
+                <td><div class='text-center'><a href='actions/delete-equipment.php?id=" . $row['id'] . "' style='color:#F66;'><i class='icon icon-trash'></i> Remove</a></div></td>
                 
               </tbody>";
                 $cnt++;
@@ -108,8 +102,6 @@ if (!isset($_SESSION['user_id'])) {
               </table>
             </div>
           </div>
-
-
 
         </div>
       </div>
@@ -121,12 +113,14 @@ if (!isset($_SESSION['user_id'])) {
   <!--Footer-part-->
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
   </div>
 
   <style>
     #footer {
       color: white;
+      text-align: center;
+      padding: 10px;
     }
   </style>
 
@@ -155,25 +149,15 @@ if (!isset($_SESSION['user_id'])) {
   <script src="../../js/matrix.tables.js"></script>
 
   <script type="text/javascript">
-    // This function is called from the pop-up menus to transfer to
-    // a different page. Ignore if the value returned is a null string:
     function goPage(newURL) {
-
-      // if url is empty, skip the menu dividers and reset the menu selection to default
       if (newURL != "") {
-
-        // if url is "-", it is this page -- reset the menu:
         if (newURL == "-") {
           resetMenu();
-        }
-        // else, send page to designated URL            
-        else {
+        } else {
           document.location.href = newURL;
         }
       }
     }
-
-    // resets the menu selection upon entry to this page:
     function resetMenu() {
       document.gomenu.selector.selectedIndex = 2;
     }

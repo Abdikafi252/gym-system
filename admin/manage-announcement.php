@@ -1,15 +1,15 @@
-<?php
+﻿<?php
 session_start();
 //the isset function to check username is already loged in and stored on the session
 if(!isset($_SESSION['user_id'])){
 header('location:../index.php');	
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>M * A GYM System</title>
+<title>M*A GYM System</title>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -27,7 +27,7 @@ header('location:../index.php');
 <!--Header-part-->
 <?php include 'includes/header-content.php'; ?>
 <!--close-Header-part--> 
-<!-- Visit codeastro.com for more projects -->
+
 
 <!--top-Header-menu-->
 <?php include 'includes/topheader.php'?>
@@ -36,7 +36,7 @@ header('location:../index.php');
 <!-- <div id="search">
   <input type="hidden" placeholder="Search here..."/>
   <button type="submit" class="tip-bottom" title="Search"><i class="icon-search icon-white"></i></button>
-</div> --><!-- Visit codeastro.com for more projects -->
+</div> --><!--  -->
 <!--close-top-serch-->
 
 <!--sidebar-menu-->
@@ -62,7 +62,9 @@ header('location:../index.php');
 	  <?php
 
       include "dbcon.php";
-      $qry="select * from announcements";
+      $branch_id = isset($_SESSION['branch_id']) ? (int)$_SESSION['branch_id'] : 0;
+      $branch_where = $branch_id > 0 ? " WHERE branch_id = " . $branch_id : "";
+      $qry="select * from announcements" . $branch_where;
       $cnt = 1;
         $result=mysqli_query($conn,$qry);
 
@@ -106,7 +108,7 @@ header('location:../index.php');
 <!--Footer-part-->
 
 <div class="row-fluid">
-  <div id="footer" class="span12"> <?php echo date("Y");?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+  <div id="footer" class="span12"> <?php echo date("Y");?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
 </div>
 
 <style>

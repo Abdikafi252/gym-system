@@ -1,16 +1,16 @@
-<?php
+﻿<?php
 session_start();
 //the isset function to check username is already loged in and stored on the session
 if (!isset($_SESSION['user_id'])) {
   header('location:../index.php');
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <title>Gym System Maamulaha</title>
+  <title>Gym System Administrator</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -30,7 +30,7 @@ if (!isset($_SESSION['user_id'])) {
   <h1><a href="index.php">&nbsp;</a></h1>
   <!--close-Header-part-->
 
-  <!-- Visit codeastro.com for more projects -->
+  
   <!--top-Header-menu-->
   <?php include 'includes/topheader.php' ?>
   <!--close-top-Header-menu-->
@@ -48,8 +48,8 @@ if (!isset($_SESSION['user_id'])) {
 
   <div id="content">
     <div id="content-header">
-      <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="fas fa-home"></i> Bogga Hore</a> <a href="member-report.php" class="current">Warbixinta Xubnaha</a> </div>
-      <h1 class="text-center">Eeg Warbixinnada <i class="fas fa-file"></i></h1>
+      <div id="breadcrumb"> <a href="index.php" title="Go to Home Page" class="tip-bottom"><i class="fas fa-home"></i> Home</a> <a href="members-report.php" class="current">Members Report</a> </div>
+      <h1 class="text-center">View Reports <i class="fas fa-file"></i></h1>
     </div>
     <div class="container-fluid">
       <hr>
@@ -59,14 +59,16 @@ if (!isset($_SESSION['user_id'])) {
           <div class='widget-box'>
 
             <div class='widget-title'> <span class='icon'> <i class='fas fa-th'></i> </span>
-              <h5>Qaybta Warbixinta</h5>
+              <h5>Reports Section</h5>
             </div>
             <div class='widget-content nopadding'>
 
               <?php
 
               include "dbcon.php";
-              $qry = "select * from members";
+              $branch_id = isset($_SESSION['branch_id']) ? (int)$_SESSION['branch_id'] : 0;
+              $branch_where = $branch_id > 0 ? " AND branch_id = " . $branch_id : "";
+              $qry = "select * from members where status != 'Deleted'" . $branch_where;
               $cnt = 1;
               $result = mysqli_query($conn, $qry);
 
@@ -75,10 +77,10 @@ if (!isset($_SESSION['user_id'])) {
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Magaca Buuxa</th>
-                  <th>Adeegga La Doortay</th>
-                  <th>Diiwaangeliyaha</th>
-                  <th>Falka</th>
+                   <th>Full Name</th>
+                  <th>Selected Service</th>
+                  <th>Registered By</th>
+                  <th>Action</th>
                 </tr>
               </thead>";
 
@@ -99,7 +101,7 @@ if (!isset($_SESSION['user_id'])) {
                     <div class='text-center'><?php echo ($row['registered_by'] ? $row['registered_by'] : 'Admin'); ?></div>
                   </td>
                   <td>
-                    <div class='text-center'><a href="view-member-report.php?id= <?php echo $row['user_id'] ?>"><i class="fas fa-file"></i> Eeg Warbixinta</a></div>
+                    <div class='text-center'><a href="view-member-report.php?id= <?php echo $row['user_id'] ?>"><i class="fas fa-file"></i> View Report</a></div>
                   </td>
 
                 </tbody>
@@ -124,7 +126,7 @@ if (!isset($_SESSION['user_id'])) {
   <!--Footer-part-->
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
   </div>
 
   <style>

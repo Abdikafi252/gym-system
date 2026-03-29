@@ -112,18 +112,29 @@ error_reporting(E_ALL);
                 $password = password_hash($password, PASSWORD_DEFAULT);
                 $totalamount = isset($_POST["total_amount"]) ? $_POST["total_amount"] : ($amount * $plan);
 
-                // Handle Photo Upload
+                // Handle Photo Upload (File or Webcam)
                 $photo_name = "";
+                $target_dir = "../../img/members/";
+
                 if (isset($_FILES['photo']) && $_FILES['photo']['error'] == 0) {
-                  $target_dir = "../../img/members/";
                   $file_ext = pathinfo($_FILES["photo"]["name"], PATHINFO_EXTENSION);
                   $photo_name = "member_" . time() . "_" . $biometric_id . "." . $file_ext;
                   $target_file = $target_dir . $photo_name;
-
-                  if (move_uploaded_file($_FILES["photo"]["tmp_name"], $target_file)) {
-                    // Success
-                  } else {
-                    $photo_name = ""; // Reset if failed
+                  if (!move_uploaded_file($_FILES["photo"]["tmp_name"], $target_file)) {
+                    $photo_name = "";
+                  }
+                } elseif (!empty($_POST['webcam_image'])) {
+                  // Handle Webcam Base64 Image
+                  $base64_img = $_POST['webcam_image'];
+                  if (strpos($base64_img, 'data:image/jpeg;base64,') === 0) {
+                    $base64_img = str_replace('data:image/jpeg;base64,', '', $base64_img);
+                    $base64_img = str_replace(' ', '+', $base64_img);
+                    $data = base64_decode($base64_img);
+                    $photo_name = "member_cam_" . time() . "_" . $biometric_id . ".jpg";
+                    $file_path = $target_dir . $photo_name;
+                    if (!file_put_contents($file_path, $data)) {
+                      $photo_name = "";
+                    }
                   }
                 }
 
@@ -177,7 +188,7 @@ error_reporting(E_ALL);
 
                 $registered_by_esc = mysqli_real_escape_string($conn, $registered_by);
                 $qry = "INSERT INTO members(fullname,username,password,dor,gender,services,amount,p_year,paid_date,plan,address,contact,biometric_id,expiry_date,status,registered_by,attendance_count,ini_bodytype,curr_bodytype,progress_date,batch,email,aadhar,pan,discount_type,discount_amount,paid_amount,comments,trainer_type,photo,branch_id,id_doc_type,id_document,created_by,updated_by,updated_at)
-                  VALUES ('$fullname','$username','$password','$dor','$gender','$services','$totalamount','$p_year','$paid_date','$plan','$address','$contact','$biometric_id','$expiry_date','Pending','$registered_by','0','','','$dor','$batch','$email','$aadhar','$pan','$discount_type','$discount_amount','$paid_amount','$comments','$trainer_type','$photo_name', '$branch_id','$id_doc_type','$id_doc_name','$registered_by_esc','$registered_by_esc',NOW())";
+                  VALUES ('$fullname','$username','$password','$dor','$gender','$services','$totalamount','$p_year','$paid_date','$plan','$address','$contact','$biometric_id','$expiry_date','Active','$registered_by','0','','','$dor','$batch','$email','$aadhar','$pan','$discount_type','$discount_amount','$paid_amount','$comments','$trainer_type','$photo_name', '$branch_id','$id_doc_type','$id_doc_name','$registered_by_esc','$registered_by_esc',NOW())";
 
                 echo "<p>Attempting Insert...</p>";
 
@@ -206,6 +217,18 @@ error_reporting(E_ALL);
                   $actorId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : '0';
                   audit_log($conn, 'staff', $actorId, 'member_register', 'member', $new_user_id, 'New member registered: ' . $fullname);
 
+                  // Face Terminal Sync (DA-T12 / WL-P72)
+                  require_once __DIR__ . '/../../includes/FaceTerminal.php';
+                  $ft = new FaceTerminal($conn);
+                  if ($ft->isEnabled()) {
+                      $sync_res = $ft->syncPerson($biometric_id, $fullname, $target_dir . $photo_name);
+                      if (isset($sync_res['status']) && $sync_res['status'] === 'success') {
+                          echo "<div class='alert alert-info'><strong>Terminal Sync:</strong> Member pushed to Face Terminal successfully.</div>";
+                      } elseif (isset($sync_res['status']) && $sync_res['status'] === 'error') {
+                          echo "<div class='alert alert-warning'><strong>Terminal Sync Warning:</strong> " . $sync_res['message'] . "</div>";
+                      }
+                  }
+
                   // Success
                   // Note: Staff page didn't have SMS code in original? Admin did.
                   // I'll add it if it was there? Admin had it. Staff didn't?
@@ -216,7 +239,7 @@ error_reporting(E_ALL);
                   echo "<div class='alert alert-success'>";
                   echo "<h1>Success!</h1>";
                   echo "<h3>Member details added successfully.</h3>";
-                  echo "<p>Status: <strong>Pending</strong>. Waxay sugaysaa aqbalidda Cashier ama Manager.</p>";
+                  echo "<p>Status: <strong>Active</strong>. Member is now active.</p>";
                   echo "</div>";
                   echo "<a class='btn btn-success' href='members.php'>Confirm & Go to List</a>";
                 }

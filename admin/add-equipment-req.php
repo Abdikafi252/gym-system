@@ -1,15 +1,15 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user_id'])) {
   header('location:../index.php');
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -28,7 +28,7 @@ if (!isset($_SESSION['user_id'])) {
   <!--Header-part-->
   <?php include 'includes/header-content.php'; ?>
   <!--close-Header-part-->
-  <!-- Visit codeastro.com for more projects -->
+  
 
   <!--top-Header-menu-->
   <?php include 'includes/topheader.php' ?>
@@ -64,10 +64,19 @@ if (!isset($_SESSION['user_id'])) {
         $status = isset($_POST["status"]) ? $_POST["status"] : 'Brand New';
         $address = $_POST["address"];
         $contact = $_POST["contact"];
+        $branch_id = isset($_POST["branch_id"]) ? (int)$_POST["branch_id"] : 0;
+
+        // Force branch_id for staff managers
+        $isStaffManager = (isset($_SESSION['designation']) && $_SESSION['designation'] == 'Manager');
+        if ($isStaffManager && isset($_SESSION['branch_id']) && $_SESSION['branch_id'] > 0) {
+          $branch_id = (int)$_SESSION['branch_id'];
+        }
 
         $totalamount = $amount * $quantity;
 
         include 'dbcon.php';
+        require_once __DIR__ . '/includes/accounting_engine.php';
+        acc_bootstrap_tables($con);
         mysqli_query($con, "ALTER TABLE equipment ADD COLUMN IF NOT EXISTS photo VARCHAR(255) NULL");
         mysqli_query($con, "ALTER TABLE equipment ADD COLUMN IF NOT EXISTS status VARCHAR(100) NOT NULL DEFAULT 'Brand New'");
 
@@ -86,7 +95,7 @@ if (!isset($_SESSION['user_id'])) {
         }
         //code after connection is successfull
         $safe_status = mysqli_real_escape_string($con, $status);
-        $qry = "insert into equipment(name,description,amount,vendor,address,contact,date,quantity,photo,status) values ('$name','$description','$totalamount','$vendor','$address','$contact','$date','$quantity','$photo_name','$safe_status')";
+        $qry = "insert into equipment(name,description,amount,vendor,address,contact,date,quantity,photo,status,branch_id) values ('$name','$description','$totalamount','$vendor','$address','$contact','$date','$quantity','$photo_name','$safe_status', '$branch_id')";
         $result = mysqli_query($con, $qry); //query executes
 
         if (!$result) {
@@ -110,6 +119,23 @@ if (!isset($_SESSION['user_id'])) {
           echo "</div>";
           echo "</div>";
         } else {
+          $equipment_id = mysqli_insert_id($con);
+          $accMemo = 'Owner-funded equipment purchase: ' . $name;
+          acc_create_entry_once(
+            $con,
+            $date,
+            $accMemo,
+            'equipment',
+            (string)$equipment_id,
+            [
+              ['account_code' => '1500', 'debit' => (float)$totalamount, 'credit' => 0, 'line_memo' => $accMemo],
+              ['account_code' => '3000', 'debit' => 0, 'credit' => (float)$totalamount, 'line_memo' => $accMemo]
+            ],
+            0,
+            $branch_id,
+            0,
+            'Admin'
+          );
 
           echo "<div class='container-fluid'>";
           echo "<div class='row-fluid'>";
@@ -137,7 +163,7 @@ if (!isset($_SESSION['user_id'])) {
 
       ?>
 
-      <!-- Visit codeastro.com for more projects -->
+      
 
 
     </form>
@@ -151,7 +177,7 @@ if (!isset($_SESSION['user_id'])) {
   <!--Footer-part-->
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
   </div>
 
   <style>
@@ -161,7 +187,7 @@ if (!isset($_SESSION['user_id'])) {
   </style>
 
   <!--end-Footer-part-->
-  <!-- Visit codeastro.com for more projects -->
+  
   <script src="../js/excanvas.min.js"></script>
   <script src="../js/jquery.min.js"></script>
   <script src="../js/jquery.ui.custom.js"></script>

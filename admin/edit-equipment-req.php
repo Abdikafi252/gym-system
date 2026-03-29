@@ -1,14 +1,14 @@
-<?php
+﻿<?php
   session_start();
     if(!isset($_SESSION['user_id'])) {
       header('location:../index.php');	
     }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>M * A GYM System</title>
+<title>M*A GYM System</title>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -37,7 +37,7 @@
   <button type="submit" class="tip-bottom" title="Search"><i class="icon-search icon-white"></i></button>
 </div> -->
 <!--close-top-serch-->
-<!-- Visit codeastro.com for more projects -->
+
 <!--sidebar-menu-->
 <?php $page='update-equip'; include 'includes/sidebar.php'?>
 
@@ -60,6 +60,13 @@
             $contact = $_POST["contact"];
             $date = $_POST["date"];
             $quantity = $_POST["quantity"];
+            $branch_id = isset($_POST["branch_id"]) ? (int)$_POST["branch_id"] : 0;
+            
+            // Force branch_id for staff managers
+            $isStaffManager = (isset($_SESSION['designation']) && $_SESSION['designation'] == 'Manager');
+            if ($isStaffManager && isset($_SESSION['branch_id']) && $_SESSION['branch_id'] > 0) {
+              $branch_id = (int)$_SESSION['branch_id'];
+            }
             $id=$_POST['id'];
 
             $totalamount = $amount * $quantity;
@@ -67,7 +74,7 @@
             include 'dbcon.php';
             //code after connection is successfull
             //update query
-            $qry = "update equipment set name='$name', amount='$totalamount',vendor='$vendor', description='$description', address='$address', address='$address', contact='$contact', date='$date', quantity='$quantity' where id='$id'";
+            $qry = "update equipment set name='$name', amount='$totalamount',vendor='$vendor', description='$description', address='$address', contact='$contact', date='$date', quantity='$quantity', branch_id='$branch_id' where id='$id'";
             $result = mysqli_query($conn,$qry); //query executes
 
             if(!$result){
@@ -109,7 +116,7 @@
                     echo"</div>";
                     echo"</div>";
                 echo"</div>";
-                // <!-- Visit codeastro.com for more projects -->
+                // 
             }
 
             }else{
@@ -124,11 +131,11 @@
 </div>
 
 <!--end-main-container-part-->
-<!-- Visit codeastro.com for more projects -->
+
 <!--Footer-part-->
 
 <div class="row-fluid">
-  <div id="footer" class="span12"> <?php echo date("Y");?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+  <div id="footer" class="span12"> <?php echo date("Y");?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
 </div>
 
 <style>

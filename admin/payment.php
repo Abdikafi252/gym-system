@@ -1,15 +1,15 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user_id'])) {
   header('location:../index.php');
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -26,12 +26,12 @@ if (!isset($_SESSION['user_id'])) {
 
 <body>
 
-  <!--Header-part--><!-- Visit codeastro.com for more projects -->
+  <!--Header-part-->
   <?php include 'includes/header-content.php'; ?>
   <!--close-Header-part-->
 
 
-  <!--top-Header-menu--><!-- Visit codeastro.com for more projects -->
+  <!--top-Header-menu-->
   <?php include 'includes/topheader.php' ?>
   <!--close-top-Header-menu-->
   <!--start-top-serch-->
@@ -48,8 +48,8 @@ if (!isset($_SESSION['user_id'])) {
 
   <div id="content">
     <div id="content-header">
-      <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="fas fa-home"></i> Bogga Hore</a> <a href="payment.php" class="current">Lacag Bixinta</a> </div>
-      <h1 class="text-center">Lacag Bixinta Xubnaha Diiwaangashan <i class="fas fa-group"></i></h1>
+      <div id="breadcrumb"> <a href="index.php" title="Go to Home Page" class="tip-bottom"><i class="fas fa-home"></i> Home</a> <a href="payment.php" class="current">Payments</a> </div>
+      <h1 class="text-center">Registered Members' Payments <i class="fas fa-group"></i></h1>
     </div>
     <div class="container-fluid payment-shell">
       <hr>
@@ -58,17 +58,17 @@ if (!isset($_SESSION['user_id'])) {
 
           <div class='widget-box'>
             <div class='widget-title'> <span class='icon'> <i class='fas fa-th'></i> </span>
-              <h5>Jadwalka Lacag-bixinta Xubnaha</h5>
+              <h5>Members' Payment Schedule</h5>
               <div class="payment-mode-switch pull-right">
-                <button type="button" id="modeReadable" class="btn btn-mini btn-primary active">Akhris Fudud</button>
-                <button type="button" id="modeCompact" class="btn btn-mini">11 Column</button>
+                <button type="button" id="modeReadable" class="btn btn-mini btn-primary active">Readable View</button>
+                <button type="button" id="modeCompact" class="btn btn-mini">Compact View</button>
               </div>
               <a href="export-payment-history.php" class="btn btn-info btn-mini pull-right" style="margin:7px 10px 0 0;"><i class="fas fa-download"></i> Export CSV</a>
-              <form id="custom-search-form" role="search" method="POST" action="search-result.php" class="form-search form-horizontal pull-right" onsubmit="showLoadingOverlay()">
-                <div class="input-append span12">
-                  <input type="text" class="search-query" placeholder="Raadi" name="search" required>
-                  <button type="submit" class="btn"><i class="fas fa-search"></i></button>
-                </div>
+              <!-- Custom Search/Filter Bar for Payments (Client-side) -->
+              <form id="paymentSearchForm" class="form-inline pull-right" style="margin:7px 10px 0 0; display: flex; gap: 10px; align-items: center;">
+                <input type="text" id="paymentSearchInput" class="form-control" placeholder="Search by name, service, or plan..." style="flex: 1; min-width: 120px;" />
+                <button type="button" class="btn btn-info" onclick="filterPayments()"><i class="fas fa-search"></i> Search</button>
+                <button type="button" class="btn btn-secondary" onclick="resetPaymentFilter()"><i class="fas fa-undo"></i> Reset</button>
               </form>
             </div>
 
@@ -87,83 +87,99 @@ if (!isset($_SESSION['user_id'])) {
               <?php
 
               include "dbcon.php";
-              $qry = "SELECT * FROM members";
+              $branch_id = isset($_SESSION['branch_id']) ? (int)$_SESSION['branch_id'] : 0;
+              $branch_where = $branch_id > 0 ? " AND branch_id = " . $branch_id : "";
+              $qry = "SELECT * FROM members WHERE status != 'Deleted'" . $branch_where;
               $cnt = 1;
               $result = mysqli_query($conn, $qry);
-
+              $errorMsg = '';
+              if (!$result) {
+                $errorMsg = 'Error loading payments: ' . htmlspecialchars(mysqli_error($conn));
+              }
 
               echo "<div id='paymentTableWrap' class='payment-fit-wrap mode-readable'>";
-              echo "<table class='table table-bordered table-hover payment-fullview'>
-              <thead>
-                <tr>
-                  <th><span class='th-long'>#</span><span class='th-short'>#</span></th>
-                  <th><span class='th-long'>Xubinta</span><span class='th-short'>Magac</span></th>
-                  <th><span class='th-long'>Taariikhda Lacagta u dambaysay</span><span class='th-short'>Date</span></th>
-                  <th><span class='th-long'>Lacagta Wadarta</span><span class='th-short'>Total</span></th>
-                  <th><span class='th-long'>Dhimista</span><span class='th-short'>Disc</span></th>
-                  <th><span class='th-long'>La Bixiyay</span><span class='th-short'>Paid</span></th>
-                  <th><span class='th-long'>Haraaga</span><span class='th-short'>Bal</span></th>
-                  <th><span class='th-long'>Adeegga La Doortay</span><span class='th-short'>Srv</span></th>
-                  <th><span class='th-long'>Qorshaha</span><span class='th-short'>Plan</span></th>
-                  <th><span class='th-long'>Falka</span><span class='th-short'>Pay</span></th>
-                  <th><span class='th-long'>Xusuusin</span><span class='th-short'>Rem</span></th>
-                </tr>
-              </thead><tbody>";
-
-              while ($row = mysqli_fetch_array($result)) { ?>
-
-                  <tr>
-                  <?php
-                  $discount = $row['discount_amount'];
-                  $paid = $row['paid_amount'];
-                  $amount = $row['amount']; // Net amount
-                  $total = $amount + $discount; // Gross amount
-                  $balance = $amount - $paid;
-                  ?>
-                  <td>
-                    <div class='text-center'><?php echo $cnt; ?></div>
-                  </td>
-                  <td>
-                    <div class='text-center'><?php echo $row['fullname'] ?></div>
-                  </td>
-                  <td>
-                    <div class='text-center'><?php echo ($row['paid_date'] == 0 ? "Xubin Cusub" : $row['paid_date']) ?></div>
-                  </td>
-
-                  <td>
-                    <div class='text-center'><strong><?php echo '$' . number_format($total, 2) ?></strong></div>
-                  </td>
-                  <td>
-                    <div class='text-center' style="color: #be185d;"><?php echo '$' . number_format($discount, 2) ?></div>
-                  </td>
-                  <td>
-                    <div class='text-center' style="color: #16a34a;"><strong><?php echo '$' . number_format($paid, 2) ?></strong></div>
-                  </td>
-                  <td>
-                    <div class='text-center' style="color: #dc2626;"><strong><?php echo '$' . number_format($balance, 2) ?></strong></div>
-                  </td>
-                  <td>
-                    <div class='text-center'><?php echo $row['services'] ?></div>
-                  </td>
-                  <td>
-                    <div class='text-center'><?php echo $row['plan'] . " Bilood" ?></div>
-                  </td>
-                  <td>
-                    <div class='text-center'><a href='user-payment.php?id=<?php echo $row['user_id'] ?>'><button class='btn btn-success btn'><i class='fas fa-dollar-sign'></i><span class='btn-label'> Bixi Lacagta</span></button></a></div>
-                  </td>
-                  <td>
-                    <div class='text-center'><a href='sendReminder.php?id=<?php echo $row['user_id'] ?>'><button class='btn btn-danger btn' <?php echo ($row['reminder'] == 1 ? "disabled" : "") ?>><i class='fas fa-bell'></i><span class='btn-label'> Digniin</span></button></a></div>
-                  </td>
-                  </tr>
-              <?php $cnt++;
+              if ($errorMsg) {
+                echo "<div class='alert alert-danger' style='margin: 10px;'>$errorMsg</div>";
               }
-
-              if ($cnt === 1) {
-                echo "<tr><td colspan='11'><div class='text-center' style='padding:18px;color:#64748b;'>Weli xog lacageed lama helin.</div></td></tr>";
-              }
-
-              echo "</tbody>";
               ?>
+              <table class='table table-bordered table-hover payment-fullview'>
+                <thead>
+                  <tr>
+                    <th><span class='th-long'>#</span><span class='th-short'>#</span></th>
+                    <th><span class='th-long'>Member</span><span class='th-short'>Name</span></th>
+                    <th><span class='th-long'>Last Payment Date</span><span class='th-short'>Date</span></th>
+                    <th><span class='th-long'>Total Amount</span><span class='th-short'>Total</span></th>
+                    <th><span class='th-long'>Discount</span><span class='th-short'>Disc</span></th>
+                    <th><span class='th-long'>Paid</span><span class='th-short'>Paid</span></th>
+                    <th><span class='th-long'>Balance</span><span class='th-short'>Bal</span></th>
+                    <th><span class='th-long'>Selected Service</span><span class='th-short'>Srv</span></th>
+                    <th><span class='th-long'>Plan</span><span class='th-short'>Plan</span></th>
+                    <th><span class='th-long'>Action</span><span class='th-short'>Pay</span></th>
+                    <th><span class='th-long'>Reminder</span><span class='th-short'>Rem</span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                <?php
+                $cnt = 1;
+                if ($result) {
+                  while ($row = mysqli_fetch_array($result)) {
+                    $discount = $row['discount_amount'];
+                    $paid = $row['paid_amount'];
+                    $amount = $row['amount']; // Net amount
+                    $total = $amount + $discount; // Gross amount
+                    $balance = $amount - $paid;
+                ?>
+                  <tr>
+                    <td><div class='text-center'><?php echo $cnt; ?></div></td>
+                    <td><div class='text-center'><?php echo htmlspecialchars($row['fullname']); ?></div></td>
+                    <td><div class='text-center'><?php echo ($row['paid_date'] == 0 ? "New Member" : htmlspecialchars($row['paid_date'])); ?></div></td>
+                    <td><div class='text-center'><strong><?php echo '$' . number_format($total, 2); ?></strong></div></td>
+                    <td><div class='text-center' style="color: #be185d;"><?php echo '$' . number_format($discount, 2); ?></div></td>
+                    <td><div class='text-center' style="color: #16a34a;"><strong><?php echo '$' . number_format($paid, 2); ?></strong></div></td>
+                    <td><div class='text-center' style="color: #dc2626;"><strong><?php echo '$' . number_format($balance, 2); ?></strong></div></td>
+                    <td><div class='text-center'><?php echo htmlspecialchars($row['services']); ?></div></td>
+                    <td><div class='text-center'><?php echo htmlspecialchars($row['plan']) . " Months"; ?></div></td>
+                    <td><div class='text-center'><a href='user-payment.php?id=<?php echo (int)$row['user_id']; ?>'><button class='btn btn-success btn'><i class='fas fa-dollar-sign'></i><span class='btn-label'> Pay Now</span></button></a></div></td>
+                    <td><div class='text-center'><a href='sendReminder.php?id=<?php echo (int)$row['user_id']; ?>'><button class='btn btn-danger btn' <?php echo ($row['reminder'] == 1 ? "disabled" : ""); ?>><i class='fas fa-bell'></i><span class='btn-label'> Send Reminder</span></button></a></div></td>
+                  </tr>
+                <?php
+                    $cnt++;
+                  }
+                }
+                if ($cnt === 1) {
+                  echo "<tr><td colspan='11'><div class='text-center' style='padding:18px;color:#64748b;'>No payment records found yet.</div></td></tr>";
+                }
+                ?>
+                </tbody>
+              </table>
+  <script>
+    // Client-side filter for payments
+    function filterPayments() {
+      var input = document.getElementById('paymentSearchInput').value.toLowerCase();
+      var table = document.querySelector('#paymentTableWrap table');
+      var rows = table.querySelectorAll('tbody tr');
+      if (!input) {
+        rows.forEach(function(row) { row.style.display = ''; });
+        return;
+      }
+      rows.forEach(function(row) {
+        var cells = row.querySelectorAll('td');
+        var name = cells[1]?.textContent.toLowerCase() || '';
+        var service = cells[7]?.textContent.toLowerCase() || '';
+        var plan = cells[8]?.textContent.toLowerCase() || '';
+        if (name.includes(input) || service.includes(input) || plan.includes(input)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    function resetPaymentFilter() {
+      document.getElementById('paymentSearchInput').value = '';
+      filterPayments();
+    }
+  </script>
 
               </table>
               </div>
@@ -182,7 +198,7 @@ if (!isset($_SESSION['user_id'])) {
   <!--Footer-part-->
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi </div>
   </div>
 
 
@@ -474,7 +490,7 @@ if (!isset($_SESSION['user_id'])) {
   <script src="../js/matrix.tables.js"></script>
   <script src="../js/toast-helper.js"></script>
 
-  <div id="loadingOverlay" class="loading-overlay"><div class="loading-box">Fadlan sug... Raadin socota</div></div>
+  <div id="loadingOverlay" class="loading-overlay"><div class="loading-box">Please wait... Searching</div></div>
 
   <script type="text/javascript">
     function showLoadingOverlay() {

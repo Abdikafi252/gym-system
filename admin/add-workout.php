@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user_id'])) {
     header('location:../index.php');
@@ -385,11 +385,11 @@ if (!isset($_SESSION['user_id'])) {
                                 <div class="add-cat-wrap">
                                     <select x-model="newCatName" style="margin:0; width:180px; font-size:13px; border-radius:6px; padding:4px;">
                                         <option value="">-- Workout Phase --</option>
-                                        <optgroup label="Upper Body (Murqaha Sare)">
+                                        <optgroup label="Upper Body">
                                             <option>Chest (Pectorals)</option>
                                             <option>Upper Chest</option>
                                             <option>Lower Chest</option>
-                                            <option>Back (Dhabarka)</option>
+                                            <option>Back</option>
                                             <option>Latissimus Dorsi (Lats)</option>
                                             <option>Traps (Trapezius)</option>
                                             <option>Rhomboids</option>
@@ -406,14 +406,14 @@ if (!isset($_SESSION['user_id'])) {
                                             <option>Triceps Medial Head</option>
                                             <option>Forearms</option>
                                         </optgroup>
-                                        <optgroup label="Core (Bartamaha Jirka)">
+                                        <optgroup label="Core">
                                             <option>Abs (Abdominals)</option>
                                             <option>Upper Abs</option>
                                             <option>Lower Abs</option>
                                             <option>Obliques</option>
                                             <option>Core</option>
                                         </optgroup>
-                                        <optgroup label="Lower Body (Murqaha Hoose)">
+                                        <optgroup label="Lower Body">
                                             <option>Legs</option>
                                             <option>Quadriceps</option>
                                             <option>Hamstrings</option>
@@ -511,7 +511,7 @@ if (!isset($_SESSION['user_id'])) {
 
     <!--Footer-part-->
     <div class="row-fluid">
-        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System</div>
+        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System</div>
     </div>
 
     <script>

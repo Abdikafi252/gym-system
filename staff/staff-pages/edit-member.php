@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -9,12 +9,11 @@ if (!isset($_SESSION['user_id'])) {
   header('location:../index.php');
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../../css/bootstrap.min.css" />
@@ -28,7 +27,7 @@ if (!isset($_SESSION['user_id'])) {
 </head>
 
 <body>
-  <!-- Visit codeastro.com for more projects -->
+
   <!--Header-part-->
   <?php include '../includes/header-content.php'; ?>
   <!--close-Header-part-->
@@ -37,23 +36,16 @@ if (!isset($_SESSION['user_id'])) {
   <!--top-Header-menu-->
   <?php include '../includes/header.php' ?>
   <!--close-top-Header-menu-->
-  <!--start-top-serch-->
-  <!-- <div id="search">
-  <input type="hidden" placeholder="Search here..."/>
-  <button type="submit" class="tip-bottom" title="Search"><i class="icon-search icon-white"></i></button>
-</div> -->
-  <!--close-top-serch-->
-  <!--sidebar-menu-->
 
+  <!--sidebar-menu-->
   <?php $page = "member";
   include '../includes/sidebar.php' ?>
-
   <!--sidebar-menu-->
 
   <div id="content">
     <div id="content-header">
-      <div id="breadcrumb"> <a href="#" title="Tag Bogga Hore" class="tip-bottom"><i class="icon-home"></i> Bogga Hore</a> <a href="#" class="current">Xubnaha Diiwaangashan</a> </div>
-      <h1 class="text-center">Liiska Xubnaha Diiwaangashan <i class="icon icon-group"></i></h1>
+      <div id="breadcrumb"> <a href="index.php" title="Go to Home" class="tip-bottom"><i class="icon-home"></i> Home</a> <a href="#" class="current">Registered Members</a> </div>
+      <h1 class="text-center">Registered Members List <i class="icon icon-group"></i></h1>
     </div>
     <div class="container-fluid">
       <hr>
@@ -62,7 +54,7 @@ if (!isset($_SESSION['user_id'])) {
 
           <div class='widget-box'>
             <div class='widget-title'> <span class='icon'> <i class='icon-th'></i> </span>
-              <h5>Jadwalka Xubnaha</h5>
+              <h5>Members Table</h5>
             </div>
             <div class='widget-content nopadding'>
 
@@ -78,16 +70,16 @@ if (!isset($_SESSION['user_id'])) {
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Magaca Buuxa</th>
-                  <th>Magaca Isticmaalaha</th>
-                  <th>Jinsiga</th>
-                  <th>Lambarka Xiriirka</th>
-                  <th>T.D</th>
-                  <th>Cinwaanka</th>
-                  <th>Lacagta</th>
-                  <th>Adeegga La Doortay</th>
-                  <th>Qorshaha</th>
-                  <th>Falka</th>
+                  <th>Full Name</th>
+                  <th>Username</th>
+                  <th>Gender</th>
+                  <th>Contact Number</th>
+                  <th>D.O.R</th>
+                  <th>Address</th>
+                  <th>Amount</th>
+                  <th>Chosen Service</th>
+                  <th>Plan</th>
+                  <th>Action</th>
                 </tr>
               </thead>";
 
@@ -104,8 +96,8 @@ if (!isset($_SESSION['user_id'])) {
                 <td><div class='text-center'>" . $row['address'] . "</div></td>
                 <td><div class='text-center'>$" . $row['amount'] . "</div></td>
                 <td><div class='text-center'>" . $row['services'] . "</div></td>
-                <td><div class='text-center'>" . $row['plan'] . " Maalmood</div></td>
-                <td><div class='text-center'><a href='edit-memberform.php?id=" . $row['user_id'] . "'><i class='icon icon-pencil'></i> Tafatir</a></div></td>
+                <td><div class='text-center'>" . $row['plan'] . " Days</div></td>
+                <td><div class='text-center'><a href='edit-memberform.php?id=" . $row['user_id'] . "'><i class='icon icon-pencil'></i> Edit</a></div></td>
                 
               </tbody>";
                 $cnt++;
@@ -128,7 +120,7 @@ if (!isset($_SESSION['user_id'])) {
   <!--Footer-part-->
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
   </div>
 
   <style>

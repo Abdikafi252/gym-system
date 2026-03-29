@@ -5,7 +5,7 @@ if (!isset($_SESSION['user_id'])) {
     header('location:../index.php');
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <?php
 
 if (isset($_POST['fullname'])) {
@@ -17,14 +17,14 @@ if (isset($_POST['fullname'])) {
     $designation = $_POST["designation"];
     $id = $_POST["id"];
     $branch_id = $_POST["branch_id"];
-    // <!-- Visit codeastro.com for more projects -->
+    $salary = (float)($_POST['salary'] ?? 0);
+    // 
     include 'dbcon.php';
+    require_once 'includes/db_helper.php';
 
     // Handle Photo Update
-    $current_photo_qry = "SELECT photo FROM staffs WHERE user_id='$id'";
-    $current_photo_res = mysqli_query($con, $current_photo_qry);
-    $current_photo_row = mysqli_fetch_assoc($current_photo_res);
-    $photo = $current_photo_row['photo'];
+    $current_photo_row = safe_fetch_assoc($con, "SELECT photo FROM staffs WHERE user_id=?", "i", [$id]);
+    $photo = $current_photo_row['photo'] ?? null;
 
     if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
         $target_dir = "../img/staff/";
@@ -41,13 +41,17 @@ if (isset($_POST['fullname'])) {
 
     //code after connection is successfull
     //update query
-    $qry = "update staffs set fullname='$fullname', username='$username', gender='$gender', contact='$contact', address='$address', designation='$designation', photo='$photo', branch_id='$branch_id' where user_id='$id'";
-    $result = mysqli_query($con, $qry); //query executes
-
+    $sql = "UPDATE staffs SET fullname=?, username=?, gender=?, contact=?, address=?, designation=?, photo=?, branch_id=?, salary=?, updated_at=NOW() WHERE user_id=?";
+    $params = [$fullname, $username, $gender, $contact, $address, $designation, $photo, $branch_id, $salary, $id];
+    $result = safe_query($con, $sql, "ssssssssdi", $params);
     if (!$result) {
-        echo "ERROR!!";
+        // Debug output for DB error
+        if (isset($con->error)) {
+            echo "<div style='color:red;font-weight:bold;'>DB ERROR: " . htmlspecialchars($con->error) . "</div>";
+        } else {
+            echo "ERROR!! (No DB error message)";
+        }
     } else {
-
         header('Location:staffs.php');
     }
 } else {

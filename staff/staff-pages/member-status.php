@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -14,7 +14,7 @@ if (!isset($_SESSION['user_id'])) {
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../../css/bootstrap.min.css" />
   <link rel="stylesheet" href="../../css/bootstrap-responsive.min.css" />
@@ -64,8 +64,8 @@ if (!isset($_SESSION['user_id'])) {
 
   <div id="content">
     <div id="content-header">
-      <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="icon-home"></i> Bogga Hore</a> <a href="member-status.php" class="current">Xaaladda</a> </div>
-      <h1 class="text-center">Xaaladda Hadda ee Xubinta <i class="icon icon-eye-open"></i></h1>
+      <div id="breadcrumb"> <a href="index.php" title="Go to Home" class="tip-bottom"><i class="icon-home"></i> Home</a> <a href="member-status.php" class="current">Status</a> </div>
+      <h1 class="text-center">Current Member Status <i class="icon icon-eye-open"></i></h1>
     </div>
     <div class="container-fluid">
       <hr>
@@ -74,7 +74,7 @@ if (!isset($_SESSION['user_id'])) {
 
           <div class='widget-box'>
             <div class='widget-title'> <span class='icon'> <i class='icon-th'></i> </span>
-              <h5>Jadwalka Xaaladda</h5>
+              <h5>Status Grid</h5>
             </div>
             <div class='widget-content nopadding'>
 
@@ -152,11 +152,6 @@ if (!isset($_SESSION['user_id'])) {
                 .card-badge.active {
                   background: #dcfce7;
                   color: #10b981;
-                }
-
-                .card-badge.pending {
-                  background: #ffedd5;
-                  color: #ea580c;
                 }
 
                 .card-header-row {
@@ -258,15 +253,12 @@ if (!isset($_SESSION['user_id'])) {
                   $badge_class = '';
                   $status_text = 'Sugaya';
 
-                  if ($status == 'Active') {
+                   if ($status == 'Active') {
                     $badge_class = 'active';
-                    $status_text = 'Waa Socdaa';
-                  } else if ($status == 'Expired') {
-                    $badge_class = '';
-                    $status_text = 'Wuu Dhacay';
+                    $status_text = 'Active';
                   } else {
-                    $badge_class = 'pending';
-                    $status_text = 'Sugaya';
+                    $badge_class = '';
+                    $status_text = 'Expired';
                   }
 
                   // Handle photo path (prefer img/members, then uploads)
@@ -305,15 +297,15 @@ if (!isset($_SESSION['user_id'])) {
 
                     <div class="card-details-grid">
                       <div class="detail-box" style="grid-column: span 2;">
-                        <span class="detail-label">Adeegga (Service)</span>
+                        <span class="detail-label">Service</span>
                         <span class="detail-val" style="color: #3b82f6;"><?php echo htmlspecialchars($row['services']); ?></span>
                       </div>
                       <div class="detail-box">
-                        <span class="detail-label">Qorshaha</span>
-                        <span class="detail-val"><?php echo htmlspecialchars($row['plan']); ?> Bilood</span>
+                        <span class="detail-label">Plan</span>
+                        <span class="detail-val"><?php echo htmlspecialchars($row['plan']); ?> Month/s</span>
                       </div>
                       <div class="detail-box">
-                        <span class="detail-label">Xilliga Uu Dhacayo</span>
+                        <span class="detail-label">Expiry Date</span>
                         <span class="detail-val expiry <?php echo ($status == 'Expired') ? 'expired' : ''; ?>">
                           <?php echo date('d M, Y', strtotime($row['expiry_date'])); ?>
                         </span>
@@ -340,7 +332,7 @@ if (!isset($_SESSION['user_id'])) {
   <!--Footer-part-->
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
   </div>
 
   <style>

@@ -1,21 +1,26 @@
 <?php
+include __DIR__ . '/../../dbcon.php';
 
-$servername="localhost";
-$uname="root";
-$pass="";
-$db="gymnsb";
+if (!isset($conn) && isset($con)) {
+    $conn = $con;
+}
 
-$conn=mysqli_connect($servername,$uname,$pass,$db);
-
-if(!$conn){
+if (!$conn) {
     die("Connection Failed");
 }
 
-$sql = "SELECT SUM( (curr_weight - ini_weight) / ini_weight * 100) FROM members WHERE user_id='$id'";
-        $amountsum = mysqli_query($conn, $sql) or die(mysqli_error($sql));
-        $row_amountsum = mysqli_fetch_assoc($amountsum);
-        $totalRows_amountsum = mysqli_num_rows($amountsum);
-        echo (int)$row_amountsum['SUM( (curr_weight - ini_weight) / ini_weight * 100)'];
+$id = $_GET['id'];
+$sql = "SELECT ini_weight, curr_weight FROM members WHERE user_id='$id'";
+$res = mysqli_query($conn, $sql);
+$row = mysqli_fetch_assoc($res);
 
-                
+$ini_weight = $row['ini_weight'];
+$curr_weight = $row['curr_weight'];
+
+if ($ini_weight > 0) {
+    $percent = (($curr_weight - $ini_weight) / $ini_weight) * 100;
+    echo round($percent, 1) . "%";
+} else {
+    echo "0%";
+}
 ?>

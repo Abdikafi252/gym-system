@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 include_once "dbcon.php";
 include_once "session.php";
@@ -17,7 +17,7 @@ $row = mysqli_fetch_assoc($result);
 <html lang="en">
 
 <head>
-    <title>M * A GYM System</title>
+    <title>M*A GYM System</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -112,7 +112,7 @@ $row = mysqli_fetch_assoc($result);
 
     <!--Footer-part-->
     <div class="row-fluid">
-        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
     </div>
     <style>
         #footer {

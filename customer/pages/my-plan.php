@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 include_once "dbcon.php";
 include_once "session.php";
@@ -14,7 +14,7 @@ if (!isset($_SESSION['user_id'])) {
 <html lang="en">
 
 <head>
-    <title>M * A GYM System</title>
+    <title>M*A GYM System</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -133,12 +133,12 @@ if (!isset($_SESSION['user_id'])) {
                                     echo '</div>';
                                 } else {
                                     $instruction_data = $row['instruction'];
-                                    echo "<h5 style='color: #475569; font-weight: 700; margin-bottom: 12px;'><i class='fas fa-clipboard-list'></i> Tilmaamaha Macalinka:</h5>";
+                                    echo "<h5 style='color: #475569; font-weight: 700; margin-bottom: 12px;'><i class='fas fa-clipboard-list'></i> Trainer Instructions:</h5>";
                                     echo "<div class='legacy-text' style='border-left: 4px solid #0284c7;'>" . nl2br(htmlspecialchars($instruction_data)) . "</div>";
                                 }
-                                echo "<div class='text-right mt-3' style='margin-top: 20px; border-top: 1px solid #f1f5f9; padding-top: 10px;'><small style='color: #94a3b8; font-weight: 600;'><i class='fas fa-clock'></i> Taariikhda la qoray: " . date('M j, Y', strtotime($row['date_assigned'])) . "</small></div>";
+                                echo "<div class='text-right mt-3' style='margin-top: 20px; border-top: 1px solid #f1f5f9; padding-top: 10px;'><small style='color: #94a3b8; font-weight: 600;'><i class='fas fa-clock'></i> Date Assigned: " . date('M j, Y', strtotime($row['date_assigned'])) . "</small></div>";
                             } else {
-                                echo "<div class='alert alert-info' style='border-radius: 10px; border: none; background: #f0f9ff; color: #0369a1; padding: 20px;'><i class='fas fa-info-circle'></i> Ma jiro barnaamij cunto oo laguu qoondeeyay weli.</div>";
+                                echo "<div class='alert alert-info' style='border-radius: 10px; border: none; background: #f0f9ff; color: #0369a1; padding: 20px;'><i class='fas fa-info-circle'></i> No diet plan has been assigned to you yet.</div>";
                             }
                             ?>
                         </div>
@@ -203,12 +203,12 @@ if (!isset($_SESSION['user_id'])) {
                                     echo '</div>';
                                 } else {
                                     $instruction_data = $row['instruction'];
-                                    echo "<h5 style='color: #475569; font-weight: 700; margin-bottom: 12px;'><i class='fas fa-clipboard-list'></i> Tilmaamaha Macalinka:</h5>";
+                                    echo "<h5 style='color: #475569; font-weight: 700; margin-bottom: 12px;'><i class='fas fa-clipboard-list'></i> Trainer Instructions:</h5>";
                                     echo "<div class='legacy-text' style='border-left: 4px solid #ea580c;'>" . nl2br(htmlspecialchars($instruction_data)) . "</div>";
                                 }
-                                echo "<div class='text-right mt-3' style='margin-top: 20px; border-top: 1px solid #f1f5f9; padding-top: 10px;'><small style='color: #94a3b8; font-weight: 600;'><i class='fas fa-clock'></i> Taariikhda la qoray: " . date('M j, Y', strtotime($row['date_assigned'])) . "</small></div>";
+                                echo "<div class='text-right mt-3' style='margin-top: 20px; border-top: 1px solid #f1f5f9; padding-top: 10px;'><small style='color: #94a3b8; font-weight: 600;'><i class='fas fa-clock'></i> Date Assigned: " . date('M j, Y', strtotime($row['date_assigned'])) . "</small></div>";
                             } else {
-                                echo "<div class='alert alert-info' style='border-radius: 10px; border: none; background: #fff7ed; color: #c2410c; padding: 20px;'><i class='fas fa-info-circle'></i> Ma jiro barnaamij tababar oo laguu qoondeeyay weli.</div>";
+                                echo "<div class='alert alert-info' style='border-radius: 10px; border: none; background: #fff7ed; color: #c2410c; padding: 20px;'><i class='fas fa-info-circle'></i> No workout plan has been assigned to you yet.</div>";
                             }
                             ?>
                         </div>
@@ -220,7 +220,7 @@ if (!isset($_SESSION['user_id'])) {
 
     <!--Footer-part-->
     <div class="row-fluid">
-        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</div>
+        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</div>
     </div>
 
     <style>

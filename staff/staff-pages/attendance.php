@@ -92,7 +92,7 @@ $has_members = mysqli_num_rows($members_res) > 0;
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../../css/bootstrap.min.css" />
@@ -323,17 +323,17 @@ $has_members = mysqli_num_rows($members_res) > 0;
 
   <div id="content">
     <div id="content-header">
-      <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="fas fa-home"></i> Bogga Hore</a> <a href="attendance.php" class="current">Maamul Imaanshaha</a> </div>
+      <div id="breadcrumb"> <a href="index.php" title="Go to Home Page" class="tip-bottom"><i class="fas fa-home"></i> Home</a> <a href="attendance.php" class="current">Manage Attendance</a> </div>
     </div>
 
     <div class="container-fluid">
       <div class="page-tabs" style="margin-top:20px;">
-        <a href="#" class="page-tab active">Imaanshaha Bilaha (Monthly Attendance)</a>
+        <a href="#" class="page-tab active">Monthly Attendance</a>
       </div>
 
       <div class="report-card">
         <div class="report-header">
-          <h2 class="report-title"><i class="fas fa-calendar-check" style="color:#6b46c1;"></i> Jadwalka Imaanshaha (Tab Cell to Change)</h2>
+          <h2 class="report-title"><i class="fas fa-calendar-check" style="color:#6b46c1;"></i> Attendance Schedule (Tab Cell to Change)</h2>
           <form method="GET" class="report-filters" id="filterForm">
             <select name="month">
               <?php
@@ -359,13 +359,10 @@ $has_members = mysqli_num_rows($members_res) > 0;
 
         <div class="legend-container">
           <div class="legend-item">
-            <div class="status-icon status-present"><i class="fas fa-check"></i></div> Soo Galay (Present/Checked Out)
+            <div class="status-icon status-present"><i class="fas fa-check"></i></div> Present (Checked In/Out)
           </div>
           <div class="legend-item">
-            <div class="status-icon status-absent"><i class="fas fa-times"></i></div> Maqane (Absent)
-          </div>
-          <div class="legend-item">
-            <div class="status-icon status-incomplete"><i class="fas fa-clock"></i></div> Wuu Joogaa Hadda (Incomplete)
+            <div class="status-icon status-absent"><i class="fas fa-times"></i></div> Absent
           </div>
         </div>
 
@@ -373,7 +370,7 @@ $has_members = mysqli_num_rows($members_res) > 0;
           <table class="attendance-table">
             <thead>
               <tr>
-                <th class="col-name">MAGACA XUBINTA</th>
+                <th class="col-name">MEMBER NAME</th>
                 <?php for ($d = 1; $d <= $num_of_days; $d++): ?>
                   <th><?php echo str_pad($d, 2, '0', STR_PAD_LEFT); ?></th>
                 <?php endfor; ?>
@@ -386,7 +383,7 @@ $has_members = mysqli_num_rows($members_res) > 0;
               if (!$has_members):
               ?>
                 <tr>
-                  <td colspan="<?php echo $num_of_days + 3; ?>" style="text-align:center; padding:20px;">Lama helin xubno firfircoon (No active members found)</td>
+                  <td colspan="<?php echo $num_of_days + 3; ?>" style="text-align:center; padding:20px;">No active members found</td>
                 </tr>
               <?php
               else:
@@ -401,7 +398,7 @@ $has_members = mysqli_num_rows($members_res) > 0;
                 <tr>
                   <td class="col-name">
                     <strong><?php echo htmlspecialchars($member['fullname']); ?></strong><br>
-                    <span style="font-size:11px; color:#718096;">Diiwaangelin: <?php echo date('d M Y', strtotime($member['dor'])); ?></span><br>
+                    <span style="font-size:11px; color:#718096;">Registration: <?php echo date('d M Y', strtotime($member['dor'])); ?></span><br>
                     <?php if (!empty($period_start) && $period_start !== $member['dor']): ?>
                       <span style="font-size:11px; color:#4c51bf;">Period Start (Renewal): <?php echo date('d M Y', strtotime($period_start)); ?></span>
                     <?php else: ?>
@@ -432,13 +429,11 @@ $has_members = mysqli_num_rows($members_res) > 0;
                             $data = $attendance_data[$uid][$d];
                             $is_incomplete = empty($data['check_out']) || strpos($data['check_out'], '0000') !== false;
 
-                            // Present but hasn't checked out
+                            echo '<div class="status-icon status-present"><i class="fas fa-check"></i></div>';
                             if ($is_incomplete) {
-                              echo '<div class="status-icon status-incomplete"><i class="fas fa-clock"></i></div>';
                               echo "<span class='tooltip-info'>Date: {$cell_date}<br>In: {$data['check_in']}</span>";
                             } else {
-                              echo '<div class="status-icon status-present"><i class="fas fa-check"></i></div>';
-                              $out_time = $data['check_out'] ? date('h:i A', strtotime($data['check_out'])) : 'No Checkout';
+                              $out_time = date('h:i A', strtotime($data['check_out']));
                               echo "<span class='tooltip-info'>Date: {$cell_date}<br>In: {$data['check_in']}<br>Out: {$out_time}</span>";
                             }
                             $present_count++;
@@ -467,7 +462,7 @@ $has_members = mysqli_num_rows($members_res) > 0;
   </div>
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi </div>
   </div>
 
   <style>
@@ -487,7 +482,7 @@ $has_members = mysqli_num_rows($members_res) > 0;
       $('.toggle-attendance').click(function() {
         var cell = $(this);
         if (cell.hasClass('future-day')) {
-          alert("Ma taaban kartid maalin aan wali la gaarin! (Cannot mark future days)");
+          alert("You cannot mark a future day!");
           return;
         }
 
@@ -516,17 +511,14 @@ $has_members = mysqli_num_rows($members_res) > 0;
           dataType: 'json',
           success: function(response) {
             if (response.status === 'success') {
-              if (response.state === 'incomplete') {
-                cell.html('<div class="status-icon status-incomplete"><i class="fas fa-clock"></i></div><span class="tooltip-info">Date: ' + date + '<br>In: ' + response.check_in + '</span>');
-                // Absent -> Present (Incomplete)
+              if (response.state === 'complete') {
+                cell.html('<div class="status-icon status-present"><i class="fas fa-check"></i></div><span class="tooltip-info">Date: ' + date + '<br>Present<br>In: ' + response.check_in + '</span>');
+                // Absent -> Present
                 preCell.text(curPre + 1);
                 absCell.text(Math.max(0, curAbs - 1));
-              } else if (response.state === 'complete') {
-                cell.html('<div class="status-icon status-present"><i class="fas fa-check"></i></div><span class="tooltip-info">Date: ' + date + '<br>In: ' + response.check_in + '<br>Out: ' + response.check_out + '</span>');
-                // Incomplete -> Complete (counts stay same)
               } else if (response.state === 'absent') {
                 cell.html('<div class="status-icon status-absent"><i class="fas fa-times"></i></div><span class="tooltip-info">Date: ' + date + '<br>Absent</span>');
-                // Complete -> Absent 
+                // Present -> Absent 
                 preCell.text(Math.max(0, curPre - 1));
                 absCell.text(curAbs + 1);
               }

@@ -20,7 +20,10 @@ $view_type = isset($_GET['view_type']) ? $_GET['view_type'] : 'calendar';
 
 // Fetch all members who were registered on or before the end of the selected month
 $end_of_selected_month = "$selected_year-$selected_month-$num_of_days";
-$members_qry = "SELECT user_id, fullname, dor, paid_date, expiry_date FROM members WHERE status = 'Active'";
+$branch_id = isset($_SESSION['branch_id']) ? (int)$_SESSION['branch_id'] : 0;
+$branch_where = $branch_id > 0 ? " AND branch_id = $branch_id " : "";
+
+$members_qry = "SELECT user_id, fullname, dor, paid_date, expiry_date FROM members WHERE status = 'Active' " . $branch_where;
 if ($view_type == 'calendar') {
     $members_qry .= " AND dor <= '$end_of_selected_month'";
 }
@@ -32,7 +35,7 @@ $attendance_data = [];
 $att_qry = "SELECT a.user_id, a.curr_time, a.check_out, a.curr_date, m.dor 
             FROM attendance a 
             JOIN members m ON a.user_id = m.user_id 
-            WHERE m.status = 'Active' AND a.present = 1";
+            WHERE m.status = 'Active' AND a.present = 1 " . ($branch_id > 0 ? " AND m.branch_id = $branch_id " : "");
 
 if ($view_type == 'calendar') {
     $att_qry .= " AND MONTH(a.curr_date) = '$selected_month' AND YEAR(a.curr_date) = '$selected_year'";
@@ -85,7 +88,7 @@ if ($period_res) {
 <html lang="en">
 
 <head>
-    <title>M * A GYM System - Attendance Report</title>
+    <title>M*A GYM System - Attendance Report</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -94,6 +97,8 @@ if ($period_res) {
     <link rel="stylesheet" href="../css/matrix-media.css" />
     <link href="../font-awesome/css/all.css" rel="stylesheet" />
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,800' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../css/premium-print.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
         .report-card {
@@ -338,6 +343,12 @@ if ($period_res) {
         .attendance-table td {
             min-width: 40px;
         }
+        
+        @media print {
+            .d-print-none { display: none !important; }
+            .matrix-sidebar, #header, #user-nav, .breadcrumb { display: none !important; }
+            #content { margin-left: 0 !important; }
+        }
     </style>
 </head>
 
@@ -350,17 +361,36 @@ if ($period_res) {
 
     <div id="content">
         <div id="content-header">
-            <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="fas fa-home"></i> Bogga Hore</a> <a href="#" class="current">Warbixinta Imaatinka</a> </div>
+            <div id="breadcrumb"> <a href="index.php" title="Go to Home" class="tip-bottom"><i class="fas fa-home"></i> Home</a> <a href="#" class="current">Attendance Report</a> </div>
         </div>
         <div class="container-fluid">
 
-            <div class="page-tabs" style="margin-top:20px;">
+            <div class="page-tabs d-print-none" style="margin-top:20px;">
                 <a href="#" class="page-tab active">Attendance Management Report</a>
             </div>
 
-            <div class="report-card">
-                <div class="report-header">
-                    <h2 class="report-title"><i class="fas fa-users" style="color:#6b46c1;"></i> Jadwalka Imaanshaha</h2>
+            <div class="premium-document">
+                <div class="premium-header">
+                    <div class="premium-brand">
+                        <h1>M*A GYM</h1>
+                        <p>Busley, Mogadishu, Somalia</p>
+                        <p>Attendance Record Archive</p>
+                    </div>
+                    <div class="premium-meta">
+                        <h2>MONTHLY ATTENDANCE: <?php echo strtoupper($monthsText[$selected_month]); ?> <?php echo $selected_year; ?></h2>
+                        <p><strong>Generated:</strong> <?php echo date("d/m/Y"); ?></p>
+                        <p><strong>Branch:</strong> <?php echo ($branch_id > 0) ? "Branch #$branch_id" : "All Branches"; ?></p>
+                    </div>
+                </div>
+
+                <div class="d-print-none" style="margin-bottom:20px; text-align:right;">
+                    <button class="btn btn-info" onclick="window.print();"><i class="fas fa-print"></i> Print Report</button>
+                    <button class="btn btn-success" onclick="generateAttendancePDF();"><i class="fas fa-file-pdf"></i> Download PDF</button>
+                </div>
+
+                <div class="report-card" style="box-shadow:none; border:1px solid #e2e8f0; padding:15px;" id="attendance-box">
+                    <div class="report-header d-print-none">
+                        <h2 class="report-title"><i class="fas fa-filter"></i> Report Filters</h2>
                     <form method="GET" class="report-filters" id="filterForm">
                         <input type="hidden" name="view_type" value="calendar">
                         <select name="month">
@@ -387,13 +417,10 @@ if ($period_res) {
 
                 <div class="legend-container">
                     <div class="legend-item">
-                        <div class="status-icon status-present"><i class="fas fa-check"></i></div> Soo Galay (Present/Checked Out)
+                        <div class="status-icon status-present"><i class="fas fa-check"></i></div> Present / Checked Out
                     </div>
                     <div class="legend-item">
-                        <div class="status-icon status-absent"><i class="fas fa-times"></i></div> Maqane (Absent)
-                    </div>
-                    <div class="legend-item">
-                        <div class="status-icon status-incomplete"><i class="fas fa-clock"></i></div> Wuu Joogaa Hadda (Incomplete)
+                        <div class="status-icon status-absent"><i class="fas fa-times"></i></div> Absent
                     </div>
                 </div>
 
@@ -401,14 +428,14 @@ if ($period_res) {
                     <table class="attendance-table">
                         <thead>
                             <tr>
-                                <th class="col-name">MAGACA XUBINTA</th>
+                                <th class="col-name" style="background:#0f172a; color:white;">MEMBER NAME</th>
                                 <?php
                                 $cols = ($view_type == 'calendar') ? $num_of_days : 30;
                                 for ($d = 1; $d <= $cols; $d++): ?>
-                                    <th><?php echo ($view_type == 'calendar') ? str_pad($d, 2, '0', STR_PAD_LEFT) : "Day $d"; ?></th>
+                                    <th style="background:#0f172a; color:white;"><?php echo ($view_type == 'calendar') ? str_pad($d, 2, '0', STR_PAD_LEFT) : "D$d"; ?></th>
                                 <?php endfor; ?>
-                                <th>TOTAL PRE.</th>
-                                <th>TOTAL ABS.</th>
+                                <th style="background:#0f172a; color:white;">P.</th>
+                                <th style="background:#0f172a; color:white;">A.</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -428,7 +455,7 @@ if ($period_res) {
                                     <tr>
                                         <td class="col-name">
                                             <strong><?php echo htmlspecialchars($member['fullname']); ?></strong><br>
-                                            <span style="font-size:11px; color:#718096;">Diiwaangelin: <?php echo date('d M Y', strtotime($start_date)); ?></span><br>
+                                            <span style="font-size:11px; color:#718096;">Registration: <?php echo date('d M Y', strtotime($start_date)); ?></span><br>
                                             <?php if (!empty($period_start) && $period_start !== $start_date): ?>
                                                 <span style="font-size:11px; color:#4c51bf;">Period Start (Renewal): <?php echo date('d M Y', strtotime($period_start)); ?></span>
                                             <?php else: ?>
@@ -461,21 +488,20 @@ if ($period_res) {
 
                                                     if ($is_future || $is_before_period_start || $is_after_period_end) {
                                                         echo "<div style='width:24px; height:24px;'></div>";
-                                                        if ($is_future) echo "<span class='tooltip-info'>Date: {$cell_date}<br>(Mustaqbal)</span>";
+                                                        if ($is_future) echo "<span class='tooltip-info'>Date: {$cell_date}<br>(Future Date)</span>";
                                                     } else {
                                                         if ($day_info) {
                                                             $is_incomplete = empty($day_info['check_out']) || strpos($day_info['check_out'], '0000') !== false;
+                                                            echo '<div class="status-icon status-present"><i class="fas fa-check"></i></div>';
                                                             if ($is_incomplete) {
-                                                                echo '<div class="status-icon status-incomplete"><i class="fas fa-clock"></i></div>';
                                                                 echo "<span class='tooltip-info'>Date: {$cell_date}<br>In: {$day_info['check_in']}</span>";
                                                             } else {
-                                                                echo '<div class="status-icon status-present"><i class="fas fa-check"></i></div>';
                                                                 echo "<span class='tooltip-info'>Date: {$cell_date}<br>In: {$day_info['check_in']}<br>Out: " . date('h:i A', strtotime($day_info['check_out'])) . "</span>";
                                                             }
                                                             $present_count++;
                                                         } else {
                                                             echo '<div class="status-icon status-absent"><i class="fas fa-times"></i></div>';
-                                                            echo "<span class='tooltip-info'>Date: {$cell_date}<br>Absent (Maqane)</span>";
+                                                            echo "<span class='tooltip-info'>Date: {$cell_date}<br>Absent</span>";
                                                             $absent_count++;
                                                         }
                                                     }
@@ -490,19 +516,21 @@ if ($period_res) {
                             <?php
                                 endwhile;
                             } else {
-                                echo "<tr><td colspan='" . ($cols + 3) . "' style='text-align:center; padding:20px;'>Lama helin xubno (No members found)</td></tr>";
+                                echo "<tr><td colspan='" . ($cols + 3) . "' style='text-align:center; padding:20px;'>No members found</td></tr>";
                             }
                             ?>
                         </tbody>
                     </table>
+                <div class="premium-signature" style="margin-top:40px;">
+                    <p>Verified By: _________________________</p>
+                    <p>Date: <?php echo date("d/m/Y"); ?></p>
                 </div>
-
             </div>
         </div>
     </div>
 
     <div class="row-fluid">
-        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi </div>
+        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi </div>
     </div>
 
     <style>
@@ -516,6 +544,22 @@ if ($period_res) {
     <script src="../js/jquery.min.js"></script>
     <script src="../js/bootstrap.min.js"></script>
     <script src="../js/matrix.js"></script>
+    <script>
+    function generateAttendancePDF() {
+        const element = document.querySelector('.premium-document');
+        const opt = {
+            margin:       [0.4, 0.2, 0.4, 0.2],
+            filename:     'Attendance_Report_<?php echo $selected_month . "_" . $selected_year; ?>.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' },
+            pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+        };
+
+        // Standard PDF generation
+        html2pdf().set(opt).from(element).save();
+    }
+    </script>
 </body>
 
 </html>

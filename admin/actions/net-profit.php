@@ -1,15 +1,11 @@
 <?php
 
-$servername = "localhost";
-$uname = "root";
-$pass = "";
-$db = "gymnsb";
+include __DIR__ . '/../../dbcon.php';
 
-$conn = mysqli_connect($servername, $uname, $pass, $db);
-
-if (!$conn) {
+if (!$con) {
     die("Connection Failed");
 }
+$conn = $con;
 
 // Income
 $sql_income = "SELECT COALESCE(SUM(paid_amount),0) FROM members";

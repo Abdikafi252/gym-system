@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -9,12 +9,12 @@ if (!isset($_SESSION['user_id'])) {
   header('location:../index.php');
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../../css/bootstrap.min.css" />
@@ -44,7 +44,7 @@ if (!isset($_SESSION['user_id'])) {
   <button type="submit" class="tip-bottom" title="Search"><i class="icon-search icon-white"></i></button>
 </div> -->
   <!--close-top-serch-->
-  <!-- Visit codeastro.com for more projects -->
+  
   <!--sidebar-menu-->
   <?php $page = 'manage-customer-progress';
   include '../includes/sidebar.php' ?>
@@ -52,8 +52,8 @@ if (!isset($_SESSION['user_id'])) {
 
   <div id="content">
     <div id="content-header">
-      <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="fas fa-home"></i> Bogga Hore</a> <a href="customer-progress.php" class="current">Horumarka Macmiilka</a> </div>
-      <h1 class="text-center">Cusboonaysii Horumarka Macmiilka <i class="fas fa-signal"></i></h1>
+      <div id="breadcrumb"> <a href="index.php" title="Go to Home" class="tip-bottom"><i class="fas fa-home"></i> Home</a> <a href="customer-progress.php" class="current">Customer Progress</a> </div>
+      <h1 class="text-center">Update Customer Progress <i class="fas fa-signal"></i></h1>
     </div>
     <div class="container-fluid">
       <hr>
@@ -62,10 +62,10 @@ if (!isset($_SESSION['user_id'])) {
 
           <div class='widget-box'>
             <div class='widget-title'> <span class='icon'> <i class='fas fa-th'></i> </span>
-              <h5>Jadwalka Xubnaha</h5>
+              <h5>Members Table</h5>
               <form id="custom-search-form" role="search" method="POST" action="search-result-progress.php" class="form-search form-horizontal pull-right">
                 <div class="input-append span12">
-                  <input type="text" class="search-query" placeholder="Raadi" name="search" required>
+                  <input type="text" class="search-query" placeholder="Search" name="search" required>
                   <button type="submit" class="btn"><i class="fas fa-search"></i></button>
                 </div>
               </form>
@@ -93,10 +93,10 @@ if (!isset($_SESSION['user_id'])) {
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Magaca Buuxa</th>
-                  <th>Adeegga La Doortay</th>
-                  <th>Qorshaha</th>
-                  <th>Falka</th>
+                  <th>Full Name</th>
+                  <th>Selected Service</th>
+                  <th>Plan</th>
+                  <th>Action</th>
                 </tr>
               </thead>";
 
@@ -107,8 +107,8 @@ if (!isset($_SESSION['user_id'])) {
                 <td><div class='text-center'>" . $cnt . "</div></td>
                 <td><div class='text-center'>" . $row['fullname'] . "</div></td>
                 <td><div class='text-center'>" . $row['services'] . "</div></td>
-                <td><div class='text-center'>" . $row['plan'] . " Bilood</div></td>
-                <td><div class='text-center'><a href='update-progress.php?id=" . $row['user_id'] . "'><button class='btn btn-warning btn'> Cusboonaysii Horumarka</button></a></div></td>
+                <td><div class='text-center'>" . $row['plan'] . " Months</div></td>
+                <td><div class='text-center'><a href='update-progress.php?id=" . $row['user_id'] . "'><button class='btn btn-warning btn'> Update Progress</button></a></div></td>
                 
               </tbody>";
                 $cnt++;
@@ -131,7 +131,7 @@ if (!isset($_SESSION['user_id'])) {
   <!--Footer-part-->
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
   </div>
 
   <style>

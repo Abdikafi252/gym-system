@@ -7,19 +7,23 @@ header('location:../index.php');
 }
 
 if(isset($_GET['id'])){
-$id=$_GET['id'];
+    $id=$_GET['id'];
 
-include 'dbcon.php';
+    include 'dbcon.php';
+    $branch_id = $_SESSION['branch_id'];
 
+    // Delete payment_history for this member (branch-checked)
+    mysqli_query($con, "DELETE FROM payment_history WHERE user_id=$id AND branch_id='$branch_id'");
 
-$qry="delete from members where user_id=$id";
-$result=mysqli_query($con,$qry);
+    // Delete member (branch-checked)
+    $qry = "DELETE FROM members WHERE user_id=$id AND branch_id='$branch_id'";
+    $result = mysqli_query($con, $qry);
 
-if($result){
-    echo"DELETED";
-    header('Location:../remove-member.php');
-}else{
-    echo"ERROR!!";
-}
+    if ($result && mysqli_affected_rows($con) > 0) {
+        echo "DELETED";
+        header('Location:../remove-member.php?msg=success');
+    } else {
+        header('Location:../remove-member.php?msg=error');
+    }
 }
 ?>

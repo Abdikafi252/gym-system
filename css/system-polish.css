@@ -1,3 +1,218 @@
+/* Responsive card grid for accounting widgets */
+.accounting-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+  margin-bottom: 24px;
+}
+@media (max-width: 900px) {
+  .accounting-card-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+}
+@media (max-width: 600px) {
+  .accounting-card-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .widget-box, .result-card, .draw-stat, .sync-stat, .card-summary {
+    padding: 14px 8px;
+    margin-bottom: 10px;
+    border-radius: 14px;
+    font-size: 15px;
+  }
+  .widget-title {
+    font-size: 18px;
+    padding: 8px 12px;
+    border-radius: 14px 14px 0 0;
+  }
+  .table th, .table td {
+    font-size: 13px;
+    padding: 8px 6px;
+  }
+  #content-header h1 {
+    font-size: 22px;
+    margin-top: 10px;
+    margin-bottom: 8px;
+  }
+}
+/* Extra polish for accounting UI */
+.widget-box, .result-card, .draw-stat, .sync-stat, .card-summary {
+  background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+  border: 1.5px solid #e0e7ef;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(15,23,42,0.10);
+  padding: 18px 16px;
+  margin-bottom: 18px;
+  transition: box-shadow 0.2s;
+}
+.widget-box:hover, .result-card:hover, .draw-stat:hover, .sync-stat:hover, .card-summary:hover {
+  box-shadow: 0 16px 40px rgba(15,23,42,0.16);
+}
+.widget-title {
+  background: linear-gradient(90deg, #e0e7ef 0%, #f8fbff 100%);
+  border-bottom: 2px solid #c7d3e3;
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 22px;
+  padding: 12px 18px;
+  border-radius: 18px 18px 0 0;
+}
+.card-summary {
+  background: linear-gradient(180deg, #e0f2fe 0%, #f8fafc 100%);
+  border: 1.5px solid #bae6fd;
+  color: #0f172a;
+  font-size: 18px;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(34,197,94,0.08);
+}
+.card-summary .user-name, .card-summary .user-role {
+  color: #2563eb;
+  font-weight: 700;
+}
+.table {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(15,23,42,0.06);
+  font-size: 16px;
+  margin-bottom: 18px;
+}
+.table th {
+  background: #e0f2fe;
+  color: #0f172a;
+  font-weight: 700;
+  border-bottom: 2px solid #bae6fd;
+  font-size: 15px;
+}
+.table td {
+  color: #334155;
+  font-size: 15px;
+  border-bottom: 1px solid #e0e7ef;
+}
+.table tr:hover td {
+  background: #f1f5f9;
+}
+.btn, button {
+  background: linear-gradient(90deg, #2563eb 0%, #38bdf8 100%);
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.10);
+  padding: 10px 18px;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+.btn:hover, button:hover {
+  background: linear-gradient(90deg, #38bdf8 0%, #2563eb 100%);
+}
+#content-header h1 {
+  color: #2563eb;
+  font-size: 28px;
+  font-weight: 800;
+  margin-top: 18px;
+  margin-bottom: 12px;
+}
+#breadcrumb {
+  background: #e0f2fe;
+  border-radius: 999px;
+  color: #2563eb;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 10px 18px;
+  margin-bottom: 12px;
+}
+/* Responsive polish for accounting pages */
+@media (max-width: 900px) {
+  .widget-box, .card-summary, .sync-stat, .draw-stat, .result-card {
+    border-radius: 12px;
+    padding: 10px 6px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 12px rgba(15,23,42,0.08);
+  }
+  .container-fluid, .row-fluid {
+    padding: 0 4px;
+    margin: 0;
+  }
+  .table {
+    font-size: 15px;
+    word-break: break-word;
+    border-radius: 8px;
+    overflow-x: auto;
+    display: block;
+    width: 100%;
+  }
+  .table th, .table td {
+    padding: 8px 6px;
+    font-size: 14px;
+  }
+  .form-inline, .form-group, .form-section {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+  .btn, button {
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 16px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+  .card-summary {
+    min-width: 100px;
+    max-width: 100%;
+    font-size: 15px;
+    flex: 1 1 100%;
+    margin-bottom: 10px;
+  }
+  .widget-title {
+    font-size: 18px;
+    min-height: 40px;
+    padding: 0 8px;
+  }
+  #content-header h1 {
+    font-size: 22px;
+    margin-top: 8px;
+  }
+  #breadcrumb {
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 600px) {
+  .widget-box, .card-summary, .sync-stat, .draw-stat, .result-card {
+    border-radius: 8px;
+    padding: 6px 2px;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 8px rgba(15,23,42,0.08);
+  }
+  .table th, .table td {
+    padding: 6px 2px;
+    font-size: 13px;
+  }
+  .btn, button {
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 15px;
+    border-radius: 6px;
+    margin-bottom: 6px;
+  }
+  .widget-title {
+    font-size: 16px;
+    min-height: 32px;
+    padding: 0 4px;
+  }
+  #content-header h1 {
+    font-size: 18px;
+    margin-top: 4px;
+  }
+  #breadcrumb {
+    padding: 4px 4px;
+    font-size: 12px;
+  }
+}
 .polish-root,
 body {
   --surface-0: #f4f7fb;

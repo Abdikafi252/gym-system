@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -9,12 +9,11 @@ if (!isset($_SESSION['user_id'])) {
   header('location:../index.php');
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../../css/bootstrap.min.css" />
@@ -35,15 +34,9 @@ if (!isset($_SESSION['user_id'])) {
   <!--close-Header-part-->
 
 
-  <!--top-Header-menu--><!-- Visit codeastro.com for more projects -->
+  <!--top-Header-menu-->
   <?php include '../includes/header.php' ?>
   <!--close-top-Header-menu-->
-  <!--start-top-serch-->
-  <!-- <div id="search">
-  <input type="hidden" placeholder="Search here..."/>
-  <button type="submit" class="tip-bottom" title="Search"><i class="icon-search icon-white"></i></button>
-</div> -->
-  <!--close-top-serch--><!-- Visit codeastro.com for more projects -->
 
   <!--sidebar-menu-->
   <?php $page = 'c-p-r';
@@ -52,8 +45,8 @@ if (!isset($_SESSION['user_id'])) {
 
   <div id="content">
     <div id="content-header">
-      <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="fas fa-home"></i> Bogga Hore</a> <a href="progress-report.php" class="current">Warbixinta Horumarka</a> </div>
-      <h1 class="text-center">Eeg Warbixinta Horumarka <i class="fas fa-signal"></i></h1>
+      <div id="breadcrumb"> <a href="index.php" title="Go to Home" class="tip-bottom"><i class="fas fa-home"></i> Home</a> <a href="progress-report.php" class="current">Progress Report</a> </div>
+      <h1 class="text-center">View Progress Report <i class="fas fa-signal"></i></h1>
     </div>
     <div class="container-fluid">
       <hr>
@@ -63,7 +56,7 @@ if (!isset($_SESSION['user_id'])) {
           <div class='widget-box'>
 
             <div class='widget-title'> <span class='icon'> <i class='fas fa-th'></i> </span>
-              <h5>Qaybta Warbixinta</h5>
+              <h5>Report Section</h5>
             </div>
             <div class='widget-content nopadding'>
 
@@ -79,9 +72,9 @@ if (!isset($_SESSION['user_id'])) {
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Magaca Buuxa</th>
-                  <th>Adeegga La Doortay</th>
-                  <th>Falka</th>
+                  <th>Full Name</th>
+                  <th>Selected Service</th>
+                  <th>Action</th>
                 </tr>
               </thead>";
 
@@ -99,7 +92,7 @@ if (!isset($_SESSION['user_id'])) {
                     <div class='text-center'><?php echo $row['services']; ?></div>
                   </td>
                   <td>
-                    <div class='text-center'><a href="view-progress-report.php?id= <?php echo $row['user_id'] ?>"><i class="fas fa-file"></i> Eeg Warbixinta Horumarka</a></div>
+                    <div class='text-center'><a href="view-progress-report.php?id= <?php echo $row['user_id'] ?>"><i class="fas fa-file"></i> View Progress Report</a></div>
                   </td>
 
                 </tbody>
@@ -124,7 +117,7 @@ if (!isset($_SESSION['user_id'])) {
   <!--Footer-part-->
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
   </div>
 
   <style>

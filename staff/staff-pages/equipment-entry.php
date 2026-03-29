@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -14,7 +14,7 @@ if (!isset($_SESSION['user_id'])) {
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../../css/bootstrap.min.css" />
@@ -43,111 +43,6 @@ if (!isset($_SESSION['user_id'])) {
   <button type="submit" class="tip-bottom" title="Search"><i class="icon-search icon-white"></i></button>
 </div> -->
   <!--close-top-serch-->
-  <!--sidebar-menu-->
-  <?php $page = "equipment";
-  include '../includes/sidebar.php' ?>
-  <!--sidebar-menu-->
-  <div id="content">
-    <div id="content-header">
-      <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="icon-home"></i> Bogga Hore</a> <a href="#" class="tip-bottom">Qalabka</a> <a href="#" class="current">Dar Qalab</a> </div>
-      <h1>Form-ka Diiwaangelinta Qalabka</h1>
-    </div>
-    <div class="container-fluid">
-      <hr>
-      <div class="row-fluid">
-        <div class="span6">
-          <div class="widget-box">
-            <div class="widget-title"> <span class="icon"> <i class="icon-align-justify"></i> </span>
-              <h5>Macluumaadka Qalabka</h5>
-            </div>
-            <div class="widget-content nopadding">
-              <form action="add-equipment-req.php" method="POST" class="form-horizontal">
-                <div class="control-group">
-                  <label class="control-label">Magaca Qalabka :</label>
-                  <div class="controls">
-                    <input type="text" class="span11" name="name" placeholder="Magaca Qalabka" required />
-                  </div>
-                </div>
-                <div class="control-group">
-                  <label class="control-label">Sharaxaadda :</label>
-                  <div class="controls">
-                    <input type="text" class="span11" name="description" placeholder="Sharaxaadda Kooban" required />
-                  </div>
-                </div>
-
-
-                <div class="control-group">
-                  <label class="control-label">Taariikhda Iibka :</label>
-                  <div class="controls">
-                    <input type="date" name="date" class="span11" />
-                    <span class="help-block">Fadlan sheeg taariikhda iibka</span>
-                  </div>
-                </div>
-
-                <div class="control-group">
-                  <label class="control-label">Tirada :</label>
-                  <div class="controls">
-                    <input type="number" class="span5" name="quantity" placeholder="Tirada Qalabka" required />
-                  </div>
-                </div>
-
-
-            </div>
-
-
-            <div class="widget-content nopadding">
-              <div class="form-horizontal">
-
-              </div>
-              <div class="widget-content nopadding">
-                <div class="form-horizontal">
-
-
-                </div>
-
-              </div>
-
-
-
-            </div>
-          </div>
-
-
-        </div>
-
-
-
-        <div class="span6">
-          <div class="widget-box">
-            <div class="widget-title"> <span class="icon"> <i class="icon-align-justify"></i> </span>
-              <h5>Faahfaahinka Kale</h5>
-            </div>
-            <div class="widget-content nopadding">
-              <div class="form-horizontal">
-                <div class="control-group">
-                  <label for="normal" class="control-label">Lambarka Xiriirka</label>
-                  <div class="controls">
-                    <input type="number" id="mask-phone" name="contact" class="span8 mask text" required>
-                    <span class="help-block blue span8">(999) 999-9999</span>
-                  </div>
-                </div>
-                <div class="control-group">
-                  <label class="control-label">Vendor :</label>
-                  <div class="controls">
-                    <input type="text" class="span11" name="vendor" placeholder="Iibiyaha" required />
-                  </div>
-                </div>
-
-                <div class="control-group">
-                  <label class="control-label">Cinwaanka :</label>
-                  <div class="controls">
-                    <input type="text" class="span11" name="address" placeholder="Cinwaanka Iibiyaha" required />
-                  </div>
-                </div>
-              </div>
-
-              <div class="widget-title"> <span class="icon"> <i class="icon-align-justify"></i> </span>
-                <h5>Qiimaha</h5>
               </div>
               <div class="widget-content nopadding">
                 <div class="form-horizontal">
@@ -156,7 +51,7 @@ if (!isset($_SESSION['user_id'])) {
 
 
                   <div class="control-group">
-                    <label class="control-label">Wadarta Qiimaha: </label>
+                    <label class="control-label">Total Amount: </label>
                     <div class="controls">
                       <div class="input-append">
                         <span class="add-on">$</span>
@@ -168,7 +63,7 @@ if (!isset($_SESSION['user_id'])) {
 
 
                   <div class="form-actions text-center">
-                    <button type="submit" class="btn btn-success">Gudbi Faahfaahinta</button>
+                    <button type="submit" class="btn btn-success">Submit Details</button>
                   </div>
                   </form>
 
@@ -194,7 +89,7 @@ if (!isset($_SESSION['user_id'])) {
   <!--Footer-part-->
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
   </div>
 
   <style>

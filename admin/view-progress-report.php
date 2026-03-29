@@ -1,16 +1,16 @@
-<?php
+﻿<?php
 session_start();
 //the isset function to check username is already loged in and stored on the session
 if (!isset($_SESSION['user_id'])) {
   header('location:../index.php');
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -156,16 +156,16 @@ if (!isset($_SESSION['user_id'])) {
                                       $bmi = $row['curr_weight'] / ($heightM * $heightM);
 
                                       if ($bmi < 18.5) {
-                                        $bmiText = "Miisaan yar (Underweight)";
+                                        $bmiText = "Underweight";
                                         $bmiColor = "#ea580c";
                                       } else if ($bmi >= 18.5 && $bmi <= 24.9) {
-                                        $bmiText = "Miisaan caadi (Normal)";
+                                        $bmiText = "Normal";
                                         $bmiColor = "#16a34a";
                                       } else if ($bmi >= 25 && $bmi <= 29.9) {
-                                        $bmiText = "Miisaan dheeraad (Overweight)";
+                                        $bmiText = "Overweight";
                                         $bmiColor = "#ca8a04";
                                       } else {
-                                        $bmiText = "Cayil aad u badan (Obese)";
+                                        $bmiText = "Obese";
                                         $bmiColor = "#dc2626";
                                       }
                                       echo "<span style='font-size:16px; font-weight:bold; color:#333;'>" . number_format($bmi, 1) . "</span><br>";
@@ -230,8 +230,8 @@ if (!isset($_SESSION['user_id'])) {
                   <div class="pull-left">
                     <br>
 
-                    <h4>Xubinta GYM-ka: <strong><?php echo $row['fullname']; ?></strong></h4>
-                    <p style="font-size: 14px;">Waad ku mahadsantahay doorashada adeegyadayada.</p>
+                    <h4>GYM Member: <strong><?php echo $row['fullname']; ?></strong></h4>
+                    <p style="font-size: 14px;">Thank you for choosing our services.</p>
                   </div>
                   <div class="pull-right text-center">
                     <h4>Approved By:</h4>
@@ -258,7 +258,7 @@ if (!isset($_SESSION['user_id'])) {
   <!--Footer-part-->
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
   </div>
 
   <style>

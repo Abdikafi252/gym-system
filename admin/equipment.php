@@ -1,16 +1,16 @@
-<?php
+﻿<?php
 session_start();
 //the isset function to check username is already loged in and stored on the session
 if (!isset($_SESSION['user_id'])) {
   header('location:../index.php');
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -368,7 +368,7 @@ if (!isset($_SESSION['user_id'])) {
 </head>
 
 <body>
-  <!-- Visit codeastro.com for more projects -->
+  
   <!--Header-part-->
   <?php include 'includes/header-content.php'; ?>
   <!--close-Header-part-->
@@ -391,21 +391,21 @@ if (!isset($_SESSION['user_id'])) {
 
   <div id="content">
     <div id="content-header">
-      <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="fas fa-home"></i> Bogga Hore</a> <a href="equipment.php" class="current">Qalabka</a> </div>
-      <h1 class="text-center">Liiska Qalabka GYM <i class="fas fa-cogs"></i></h1>
+      <div id="breadcrumb"> <a href="index.php" title="Go to Home" class="tip-bottom"><i class="fas fa-home"></i> Home</a> <a href="equipment.php" class="current">Equipment</a> </div>
+      <h1 class="text-center">GYM Equipment List <i class="fas fa-cogs"></i></h1>
     </div>
     <div class="container-fluid">
       <hr>
       <div class="equip-page-hero">
         <h2><i class="fas fa-dumbbell"></i> Gym Equipment Center</h2>
-        <p>Ka maamul qalabka gym-ka adigoo helaya list muuqaal fiican leh, action buttons buuxa, iyo responsive design u shaqaynaya mobile iyo desktop.</p>
+        <p>Manage gym equipment with a modern list view, full action buttons, and responsive design for both mobile and desktop.</p>
       </div>
       <div class="row-fluid">
         <div class="span12">
 
           <div class='widget-box'>
             <div class='widget-title'> <span class='icon'> <i class='fas fa-cogs'></i> </span>
-              <h5>Jadwalka Qalabka</h5>
+              <h5>Equipment Table</h5>
             </div>
             <div class='widget-content nopadding'>
 
@@ -414,7 +414,9 @@ if (!isset($_SESSION['user_id'])) {
               include "dbcon.php";
               mysqli_query($con, "ALTER TABLE equipment ADD COLUMN IF NOT EXISTS photo VARCHAR(255) NULL");
               mysqli_query($con, "ALTER TABLE equipment ADD COLUMN IF NOT EXISTS status VARCHAR(100) NOT NULL DEFAULT 'Brand New'");
-              $qry = "select * from equipment ORDER BY date DESC, id DESC";
+              $branch_id = isset($_SESSION['branch_id']) ? (int)$_SESSION['branch_id'] : 0;
+              $branch_where = $branch_id > 0 ? " WHERE branch_id = " . $branch_id : "";
+              $qry = "select * from equipment" . $branch_where . " ORDER BY date DESC, id DESC";
               $cnt = 1;
               $result = mysqli_query($con, $qry);
               $equipment_rows = array();
@@ -487,6 +489,13 @@ if (!isset($_SESSION['user_id'])) {
                   echo "<span class='equip-badge " . $status_class . "'>Status: " . htmlspecialchars($status_text) . "</span>";
                   echo "<span class='equip-badge'>Qty: " . (int)$row['quantity'] . "</span>";
                   echo "<span class='equip-badge'>Cost: $" . number_format((float)$row['amount'], 2) . "</span>";
+                  if (isset($row['branch_id']) && $row['branch_id'] > 0) {
+                    $bid = $row['branch_id'];
+                    $br_res = mysqli_query($con, "SELECT branch_name FROM branches WHERE id='$bid'");
+                    $br_row = mysqli_fetch_assoc($br_res);
+                    $bname = $br_row ? $br_row['branch_name'] : 'Unknown';
+                    echo "<span class='equip-badge' style='background:#fef2f2; color:#991b1b; border-color:#fee2e2;'><i class='fas fa-building'></i> " . htmlspecialchars($bname) . "</span>";
+                  }
                   echo "</div>";
                   echo "<div class='equip-actions'>";
                   echo "<a class='equip-btn view' href='view-equipment.php?id=" . (int)$row['id'] . "'><i class='fas fa-eye'></i> View</a>";
@@ -498,7 +507,7 @@ if (!isset($_SESSION['user_id'])) {
                   $cnt++;
                 }
               } else {
-                echo "<div class='equip-card'><div class='equip-title'>No Equipment Found</div><div class='equip-meta'>Fadlan ku dar qalab cusub.</div><a class='empty-equip-link' href='equipment-entry.php'><i class='fas fa-plus-circle'></i> Add Equipment</a></div>";
+                echo "<div class='equip-card'><div class='equip-title'>No Equipment Found</div><div class='equip-meta'>Please add new equipment.</div><a class='empty-equip-link' href='equipment-entry.php'><i class='fas fa-plus-circle'></i> Add Equipment</a></div>";
               }
               echo "</div>";
               ?>
@@ -517,7 +526,7 @@ if (!isset($_SESSION['user_id'])) {
   <!--Footer-part-->
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi </div>
   </div>
 
   <style>

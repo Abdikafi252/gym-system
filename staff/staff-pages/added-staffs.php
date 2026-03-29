@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -9,12 +9,12 @@ if (!isset($_SESSION['user_id'])) {
   header('location:../index.php');
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../../css/bootstrap.min.css" />
@@ -36,7 +36,7 @@ if (!isset($_SESSION['user_id'])) {
   <!--top-Header-menu-->
   <?php include '../includes/header.php' ?>
 
-  <!-- Visit codeastro.com for more projects -->
+  
   <!--sidebar-menu-->
   <?php $page = 'staff-management';
   include '../includes/sidebar.php' ?>
@@ -60,7 +60,7 @@ if (!isset($_SESSION['user_id'])) {
         $gender = $_POST["gender"];
         $contact = $_POST["contact"];
 
-        $password = md5($password);
+        $password = password_hash($password, PASSWORD_DEFAULT);
 
         // Handle Photo Upload
         $photo = null;
@@ -76,7 +76,11 @@ if (!isset($_SESSION['user_id'])) {
         include '../dbcon.php';
         //code after connection is successfull
         $branch_id = $_SESSION['branch_id'];
-        $qry = "insert into staffs(fullname,username,password,email,address,designation,gender,contact,photo,branch_id) values ('$fullname','$username','$password','$email','$address','$designation','$gender','$contact','$photo','$branch_id')";
+        // Ensure created_at and updated_at columns exist
+        mysqli_query($con, "ALTER TABLE staffs ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP");
+        mysqli_query($con, "ALTER TABLE staffs ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP");
+
+        $qry = "insert into staffs(fullname,username,password,email,address,designation,gender,contact,photo,branch_id,created_at) values ('$fullname','$username','$password','$email','$address','$designation','$gender','$contact','$photo','$branch_id',NOW())";
         $result = mysqli_query($con, $qry); //query executes
 
         if (!$result) {
@@ -119,7 +123,7 @@ if (!isset($_SESSION['user_id'])) {
           echo "</div>";
           echo "</div>";
         }
-        // <!-- Visit codeastro.com for more projects -->
+        // 
       } else {
         echo "<h3>YOU ARE NOT AUTHORIZED TO REDIRECT THIS PAGE. GO BACK to <a href='index.php'> DASHBOARD </a></h3>";
       }
@@ -132,14 +136,14 @@ if (!isset($_SESSION['user_id'])) {
   </div>
   <!--Footer-part-->
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
   </div>
 
   <style>
     #footer {
       color: white;
     }
-  </style><!-- Visit codeastro.com for more projects -->
+  </style>
   <!--end-Footer-part-->
   <script src="../../js/jquery.min.js"></script>
   <script src="../../js/jquery.ui.custom.js"></script>

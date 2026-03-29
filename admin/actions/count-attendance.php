@@ -1,18 +1,12 @@
 <?php
+include __DIR__ . '/../../dbcon.php';
 
-$servername="localhost";
-$uname="root";
-$pass="";
-$db="gymnsb";
-
-$conn=mysqli_connect($servername,$uname,$pass,$db);
-
-if(!$conn){
-    die("Connection Failed");
+if (!isset($conn) && isset($con)) {
+    $conn = $con;
 }
 
-$sql = "SELECT * FROM attendance";
-                $query = $conn->query($sql);
-
-                echo "$query->num_rows";
-?><!-- Visit codeastro.com for more projects -->
+$date = date("Y-m-d");
+$sql = "SELECT * FROM attendance WHERE curr_date='$date'";
+$query = mysqli_query($conn, $sql);
+echo mysqli_num_rows($query);
+?>

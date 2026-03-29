@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user_id'])) {
     header('location:../index.php');
@@ -122,8 +122,18 @@ if (!isset($_SESSION['user_id'])) {
                         <div class="widget-title"> <span class="icon"> <i class="fas fa-th"></i> </span>
                             <h5>Packages List</h5>
                         </div>
+                        <!-- Search/Filter Bar for Packages -->
+                        <div class="row-fluid">
+                            <div class="span6 offset3">
+                                <form id="packageSearchForm" class="form-inline" style="margin-bottom: 18px; display: flex; gap: 10px; align-items: center;">
+                                    <input type="text" id="packageSearchInput" class="form-control" placeholder="Search by name, duration, or description..." style="flex: 1; min-width: 120px;" />
+                                    <button type="button" class="btn btn-info" onclick="filterPackages()"><i class="fas fa-search"></i> Search</button>
+                                    <button type="button" class="btn btn-secondary" onclick="resetPackageFilter()"><i class="fas fa-undo"></i> Reset</button>
+                                </form>
+                            </div>
+                        </div>
                         <div class="widget-content nopadding">
-                            <table class="table table-bordered table-striped">
+                            <table class="table table-bordered table-striped" id="packagesTable">
                                 <thead>
                                     <tr>
                                         <th>#</th>
@@ -140,21 +150,61 @@ if (!isset($_SESSION['user_id'])) {
                                     $qry = "SELECT * FROM packages";
                                     $result = mysqli_query($con, $qry);
                                     $cnt = 1;
+                                    $errorMsg = '';
+                                    if (!$result) {
+                                        $errorMsg = 'Error loading packages: ' . htmlspecialchars(mysqli_error($con));
+                                    }
+                                    if ($errorMsg) {
+                                        echo "<tr><td colspan='6'><div class='alert alert-danger' style='margin: 10px;'>$errorMsg</div></td></tr>";
+                                    }
+                                    $rowCount = 0;
                                     while ($row = mysqli_fetch_array($result)) {
+                                        $rowCount++;
                                         echo "<tr>";
                                         echo "<td>" . $cnt . "</td>";
-                                        echo "<td>" . $row['packagename'] . "</td>";
-                                        echo "<td>" . $row['duration'] . " Month(s)</td>";
-                                        echo "<td>$" . $row['amount'] . "</td>";
-                                        echo "<td>" . $row['description'] . "</td>";
-                                        echo "<td><div class='text-center'><a href='edit-package.php?id=" . $row['id'] . "'><i class='fas fa-edit' style='color:#28b779'></i> Edit</a> | <a href='remove-package.php?id=" . $row['id'] . "' style='color:#F66;' onclick='return confirm(\"Are you sure?\")'><i class='fas fa-trash'></i> Remove</a></div></td>";
+                                        echo "<td>" . htmlspecialchars($row['packagename']) . "</td>";
+                                        echo "<td>" . htmlspecialchars($row['duration']) . " Month(s)</td>";
+                                        echo "<td>$" . htmlspecialchars($row['amount']) . "</td>";
+                                        echo "<td>" . htmlspecialchars($row['description']) . "</td>";
+                                        echo "<td><div class='text-center'><a href='edit-package.php?id=" . (int)$row['id'] . "'><i class='fas fa-edit' style='color:#28b779'></i> Edit</a> | <a href='remove-package.php?id=" . (int)$row['id'] . "' style='color:#F66;' onclick='return confirm(\"Are you sure?\")'><i class='fas fa-trash'></i> Remove</a></div></td>";
                                         echo "</tr>";
                                         $cnt++;
+                                    }
+                                    if ($rowCount === 0 && !$errorMsg) {
+                                        echo "<tr><td colspan='6'><div class='text-center' style='padding:18px;color:#64748b;'>No packages found yet.</div></td></tr>";
                                     }
                                     ?>
                                 </tbody>
                             </table>
                         </div>
+                        <script>
+                            // Client-side filter for packages
+                            function filterPackages() {
+                                var input = document.getElementById('packageSearchInput').value.toLowerCase();
+                                var table = document.getElementById('packagesTable');
+                                var rows = table.querySelectorAll('tbody tr');
+                                if (!input) {
+                                    rows.forEach(function(row) { row.style.display = ''; });
+                                    return;
+                                }
+                                rows.forEach(function(row) {
+                                    var cells = row.querySelectorAll('td');
+                                    var name = cells[1]?.textContent.toLowerCase() || '';
+                                    var duration = cells[2]?.textContent.toLowerCase() || '';
+                                    var desc = cells[4]?.textContent.toLowerCase() || '';
+                                    if (name.includes(input) || duration.includes(input) || desc.includes(input)) {
+                                        row.style.display = '';
+                                    } else {
+                                        row.style.display = 'none';
+                                    }
+                                });
+                            }
+
+                            function resetPackageFilter() {
+                                document.getElementById('packageSearchInput').value = '';
+                                filterPackages();
+                            }
+                        </script>
                     </div>
                 </div>
             </div>
@@ -163,7 +213,7 @@ if (!isset($_SESSION['user_id'])) {
 
     <!--Footer-part-->
     <div class="row-fluid">
-        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</div>
+        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</div>
     </div>
 
     <style>

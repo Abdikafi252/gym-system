@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -10,12 +10,12 @@ if (!isset($_SESSION['user_id'])) {
   exit();
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../../css/bootstrap.min.css" />
@@ -44,8 +44,8 @@ if (!isset($_SESSION['user_id'])) {
 
   <div id="content">
     <div id="content-header">
-      <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="icon-home"></i> Bogga Hore</a> <a href="#" class="tip-bottom">Maamul Qalabka</a> <a href="#" class="current">Ku dar Qalab</a> </div>
-      <h1>Foomka Gelitaanka Qalabka</h1>
+      <div id="breadcrumb"> <a href="index.php" title="Go to Home" class="tip-bottom"><i class="icon-home"></i> Home</a> <a href="#" class="tip-bottom">Manage Equipment</a> <a href="#" class="current">Add Equipment</a> </div>
+      <h1>Equipment Entry Form</h1>
     </div>
     <form role="form" action="index.php" method="POST">
       <?php
@@ -72,14 +72,14 @@ if (!isset($_SESSION['user_id'])) {
           echo "<div class='span12'>";
           echo "<div class='widget-box'>";
           echo "<div class='widget-title'> <span class='icon'> <i class='icon-info-sign'></i> </span>";
-          echo "<h5>Dhambaal Khalad ah</h5>";
+          echo "<h5>Error Message</h5>";
           echo "</div>";
           echo "<div class='widget-content'>";
           echo "<div class='error_ex'>";
-          echo "<h1 style='color:maroon;'>Khalad 404</h1>";
-          echo "<h3>Khalad ayaa dhacay intii lagu guda jiray gelinta faahfaahintaada</h3>";
-          echo "<p>Fadlan isku day markale</p>";
-          echo "<a class='btn btn-warning btn-big'  href='equipment-entry.php'>Dib u noqo</a> </div>";
+          echo "<h1 style='color:maroon;'>Error 404</h1>";
+          echo "<h3>An error occurred while entering your details</h3>";
+          echo "<p>Please try again</p>";
+          echo "<a class='btn btn-warning btn-big'  href='equipment-entry.php'>Go Back</a> </div>";
           echo "</div>";
           echo "</div>";
           echo "</div>";
@@ -92,14 +92,14 @@ if (!isset($_SESSION['user_id'])) {
           echo "<div class='span12'>";
           echo "<div class='widget-box'>";
           echo "<div class='widget-title'> <span class='icon'> <i class='icon-info-sign'></i> </span>";
-          echo "<h5>Dhambaal</h5>";
+          echo "<h5>Message</h5>";
           echo "</div>";
           echo "<div class='widget-content'>";
           echo "<div class='error_ex'>";
-          echo "<h1>Guul</h1>";
-          echo "<h3>Diiwaanka qalabka waa lagu daray!</h3>";
-          echo "<p>Faahfaahintii la codsaday waa lagu daray. Fadlan guji badhanka si aad dib ugu noqoto.</p>";
-          echo "<a class='btn btn-inverse btn-big'  href='equipment.php'>Dib u noqo</a> </div>";
+          echo "<h1>Success</h1>";
+          echo "<h3>Equipment record has been added!</h3>";
+          echo "<p>The requested details have been added. Please click the button to go back.</p>";
+          echo "<a class='btn btn-inverse btn-big'  href='equipment.php'>Go Back</a> </div>";
           echo "</div>";
           echo "</div>";
           echo "</div>";
@@ -107,7 +107,7 @@ if (!isset($_SESSION['user_id'])) {
           echo "</div>";
         }
       } else {
-        echo "<h3>MA ADID FASAXAAD INAAD BOGGAN RAACDO. DIB U NOQO <a href='index.php'> DASHBOARD-KA </a></h3>";
+        echo "<h3>YOU ARE NOT AUTHORIZED TO ACCESS THIS PAGE. GO BACK TO <a href='index.php'> DASHBOARD </a></h3>";
       }
 
 
@@ -127,7 +127,7 @@ if (!isset($_SESSION['user_id'])) {
   <!--Footer-part-->
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
   </div>
 
   <style>

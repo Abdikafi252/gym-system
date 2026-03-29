@@ -5,10 +5,10 @@ ensure_security_tables($con);
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<!-- Visit codeastro.com for more projects -->
+
 
 <head>
-    <title>M * A GYM System</title>
+    <title>M*A GYM System</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="css/bootstrap.min.css" />
@@ -18,7 +18,7 @@ ensure_security_tables($con);
     <link rel="stylesheet" href="css/login-desktop.css" />
     <link href="font-awesome/css/fontawesome.css" rel="stylesheet" />
     <link href="font-awesome/css/all.css" rel="stylesheet" />
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,800' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700,800' rel='stylesheet' type='text/css'>
 
 </head>
 
@@ -159,6 +159,6 @@ ensure_security_tables($con);
     <script src="js/bootstrap.min.js"></script>
     <script src="js/matrix.js"></script>
 </body>
-<!-- Visit codeastro.com for more projects -->
+
 
 </html>

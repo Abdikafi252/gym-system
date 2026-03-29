@@ -107,6 +107,8 @@ error_reporting(E_ALL);
 
                 include 'dbcon.php';
                 require_once __DIR__ . '/../includes/audit_helper.php';
+                require_once __DIR__ . '/includes/accounting_engine.php';
+                acc_bootstrap_tables($con);
 
                 if (!$con) {
                   die("<h3 style='color:red'>Database Connection Failed: " . mysqli_connect_error() . "</h3>");
@@ -115,14 +117,27 @@ error_reporting(E_ALL);
                 $trainer_type = isset($_POST['trainer_type']) ? $_POST['trainer_type'] : 'General Training';
                 $totalamount  = isset($_POST['total_amount']) ? $_POST['total_amount'] : ($amount * $plan);
 
-                // Handle Photo Upload
+                // Handle Photo Upload (File or Webcam)
                 $photo_name = '';
+                $target_dir = "../img/members/";
+
                 if (isset($_FILES['photo']) && $_FILES['photo']['error'] == 0) {
-                  $target_dir = "../img/members/";
                   $file_ext   = pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
                   $photo_name = "member_" . time() . "_" . $biometric_id . "." . $file_ext;
                   if (!move_uploaded_file($_FILES['photo']['tmp_name'], $target_dir . $photo_name)) {
                     $photo_name = '';
+                  }
+                } elseif (!empty($_POST['webcam_image'])) {
+                  // Handle Webcam Base64 Image
+                  $base64_img = $_POST['webcam_image'];
+                  if (strpos($base64_img, 'data:image/jpeg;base64,') === 0) {
+                    $base64_img = str_replace('data:image/jpeg;base64,', '', $base64_img);
+                    $base64_img = str_replace(' ', '+', $base64_img);
+                    $data = base64_decode($base64_img);
+                    $photo_name = "member_cam_" . time() . "_" . $biometric_id . ".jpg";
+                    if (!file_put_contents($target_dir . $photo_name, $data)) {
+                      $photo_name = "";
+                    }
                   }
                 }
 
@@ -168,7 +183,7 @@ error_reporting(E_ALL);
 
                 $registered_by_esc = mysqli_real_escape_string($con, $registered_by);
                 $qry = "INSERT INTO members(fullname,username,password,dor,gender,services,amount,p_year,paid_date,plan,address,contact,biometric_id,expiry_date,status,registered_by,attendance_count,ini_bodytype,curr_bodytype,progress_date,batch,email,aadhar,pan,discount_type,discount_amount,paid_amount,comments,trainer_type,photo,branch_id,id_doc_type,id_document,created_by,updated_by,updated_at)
-                  VALUES ('$fullname','$username','$password','$dor','$gender','$services','$totalamount','$p_year','$paid_date','$plan','$address','$contact','$biometric_id','$expiry_date','Pending','$registered_by','0','','','$dor','$batch','$email','$aadhar','$pan','$discount_type','$discount_amount','$paid_amount','$comments','$trainer_type','$photo_name','$branch_id','$id_doc_type','$id_doc_name','$registered_by_esc','$registered_by_esc',NOW())";
+                  VALUES ('$fullname','$username','$password','$dor','$gender','$services','$totalamount','$p_year','$paid_date','$plan','$address','$contact','$biometric_id','$expiry_date','Active','$registered_by','0','','','$dor','$batch','$email','$aadhar','$pan','$discount_type','$discount_amount','$paid_amount','$comments','$trainer_type','$photo_name','$branch_id','$id_doc_type','$id_doc_name','$registered_by_esc','$registered_by_esc',NOW())";
 
                 echo "<p>Attempting Insert...</p>";
 
@@ -193,19 +208,50 @@ error_reporting(E_ALL);
                   $history_qry = "INSERT INTO payment_history (invoice_no, user_id, fullname, amount, paid_amount, discount_amount, discount_type, plan, services, paid_date, expiry_date, branch_id, recorded_by)
                                   VALUES ('$invoice_no', '$new_user_id', '$fullname_esc', '$totalamount', '$paid_amount', '$discount_amount', '$discount_type_esc', '$plan', '$services_esc', '$paid_date', '$expiry_date', '$branch_id', '$recorded_by_esc')";
                   mysqli_query($con, $history_qry);
+                  $payment_history_id = mysqli_insert_id($con);
+
+                  if ((float)$paid_amount > 0) {
+                    $accMemo = 'New member payment Invoice ' . $invoice_no;
+                    acc_create_entry_once(
+                      $con,
+                      $paid_date,
+                      $accMemo,
+                      'payment_history',
+                      (string)$payment_history_id,
+                      [
+                        ['account_code' => '1000', 'debit' => (float)$paid_amount, 'credit' => 0, 'line_memo' => $accMemo],
+                        ['account_code' => '4000', 'debit' => 0, 'credit' => (float)$paid_amount, 'line_memo' => $accMemo]
+                      ],
+                      0,
+                      0,
+                      $recorded_by_esc
+                    );
+                  }
 
                   $actorId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : '0';
                   audit_log($con, 'admin', $actorId, 'member_register', 'member', $new_user_id, 'New member registered: ' . $fullname);
 
                   // Success
                   include_once '../api/sms_helper.php';
-                  $welcome_msg = "Asc $fullname, Ku soo dhowaw GYM System. Xubinnimadaada waa diyaar. Biometric ID: $biometric_id. Dhicitaanka: $expiry_date.";
+                  $welcome_msg = "Asc $fullname, Ku soo dhowaw GYM System. Xubinnimadaada waa diyaar. Face ID: $biometric_id. Dhicitaanka: $expiry_date.";
                   sendSMS($contact, $welcome_msg);
 
-                  echo "<div class='alert alert-success'>";
+                  // Face Terminal Sync (DA-T12 / WL-P72)
+                  require_once __DIR__ . '/../includes/FaceTerminal.php';
+                  $ft = new FaceTerminal($con);
+                  if ($ft->isEnabled()) {
+                      $sync_res = $ft->syncPerson($biometric_id, $fullname, $target_dir . $photo_name);
+                      if (isset($sync_res['status']) && $sync_res['status'] === 'success') {
+                          echo "<div class='alert alert-info'><strong>Terminal Sync:</strong> Member pushed to Face Terminal successfully.</div>";
+                      } elseif (isset($sync_res['status']) && $sync_res['status'] === 'error') {
+                          echo "<div class='alert alert-warning'><strong>Terminal Sync Warning:</strong> " . $sync_res['message'] . "</div>";
+                      }
+                  }
+
+                   echo "<div class='alert alert-success'>";
                   echo "<h1>Success!</h1>";
                   echo "<h3>Member details added successfully.</h3>";
-                  echo "<p>Status: <strong>Pending</strong>. Waxay sugaysaa aqbalidda Cashier ama Manager.</p>";
+                  echo "<p>Status: <strong>Active</strong>. Member is now active.</p>";
                   echo "</div>";
                   echo "<a class='btn btn-success' href='members.php'>Confirm & Go to List</a>";
 

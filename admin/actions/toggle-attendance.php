@@ -27,7 +27,7 @@ if (!$period_res || mysqli_num_rows($period_res) == 0) {
     $fallback_end = !empty($member['expiry_date']) ? $member['expiry_date'] : null;
 
     if (empty($fallback_start) || strtotime($date) < strtotime($fallback_start) || (!empty($fallback_end) && strtotime($date) > strtotime($fallback_end))) {
-        echo json_encode(["status" => "error", "message" => "Attendance-kan kuma jiro period-ka xubinnimada (renewal period)."]);
+        echo json_encode(["status" => "error", "message" => "This attendance is not within a valid membership period (renewal period)."]);
         exit;
     }
 }
@@ -42,51 +42,34 @@ $check_qry = "SELECT * FROM attendance WHERE curr_date = '$date' AND user_id = '
 $check_res = mysqli_query($con, $check_qry);
 
 if (mysqli_num_rows($check_res) == 0) {
-    // 0 -> 1: Check In (Incomplete)
+    // 0 -> 1: Mark Present
     $sql = "INSERT INTO attendance (user_id, member_id, curr_date, curr_time, present, check_in) 
             VALUES ('$user_id', '$user_id', '$date', '$curr_time', 1, NOW())";
 
     if ($con->query($sql) === TRUE) {
         $con->query("UPDATE members SET attendance_count = attendance_count + 1 WHERE user_id='$user_id'");
         $actorId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : '0';
-        audit_log($con, 'admin', $actorId, 'attendance_check_in', 'attendance', $user_id . '|' . $date, 'Attendance checked in');
+        audit_log($con, 'admin', $actorId, 'attendance_check_in', 'attendance', $user_id . '|' . $date, 'Attendance marked present');
         echo json_encode([
             "status" => "success",
-            "state" => "incomplete",
+            "state" => "complete",
             "check_in" => $curr_time
         ]);
     } else {
         echo json_encode(["status" => "error", "message" => "Database error"]);
     }
 } else {
-    $row = mysqli_fetch_array($check_res);
-    $check_in_time = $row['curr_time'];
-
-    if (empty($row['check_out']) || strpos($row['check_out'], '0000') !== false) {
-        // 1 -> 2: Check Out (Complete)
-        $sql = "UPDATE attendance SET check_out = NOW() WHERE user_id='$user_id' AND curr_date = '$date'";
-        if ($con->query($sql) === TRUE) {
-            $out_time = date('h:i A'); // Approximate since we just used NOW()
-            $actorId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : '0';
-            audit_log($con, 'admin', $actorId, 'attendance_check_out', 'attendance', $user_id . '|' . $date, 'Attendance checked out');
-            echo json_encode([
-                "status" => "success",
-                "state" => "complete",
-                "check_in" => $check_in_time,
-                "check_out" => $out_time
-            ]);
-        }
+    // 1 -> 0: Delete Record (Absent)
+    $sql = "DELETE FROM attendance WHERE user_id='$user_id' AND curr_date = '$date'";
+    if ($con->query($sql) === TRUE) {
+        $con->query("UPDATE members SET attendance_count = GREATEST(0, attendance_count - 1) WHERE user_id='$user_id'");
+        $actorId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : '0';
+        audit_log($con, 'admin', $actorId, 'attendance_mark_absent', 'attendance', $user_id . '|' . $date, 'Attendance removed and marked absent');
+        echo json_encode([
+            "status" => "success",
+            "state" => "absent"
+        ]);
     } else {
-        // 2 -> 0: Delete Record (Absent)
-        $sql = "DELETE FROM attendance WHERE user_id='$user_id' AND curr_date = '$date'";
-        if ($con->query($sql) === TRUE) {
-            $con->query("UPDATE members SET attendance_count = GREATEST(0, attendance_count - 1) WHERE user_id='$user_id'");
-            $actorId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : '0';
-            audit_log($con, 'admin', $actorId, 'attendance_mark_absent', 'attendance', $user_id . '|' . $date, 'Attendance removed and marked absent');
-            echo json_encode([
-                "status" => "success",
-                "state" => "absent"
-            ]);
-        }
+        echo json_encode(["status" => "error", "message" => "Database error"]);
     }
 }

@@ -1,16 +1,16 @@
-<?php
+﻿<?php
 session_start();
 //the isset function to check username is already loged in and stored on the session
 if (!isset($_SESSION['user_id'])) {
   header('location:../index.php');
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -30,7 +30,7 @@ if (!isset($_SESSION['user_id'])) {
   <?php include 'includes/header-content.php'; ?>
   <!--close-Header-part-->
 
-  <!-- Visit codeastro.com for more projects -->
+  
   <!--top-Header-menu-->
   <?php include 'includes/topheader.php' ?>
   <!--close-top-Header-menu-->
@@ -56,8 +56,8 @@ if (!isset($_SESSION['user_id'])) {
 
     <div id="content">
       <div id="content-header">
-        <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="fas fa-home"></i> Bogga Hore</a> <a href="payment.php">Lacag Bixinta</a> <a href="#" class="current">Invoice</a> </div>
-        <h1>Foomka Lacag Bixinta</h1>
+        <div id="breadcrumb"> <a href="index.php" title="Go to Home" class="tip-bottom"><i class="fas fa-home"></i> Home</a> <a href="payment.php">Payments</a> <a href="#" class="current">Invoice</a> </div>
+        <h1>Payment Form</h1>
       </div>
 
 
@@ -66,7 +66,7 @@ if (!isset($_SESSION['user_id'])) {
           <div class="span12">
             <div class="widget-box">
               <div class="widget-title"> <span class="icon"> <i class="fas fa-money"></i> </span>
-                <h5>Lacag Bixinta</h5>
+                <h5>Payment</h5>
               </div>
               <div class="widget-content">
                 <div class="row-fluid">
@@ -103,31 +103,31 @@ if (!isset($_SESSION['user_id'])) {
                         <form action="userpay.php" method="POST">
                           <tr>
                           <tr>
-                            <td class="width30">Magaca Buuxa:</td>
+                            <td class="width30">Full Name:</td>
                             <input type="hidden" name="fullname" value="<?php echo $row['fullname']; ?>">
                             <td class="width70"><strong><?php echo $row['fullname']; ?></strong></td>
                           </tr>
                           <tr>
-                            <td>Adeegga:</td>
+                            <td>Service:</td>
                             <input type="hidden" name="services" value="<?php echo $row['services']; ?>">
                             <td><strong><?php echo $row['services']; ?></strong></td>
                           </tr>
                           <tr>
-                            <td>Lacagta Bishii:</td>
+                            <td>Monthly Amount:</td>
                             <td><input id="amount" type="number" name="amount" value='<?php echo $row['amount']; ?>' /></td>
                           </tr>
 
                           <input type="hidden" name="paid_date" value="<?php echo $row['paid_date']; ?>">
 
-                          <td class="width30">Qorshaha:</td>
+                          <td class="width30">Plan:</td>
                           <td class="width70">
                             <div class="controls">
                               <select name="plan" required="required" id="select">
-                                <option value="1" selected="selected">Hal Bil</option>
-                                <option value="3">Saddex Bilood</option>
-                                <option value="6">Lix Bilood</option>
-                                <option value="12">Hal Sano</option>
-                                <option value="0">Ma Dhacayo</option>
+                                <option value="1" selected="selected">1 Month</option>
+                                <option value="3">3 Months</option>
+                                <option value="6">6 Months</option>
+                                <option value="12">1 Year</option>
+                                <option value="0">No Expiry</option>
 
                               </select>
                             </div>
@@ -139,12 +139,12 @@ if (!isset($_SESSION['user_id'])) {
                           <tr>
 
                           </tr>
-                          <td class="width30">Xaaladda Xubinta:</td>
+                          <td class="width30">Member Status:</td>
                           <td class="width70">
                             <div class="controls">
                               <select name="status" required="required" id="select">
-                                <option value="Active" selected="selected">Waa Socdaa (Active)</option>
-                                <option value="Expired">Wuu Dhacay (Expired)</option>
+                                <option value="Active" selected="selected">Active</option>
+                                <option value="Expired">Expired</option>
 
                               </select>
                             </div>
@@ -171,7 +171,7 @@ if (!isset($_SESSION['user_id'])) {
 
                       <input type="hidden" name="id" value="<?php echo $row['user_id']; ?>">
 
-                      <button class="btn btn-success btn-large" type="SUBMIT" href="">Bixi Hadda</button>
+                      <button class="btn btn-success btn-large" type="SUBMIT" href="">Pay Now</button>
                     </div>
 
                     </form>
@@ -197,7 +197,7 @@ if (!isset($_SESSION['user_id'])) {
     <!--Footer-part-->
 
     <div class="row-fluid">
-      <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+      <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
     </div>
 
     <style>

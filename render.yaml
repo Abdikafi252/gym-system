@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: m-a-gym
+    env: docker
+    plan: free
+    region: ohio
+    envVars:
+      - key: DB_HOST
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASS
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: SMS_SENDER_ID
+        value: M*AGYM
+      - key: PORT
+        value: 80

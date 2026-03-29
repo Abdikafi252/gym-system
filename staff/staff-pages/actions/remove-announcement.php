@@ -12,7 +12,8 @@ $id=$_GET['id'];
 include 'dbcon.php';
 
 
-$qry="delete from announcements where id=$id";
+$branch_id = $_SESSION['branch_id'];
+$qry="delete from announcements where id=$id AND branch_id='$branch_id'";
 $result=mysqli_query($con,$qry);
 
 if($result){

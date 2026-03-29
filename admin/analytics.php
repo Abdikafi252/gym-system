@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user_id'])) {
     header('location:../index.php');
@@ -10,16 +10,19 @@ include "dbcon.php";
 $from = isset($_GET['from']) ? $_GET['from'] : date('Y-m-01');
 $to = isset($_GET['to']) ? $_GET['to'] : date('Y-m-d');
 
-$income_q = mysqli_query($con, "SELECT COALESCE(SUM(paid_amount),0) total FROM payment_history WHERE paid_date BETWEEN '$from' AND '$to'");
+$branch_id = isset($_SESSION['branch_id']) ? (int)$_SESSION['branch_id'] : 0;
+$branch_where = $branch_id > 0 ? " AND branch_id = $branch_id " : "";
+
+$income_q = mysqli_query($con, "SELECT COALESCE(SUM(paid_amount),0) total FROM payment_history WHERE paid_date BETWEEN '$from' AND '$to' " . $branch_where);
 $income = (float)mysqli_fetch_assoc($income_q)['total'];
 
-$expense_q = mysqli_query($con, "SELECT COALESCE(SUM(amount),0) total FROM expenses WHERE date BETWEEN '$from' AND '$to'");
+$expense_q = mysqli_query($con, "SELECT COALESCE(SUM(amount),0) total FROM expenses WHERE date BETWEEN '$from' AND '$to' " . $branch_where);
 $total_expense = (float)mysqli_fetch_assoc($expense_q)['total'];
 
-$renew_q = mysqli_query($con, "SELECT COUNT(*) total FROM payment_history WHERE paid_date BETWEEN '$from' AND '$to'");
+$renew_q = mysqli_query($con, "SELECT COUNT(*) total FROM payment_history WHERE paid_date BETWEEN '$from' AND '$to' " . $branch_where);
 $renewals = (int)mysqli_fetch_assoc($renew_q)['total'];
 
-$expiry_q = mysqli_query($con, "SELECT COUNT(*) total FROM members WHERE expiry_date BETWEEN '$from' AND '$to'");
+$expiry_q = mysqli_query($con, "SELECT COUNT(*) total FROM members WHERE expiry_date BETWEEN '$from' AND '$to' " . $branch_where);
 $expiries = (int)mysqli_fetch_assoc($expiry_q)['total'];
 
 $branch_labels = [];
@@ -124,7 +127,7 @@ while ($br = mysqli_fetch_assoc($branch_rev_res)) {
     </div>
 </div>
 
-<div class="row-fluid"><div id="footer" class="span12" style="color:white;"><?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</div></div>
+<div class="row-fluid"><div id="footer" class="span12" style="color:white;"><?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</div></div>
 
 <script src="../js/jquery.min.js"></script>
 <script src="../js/jquery.ui.custom.js"></script>

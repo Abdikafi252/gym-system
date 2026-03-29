@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -38,23 +38,16 @@ if (!isset($_SESSION['user_id'])) {
   <?php include '../includes/header.php' ?>
 
   <!--close-top-Header-menu-->
-  <!--start-top-serch-->
-  <!-- <div id="search">
-  <input type="hidden" placeholder="Search here..."/>
-  <button type="submit" class="tip-bottom" title="Search"><i class="icon-search icon-white"></i></button>
-</div> -->
-  <!--close-top-serch-->
-  <!--sidebar-menu-->
 
+  <!--sidebar-menu-->
   <?php $page = "equipment";
   include '../includes/sidebar.php' ?>
-
-
   <!--sidebar-menu-->
+
   <div id="content">
     <div id="content-header">
-      <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="icon-home"></i> Bogga Hore</a> <a href="#" class="tip-bottom">Maamul Qalabka</a> <a href="#" class="current">Cusboonaysii Qalabka</a> </div>
-      <h1>Cusboonaysii Qalabka</h1>
+      <div id="breadcrumb"> <a href="index.php" title="Go to Home" class="tip-bottom"><i class="icon-home"></i> Home</a> <a href="#" class="tip-bottom">Manage Equipment</a> <a href="#" class="current">Update Equipment</a> </div>
+      <h1>Update Equipment</h1>
     </div>
     <form role="form" action="index.php" method="POST">
       <?php
@@ -73,7 +66,7 @@ if (!isset($_SESSION['user_id'])) {
         include 'dbcon.php';
         //code after connection is successfull
         //update query
-        $qry = "update equipment set name='$name', amount='$amount',vendor='$vendor', description='$description', address='$address', address='$address', contact='$contact', date='$date', quantity='$quantity' where id='$id'";
+        $qry = "update equipment set name='$name', amount='$amount',vendor='$vendor', description='$description', address='$address', contact='$contact', date='$date', quantity='$quantity' where id='$id'";
         $result = mysqli_query($conn, $qry); //query executes
 
         if (!$result) {
@@ -82,14 +75,14 @@ if (!isset($_SESSION['user_id'])) {
           echo "<div class='span12'>";
           echo "<div class='widget-box'>";
           echo "<div class='widget-title'> <span class='icon'> <i class='icon-info-sign'></i> </span>";
-          echo "<h5>Dhambaal Khalad ah</h5>";
+          echo "<h5>Error Message</h5>";
           echo "</div>";
           echo "<div class='widget-content'>";
           echo "<div class='error_ex'>";
-          echo "<h1 style='color:maroon;'>Khalad 404</h1>";
-          echo "<h3>Khalad ayaa dhacay intii lagu guda jiray cusboonaysiinta faahfaahintaada</h3>";
-          echo "<p>Fadlan isku day markale</p>";
-          echo "<a class='btn btn-warning btn-big'  href='edit-equipment.php'>Dib u noqo</a> </div>";
+          echo "<h1 style='color:maroon;'>Error 404</h1>";
+          echo "<h3>An error occurred while updating your details</h3>";
+          echo "<p>Please try again</p>";
+          echo "<a class='btn btn-warning btn-big'  href='edit-equipment.php'>Go Back</a> </div>";
           echo "</div>";
           echo "</div>";
           echo "</div>";
@@ -102,14 +95,14 @@ if (!isset($_SESSION['user_id'])) {
           echo "<div class='span12'>";
           echo "<div class='widget-box'>";
           echo "<div class='widget-title'> <span class='icon'> <i class='icon-info-sign'></i> </span>";
-          echo "<h5>Dhambaal</h5>";
+          echo "<h5>Message</h5>";
           echo "</div>";
           echo "<div class='widget-content'>";
           echo "<div class='error_ex'>";
-          echo "<h1>Guul</h1>";
-          echo "<h3>Qalabka waa la cusboonaysiiyay!</h3>";
-          echo "<p>Faahfaahintii la codsaday waa la cusboonaysiiyay. Fadlan guji badhanka si aad dib ugu noqoto.</p>";
-          echo "<a class='btn btn-inverse btn-big'  href='equipment.php'>Dib u noqo</a> </div>";
+          echo "<h1>Success</h1>";
+          echo "<h3>Equipment has been updated!</h3>";
+          echo "<p>The requested details have been updated. Please click the button to go back.</p>";
+          echo "<a class='btn btn-inverse btn-big'  href='equipment.php'>Go Back</a> </div>";
           echo "</div>";
           echo "</div>";
           echo "</div>";
@@ -117,7 +110,7 @@ if (!isset($_SESSION['user_id'])) {
           echo "</div>";
         }
       } else {
-        echo "<h3>MA ADID FASAXAAD INAAD BOGGAN RAACDO. DIB U NOQO <a href='index.php'> DASHBOARD-KA </a></h3>";
+        echo "<h3>YOU ARE NOT AUTHORIZED TO ACCESS THIS PAGE. GO BACK TO <a href='index.php'> DASHBOARD </a></h3>";
       }
       ?>
 
@@ -133,7 +126,7 @@ if (!isset($_SESSION['user_id'])) {
   <!--Footer-part-->
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
   </div>
 
   <style>

@@ -22,7 +22,7 @@ if (!in_array($_SESSION['designation'], ['Manager', 'Cashier'])) {
 <html lang="en">
 
 <head>
-    <title>M * A GYM System</title>
+    <title>M*A GYM System</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="../../css/bootstrap.min.css" />
@@ -33,6 +33,40 @@ if (!in_array($_SESSION['designation'], ['Manager', 'Cashier'])) {
     <link href="../../font-awesome/css/all.css" rel="stylesheet" />
     <link rel="stylesheet" href="../../css/jquery.gritter.css" />
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,800' rel='stylesheet' type='text/css'>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <style>
+        .thermal-receipt {
+            width: 320px;
+            background: #fff;
+            padding: 12px;
+            color: #000;
+            margin: 0 auto;
+            box-sizing: border-box;
+            font-family: 'Courier Prime', monospace;
+            border: 1px solid #eee;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .thermal-header { text-align: center; margin-bottom: 12px; }
+        .thermal-header h2 { margin: 0; font-size: 24px; }
+        .thermal-header p { margin: 4px 0; font-size: 14px; }
+        .thermal-divider { border-top: 1.5px dashed #000; margin: 12px 0; }
+        .thermal-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 6px; }
+        .thermal-table { width: 100%; font-size: 14px; border-collapse: collapse; margin: 12px 0; }
+        .thermal-table th { border-top: 1.5px dashed #000; border-bottom: 1.5px dashed #000; padding: 8px 0; text-align: left; }
+        .thermal-table td { padding: 8px 0; }
+        .thermal-total-row { display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; border-top: 1.5px dashed #000; padding-top: 8px; margin-top: 8px; }
+        .thermal-footer { text-align: center; margin-top: 20px; font-size: 13px; border-top: 1.5px dashed #000; padding-top: 12px; }
+        
+        @media print {
+            body * { visibility: hidden; }
+            .print-container, .print-container * { visibility: visible; }
+            .print-container { position: absolute; left: 0; top: 0; width: 320px !important; }
+            .d-print-none { display: none !important; }
+            @page { size: 80mm auto; margin: 0; }
+        }
+    </style>
 </head>
 
 <body>
@@ -59,8 +93,8 @@ if (!in_array($_SESSION['designation'], ['Manager', 'Cashier'])) {
 
     <div id="content">
         <div id="content-header">
-            <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="icon-home"></i> Bogga Hore</a> <a href="payment.php" class="tip-bottom">Lacag Bixinta</a> <a href="#" class="current">Bixi Lacagta</a> </div>
-            <h1>Lacag Bixinta</h1>
+            <div id="breadcrumb"> <a href="index.php" title="Go to Home Page" class="tip-bottom"><i class="icon-home"></i> Home</a> <a href="payment.php" class="tip-bottom">Payments</a> <a href="#" class="current">Pay Money</a> </div>
+            <h1>Payment</h1>
         </div>
         <form role="form" action="index.php" method="POST">
             <?php
@@ -130,6 +164,11 @@ if (!in_array($_SESSION['designation'], ['Manager', 'Cashier'])) {
                                 VALUES ('$invoice_no', '$id', '$fullname_esc', '$amountpayable', '$paid_amount', '$discount_amount', '$discount_type', '$plan', '$services', '$today_date', '$new_expiry', '$branch_id', '$staff_name')";
                 mysqli_query($con, $history_qry);
 
+                // Receipt Verification QR Setup
+                $verify_code = strtoupper(substr(hash('sha256', $invoice_no . '|' . $today_date . '|' . $paid_amount), 0, 12));
+                $verify_payload = rawurlencode("Invoice:$invoice_no|Verify:$verify_code|Member:$id");
+                $qr_url = "https://quickchart.io/qr?size=150&text=$verify_payload";
+
                 //update query
                 $staff_name_esc = mysqli_real_escape_string($con, $staff_name);
                 $qry = "UPDATE members SET amount='$amountpayable', plan='$plan', status='$status', paid_date='$today_date', expiry_date='$new_expiry', reminder = '0', updated_by='$staff_name_esc', updated_at=NOW() WHERE user_id='$id'";
@@ -137,7 +176,7 @@ if (!in_array($_SESSION['designation'], ['Manager', 'Cashier'])) {
 
                 if (!$result) { ?>
 
-                    <h3 class="text-center">Wax baa khaldamay!</h3>
+                    <h3 class="text-center">Something went wrong!</h3>
 
                 <?php } else { ?>
 
@@ -148,117 +187,91 @@ if (!in_array($_SESSION['designation'], ['Manager', 'Cashier'])) {
 
                     <?php if ($status == 'Active') { ?>
 
-                        <table class="body-wrap">
-                            <tbody>
-                                <tr>
-                                    <td></td>
-                                    <td class="container" width="600">
-                                        <div class="content">
-                                            <table class="main" width="100%" cellpadding="0" cellspacing="0">
-                                                <tbody>
-                                                    <tr>
-                                                        <td class="content-wrap aligncenter print-container">
-                                                            <table width="100%" cellpadding="0" cellspacing="0">
-                                                                <tbody>
-                                                                    <tr>
-                                                                        <td class="content-block">
-                                                                            <h3 class="text-center">Rasiidka Lacag Bixinta</h3>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td class="content-block">
-                                                                            <table class="invoice">
-                                                                                <tbody>
-                                                                                    <tr>
-                                                                                        <td>
-                                                                                            <div style="float:left">Rasiid #<?php echo $invoice_no; ?> <br> Busley, Bondheere, <br>Mogadishu, Somalia </div>
-                                                                                            <div style="float:right"> Lacagtii u dambaysay: <?php echo $paid_date ?></div>
-                                                                                        </td>
-                                                                                    </tr>
+                        <div class="print-container">
+                            <div id="print-area" class="thermal-receipt">
+                                <div class="thermal-header">
+                                    <h2>M*A GYM</h2>
+                                    <p>Busley, Bondheere, Mogadishu</p>
+                                    <p>Tel: 252-610-000-000</p>
+                                </div>
 
-                                                                                    <tr>
-                                                                                        <td class="text-center" style="font-size:14px;"><b>Xubinta: <?php echo $fullname; ?></b> <br>
-                                                                                            La bixiyay: <?php echo date("F j, Y - g:i a"); ?>
-                                                                                        </td>
+                                <div class="thermal-divider"></div>
 
-                                                                                    </tr>
+                                <div class="thermal-row">
+                                    <span>Invoice #:</span>
+                                    <span><?php echo $invoice_no; ?></span>
+                                </div>
+                                <div class="thermal-row">
+                                    <span>Date:</span>
+                                    <span><?php echo date("Y-m-d H:i"); ?></span>
+                                </div>
+                                <div class="thermal-row" style="flex-wrap: wrap;">
+                                    <span>Member:</span>
+                                    <span style="text-align:right"><?php echo $fullname; ?></span>
+                                </div>
+                                <div class="thermal-row">
+                                    <span>Member ID:</span>
+                                    <span>PGC-<?php echo $id; ?></span>
+                                </div>
 
-                                                                                    <tr>
-                                                                                        <td>
-                                                                                            <table class="invoice-items" cellpadding="0" cellspacing="0">
-                                                                                                <tbody>
+                                <div class="thermal-divider"></div>
 
-                                                                                                    <tr>
-                                                                                                        <td><b>Adeegga La Qaatay</b></td>
-                                                                                                        <td class="alignright"><b>Wuxuu Soconayaa</b></td>
-                                                                                                    </tr>
+                                <table class="thermal-table">
+                                    <thead>
+                                        <tr>
+                                            <th>SERVICE / PLAN</th>
+                                            <th style="text-align:right">AMT</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <?php echo $services; ?><br>
+                                                <small>(<?php echo $plan ?> Month/s)</small>
+                                            </td>
+                                            <td style="text-align:right">$<?php echo number_format((float)$amountpayable, 2) ?></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
 
+                                <div class="thermal-total-row">
+                                    <span>TOTAL PAID:</span>
+                                    <span>$<?php echo number_format((float)$amountpayable, 2); ?></span>
+                                </div>
 
-                                                                                                    <tr>
-                                                                                                        <td><?php echo $services; ?></td>
-                                                                                                        <td class="alignright"><?php echo $plan ?> Bilood</td>
-                                                                                                    </tr>
+                                <div class="thermal-divider"></div>
+                                <div style="text-align:center; padding: 10px 0;">
+                                    <img src="<?php echo $qr_url; ?>" style="width:120px; height:120px;">
+                                    <p style="font-size:10px; margin-top:5px;">VERIFY: <?php echo $verify_code; ?></p>
+                                </div>
 
-                                                                                                    <tr>
-                                                                                                        <td><?php echo 'Lacagta Bishii'; ?></td>
-                                                                                                        <td class="alignright"><?php echo '$' . $amount ?></td>
-                                                                                                    </tr>
-
-
-                                                                                                    <tr class="total">
-                                                                                                        <td class="alignright" width="80%">Wadarta Lacagta</td>
-                                                                                                        <td class="alignright">$<?php echo $amountpayable; ?></td>
-                                                                                                    </tr>
-                                                                                                </tbody>
-                                                                                            </table>
-                                                                                        </td>
-                                                                                    </tr>
-                                                                                </tbody>
-                                                                            </table>
-                                                                        </td>
-                                                                    </tr>
-
-                                                                    <tr>
-                                                                        <td class="content-block text-center">
-                                                                            Waxaan si dhab ah u qaddarinaynaa sida aad ugu degdegto bixinta dhammaan lacagaha lagaaga baahan yahay.
-                                                                        </td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <div class="footer">
-                                                <table width="100%">
-                                                    <tbody>
-                                                        <tr>
-                                                            <td class="aligncenter content-block"><button class="btn btn-danger" onclick="window.print()"><i class="icon icon-print"></i> Daabac</button></td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                <div class="thermal-footer">
+                                    <p>*** THANK YOU! ***</p>
+                                    <p>Official Receipt - Power by M*A</p>
+                                    <p><?php echo date("d/m/Y H:i:s"); ?></p>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center d-print-none" style="margin-top: 20px;">
+                                <button type="button" class="btn btn-danger" onclick="window.print()"><i class="fas fa-print"></i> [ PRINT SLIP ]</button>
+                                <button type="button" class="btn btn-primary" onclick="generatePOSPDF('POS_Receipt_<?php echo $invoice_no; ?>')"><i class="fas fa-download"></i> [ DOWNLOAD PDF ]</button>
+                            </div>
+                        </div>
 
                     <?php } else { ?>
 
                         <div class='error_ex'>
                             <h1>409</h1>
-                            <h3>Waxay u muuqataa inaad damisay xisaabta macmiilka!</h3>
-                            <p>Xisaabta xubinta la doortay dib loo dhaqaajin maayo ilaa lacag bixinta xigta.</p>
-                            <a class='btn btn-danger btn-big' href='payment.php'>Dib u noqo</a>
+                            <h3>It seems you have deactivated the customer's account!</h3>
+                            <p>The selected member's account will not be reactivated until the next payment.</p>
+                            <a class='btn btn-danger btn-big' href='payment.php'>Go Back</a>
                         </div>
 
                     <?php } ?>
 
                 <?php   }
             } else { ?>
-                <h3>MA ADID FASAXAAD INAAD BOGGAN RAACDO. DIB U NOQO <a href='index.php'> DASHBOARD-KA </a></h3>
+                <h3>YOU ARE NOT AUTHORIZED TO ACCESS THIS PAGE. GO BACK TO <a href='index.php'> DASHBOARD </a></h3>
             <?php }
             ?>
 
@@ -274,7 +287,7 @@ if (!in_array($_SESSION['designation'], ['Manager', 'Cashier'])) {
     <!--Footer-part-->
 
     <div class="row-fluid">
-        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
     </div>
 
     <style>
@@ -282,137 +295,12 @@ if (!in_array($_SESSION['designation'], ['Manager', 'Cashier'])) {
             color: white;
         }
 
-
         body {
             -webkit-font-smoothing: antialiased;
             -webkit-text-size-adjust: none;
             width: 100% !important;
             height: 100%;
             line-height: 1.6;
-        }
-
-        /* Let's make sure all tables have defaults */
-        table td {
-            vertical-align: top;
-        }
-
-        /* -------------------------------------
-    BODY & CONTAINER
-------------------------------------- */
-
-
-        .body-wrap {
-            background-color: #f6f6f6;
-            width: 100%;
-        }
-
-        .container {
-            display: block !important;
-            max-width: 600px !important;
-            margin: 0 auto !important;
-            /* makes it centered */
-            clear: both !important;
-        }
-
-        .content {
-            max-width: 600px;
-            margin: 0 auto;
-            display: block;
-            padding: 20px;
-        }
-
-        /* -------------------------------------
-    HEADER, FOOTER, MAIN
-------------------------------------- */
-        .main {
-            background: #fff;
-            border: 1px solid #e9e9e9;
-            border-radius: 3px;
-        }
-
-        .content-wrap {
-            padding: 20px;
-        }
-
-
-
-        .footer {
-            width: 100%;
-            clear: both;
-            color: #999;
-            padding: 20px;
-        }
-
-
-        /* -------------------------------------
-    INVOICE
-    Styles for the billing table
-------------------------------------- */
-        .invoice {
-            margin: 22px auto;
-            text-align: left;
-            width: 80%;
-        }
-
-        .invoice td {
-            padding: 7px 0;
-        }
-
-        .invoice .invoice-items {
-            width: 100%;
-        }
-
-        .invoice .invoice-items td {
-            border-top: #eee 1px solid;
-        }
-
-        .invoice .invoice-items .total td {
-            border-top: 2px solid #333;
-            border-bottom: 2px solid #333;
-            font-weight: 700;
-        }
-
-        /* -------------------------------------
-    RESPONSIVE AND MOBILE FRIENDLY STYLES
-------------------------------------- */
-        @media only screen and (max-width: 640px) {
-
-
-            h2 {
-                font-size: 18px !important;
-            }
-
-
-            .container {
-                width: 100% !important;
-            }
-
-            .content,
-            .content-wrap {
-                padding: 10px !important;
-            }
-
-            .invoice {
-                width: 100% !important;
-            }
-        }
-
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-
-            .print-container,
-            .print-container * {
-                visibility: visible;
-            }
-
-            .print-container {
-                position: absolute;
-                left: 0px;
-                top: 0px;
-                right: 0px;
-            }
         }
     </style>
 
@@ -463,7 +351,23 @@ if (!in_array($_SESSION['designation'], ['Manager', 'Cashier'])) {
         function resetMenu() {
             document.gomenu.selector.selectedIndex = 2;
         }
+
+        function generatePOSPDF(filename) {
+            var element = document.getElementById('print-area');
+            var opt = {
+                margin:       0,
+                filename:     filename + '.pdf',
+                image:        { type: 'jpeg', quality: 1 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'in', format: [3.15, 12], orientation: 'portrait' }
+            };
+            document.body.classList.add('generating-pdf');
+            html2pdf().from(element).set(opt).save().then(function() {
+                document.body.classList.remove('generating-pdf');
+            });
+        }
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </body>
 
 </html>

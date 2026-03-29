@@ -5,12 +5,12 @@ if (!isset($_SESSION['user_id'])) {
     header('location:../index.php');
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <title>M * A GYM System</title>
+    <title>M*A GYM System</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -22,6 +22,40 @@ if (!isset($_SESSION['user_id'])) {
     <link href="../font-awesome/css/all.css" rel="stylesheet" />
     <link rel="stylesheet" href="../css/jquery.gritter.css" />
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,800' rel='stylesheet' type='text/css'>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <style>
+        .thermal-receipt {
+            width: 320px;
+            background: #fff;
+            padding: 12px;
+            color: #000;
+            margin: 0 auto;
+            box-sizing: border-box;
+            font-family: 'Courier Prime', monospace;
+            border: 1px solid #eee;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .thermal-header { text-align: center; margin-bottom: 12px; }
+        .thermal-header h2 { margin: 0; font-size: 24px; }
+        .thermal-header p { margin: 4px 0; font-size: 14px; }
+        .thermal-divider { border-top: 1.5px dashed #000; margin: 12px 0; }
+        .thermal-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 6px; }
+        .thermal-table { width: 100%; font-size: 14px; border-collapse: collapse; margin: 12px 0; }
+        .thermal-table th { border-top: 1.5px dashed #000; border-bottom: 1.5px dashed #000; padding: 8px 0; text-align: left; }
+        .thermal-table td { padding: 8px 0; }
+        .thermal-total-row { display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; border-top: 1.5px dashed #000; padding-top: 8px; margin-top: 8px; }
+        .thermal-footer { text-align: center; margin-top: 20px; font-size: 13px; border-top: 1.5px dashed #000; padding-top: 12px; }
+        
+        @media print {
+            body * { visibility: hidden; }
+            .print-container, .print-container * { visibility: visible; }
+            .print-container { position: absolute; left: 0; top: 0; width: 320px !important; }
+            .d-print-none { display: none !important; }
+            @page { size: 80mm auto; margin: 0; }
+        }
+    </style>
 </head>
 
 <body>
@@ -30,7 +64,7 @@ if (!isset($_SESSION['user_id'])) {
     <?php include 'includes/header-content.php'; ?>
     <!--close-Header-part-->
 
-    <!-- Visit codeastro.com for more projects -->
+    
     <!--top-Header-menu-->
     <?php include 'includes/topheader.php' ?>
     <!--close-top-Header-menu-->
@@ -70,29 +104,8 @@ if (!isset($_SESSION['user_id'])) {
 
                 include 'dbcon.php';
                 require_once __DIR__ . '/../includes/audit_helper.php';
-
-                mysqli_query($con, "CREATE TABLE IF NOT EXISTS payment_history (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    invoice_no VARCHAR(50) NULL,
-                    user_id INT NOT NULL,
-                    fullname VARCHAR(255) NOT NULL,
-                    amount DECIMAL(10,2) DEFAULT 0,
-                    paid_amount DECIMAL(10,2) DEFAULT 0,
-                    discount_amount DECIMAL(10,2) DEFAULT 0,
-                    discount_type VARCHAR(20) DEFAULT 'amount',
-                    plan INT DEFAULT 1,
-                    services VARCHAR(255) DEFAULT '',
-                    paid_date DATE,
-                    expiry_date DATE,
-                    branch_id INT DEFAULT 0,
-                    recorded_by VARCHAR(100) DEFAULT 'Admin',
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )");
-                mysqli_query($con, "ALTER TABLE payment_history ADD COLUMN IF NOT EXISTS invoice_no VARCHAR(50) NULL");
-                mysqli_query($con, "ALTER TABLE payment_history ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP");
-                mysqli_query($con, "ALTER TABLE members ADD COLUMN IF NOT EXISTS created_by VARCHAR(100) NULL");
-                mysqli_query($con, "ALTER TABLE members ADD COLUMN IF NOT EXISTS updated_by VARCHAR(100) NULL");
-                mysqli_query($con, "ALTER TABLE members ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP NULL DEFAULT NULL");
+                require_once __DIR__ . '/includes/accounting_engine.php';
+                acc_bootstrap_tables($con);
 
                 // Fetch current expiry date to decide extension logic
                 $check_qry = mysqli_query($con, "SELECT expiry_date FROM members WHERE user_id='$id'");
@@ -119,6 +132,53 @@ if (!isset($_SESSION['user_id'])) {
                 $history_qry = "INSERT INTO payment_history (invoice_no, user_id, fullname, amount, paid_amount, discount_amount, discount_type, plan, services, paid_date, expiry_date, branch_id, recorded_by) 
                                 VALUES ('$invoice_no', '$id', '$fullname_esc', '$amountpayable', '$paid_amount', '$discount_amount', '$discount_type', '$plan', '$services', '$today_date', '$new_expiry', '$branch_id', 'Admin')";
                 mysqli_query($con, $history_qry);
+                $payment_history_id = mysqli_insert_id($con);
+                
+                // Receipt Verification QR Setup
+                $verify_code = strtoupper(substr(hash('sha256', $invoice_no . '|' . $today_date . '|' . $paid_amount), 0, 12));
+                $verify_payload = rawurlencode("Invoice:$invoice_no|Verify:$verify_code|Member:$id");
+                $qr_url = "https://quickchart.io/qr?size=150&text=$verify_payload";
+
+                // Auto-journalize membership payment (Cash Dr / Membership Revenue Cr)
+                if ((float)$amountpayable > 0) {
+                    // Fetch package info for memo
+                    $packageInfo = '';
+                    $packageQ = mysqli_query($con, "SELECT packagename, duration FROM packages WHERE amount='" . mysqli_real_escape_string($con, $amount) . "' AND duration='" . mysqli_real_escape_string($con, $plan) . "' LIMIT 1");
+                    if ($packageQ && ($prow = mysqli_fetch_assoc($packageQ))) {
+                        $packageInfo = $prow['packagename'];
+                    } else {
+                        $packageInfo = $plan . ' Month Membership';
+                    }
+                    $accMemo = 'Payment for ' . $packageInfo . ' - ' . $fullname;
+                    $months_paid = 1;
+                    if ((float)$amount > 0) {
+                        $months_paid = round((float)$amountpayable / (float)$amount);
+                    }
+                    $monthly_fee = ((float)$amount > 0) ? (float)$amount : (float)$amountpayable;
+                    $revenue = $monthly_fee;
+                    $liability = (float)$amountpayable - $revenue;
+                    if ($liability < 0) $liability = 0;
+                    $lines = [
+                        ['account_code' => '1000', 'debit' => (float)$amountpayable, 'credit' => 0, 'line_memo' => $accMemo]
+                    ];
+                    if ($revenue > 0) {
+                        $lines[] = ['account_code' => '4000', 'debit' => 0, 'credit' => $revenue, 'line_memo' => $accMemo . ' (Revenue)'];
+                    }
+                    if ($liability > 0) {
+                        $lines[] = ['account_code' => '2000', 'debit' => 0, 'credit' => $liability, 'line_memo' => $accMemo . ' (Unearned/Advance Liability)'];
+                    }
+                    acc_create_entry_once(
+                        $con,
+                        $today_date,
+                        $accMemo,
+                        'payment_history',
+                        (string)$payment_history_id,
+                        $lines,
+                        0,
+                        0,
+                        'Admin'
+                    );
+                }
 
                 //update query
                 $qry = "UPDATE members SET amount='$amountpayable', plan='$plan', status='$status', paid_date='$today_date', expiry_date='$new_expiry', reminder='0', updated_by='Admin', updated_at=NOW() WHERE user_id='$id'";
@@ -137,102 +197,76 @@ if (!isset($_SESSION['user_id'])) {
 
                     <?php if ($status == 'Active') { ?>
 
-                        <table class="body-wrap">
-                            <tbody>
-                                <tr>
-                                    <td></td>
-                                    <td class="container" width="600">
-                                        <div class="content">
-                                            <table class="main" width="100%" cellpadding="0" cellspacing="0">
-                                                <tbody>
-                                                    <tr>
-                                                        <td class="content-wrap aligncenter print-container">
-                                                            <table width="100%" cellpadding="0" cellspacing="0">
-                                                                <tbody>
-                                                                    <tr>
-                                                                        <td class="content-block">
-                                                                            <h3 class="text-center">Payment Receipt</h3>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td class="content-block">
-                                                                            <table class="invoice">
-                                                                                <tbody>
-                                                                                    <tr>
-                                                                                        <td>
-                                                                                            <div style="float:left">Invoice #<?php echo $invoice_no; ?> <br> 5021 Wetzel Lane, <br>Williamsburg </div>
-                                                                                            <div style="float:right"> Last Payment: <?php echo $paid_date ?></div>
-                                                                                        </td>
-                                                                                    </tr>
+                        <div class="print-container">
+                            <div id="print-area" class="thermal-receipt">
+                                <div class="thermal-header">
+                                    <h2>M*A GYM</h2>
+                                    <p>Busley, Bondheere, Mogadishu</p>
+                                    <p>Tel: 252-610-000-000</p>
+                                </div>
 
-                                                                                    <tr>
-                                                                                        <td class="text-center" style="font-size:14px;"><b>Member: <?php echo $fullname; ?></b> <br>
-                                                                                            Paid On: <?php echo date("F j, Y - g:i a"); ?>
-                                                                                        </td>
+                                <div class="thermal-divider"></div>
 
-                                                                                    </tr>
+                                <div class="thermal-row">
+                                    <span>Invoice #:</span>
+                                    <span><?php echo $invoice_no; ?></span>
+                                </div>
+                                <div class="thermal-row">
+                                    <span>Date:</span>
+                                    <span><?php echo date("Y-m-d H:i"); ?></span>
+                                </div>
+                                <div class="thermal-row" style="flex-wrap: wrap;">
+                                    <span>Member:</span>
+                                    <span style="text-align:right"><?php echo $fullname; ?></span>
+                                </div>
+                                <div class="thermal-row">
+                                    <span>Member ID:</span>
+                                    <span>PGC-<?php echo $id; ?></span>
+                                </div>
 
-                                                                                    <tr>
-                                                                                        <td>
-                                                                                            <table class="invoice-items" cellpadding="0" cellspacing="0">
-                                                                                                <tbody>
+                                <div class="thermal-divider"></div>
 
-                                                                                                    <tr>
-                                                                                                        <td><b>Service Taken</b></td>
-                                                                                                        <td class="alignright"><b>Valid Upto</b></td>
-                                                                                                    </tr>
+                                <table class="thermal-table">
+                                    <thead>
+                                        <tr>
+                                            <th>SERVICE / PLAN</th>
+                                            <th style="text-align:right">AMT</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <?php echo $services; ?><br>
+                                                <small>(<?php echo $plan ?> Month/s)</small>
+                                            </td>
+                                            <td style="text-align:right">$<?php echo number_format((float)$amountpayable, 2) ?></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
 
+                                <div class="thermal-total-row">
+                                    <span>TOTAL PAID:</span>
+                                    <span>$<?php echo number_format((float)$amountpayable, 2); ?></span>
+                                </div>
 
-                                                                                                    <tr>
-                                                                                                        <td><?php echo $services; ?></td>
-                                                                                                        <td class="alignright"><?php echo $plan ?> Month/s</td>
-                                                                                                    </tr>
+                                <div class="thermal-divider"></div>
+                                <div style="text-align:center; padding: 10px 0;">
+                                    <img src="<?php echo $qr_url; ?>" style="width:120px; height:120px;">
+                                    <p style="font-size:10px; margin-top:5px;">VERIFY: <?php echo $verify_code; ?></p>
+                                </div>
 
-                                                                                                    <tr>
-                                                                                                        <td><?php echo 'Charge Per Month'; ?></td>
-                                                                                                        <td class="alignright"><?php echo '$' . $amount ?></td>
-                                                                                                    </tr>
-
-
-                                                                                                    <tr class="total">
-                                                                                                        <td class="alignright" width="80%">Total Amount</td>
-                                                                                                        <td class="alignright">$<?php echo $amountpayable; ?></td>
-                                                                                                    </tr>
-                                                                                                </tbody>
-                                                                                            </table>
-                                                                                        </td>
-                                                                                    </tr>
-                                                                                </tbody>
-                                                                            </table>
-                                                                        </td>
-                                                                    </tr>
-
-                                                                    <tr>
-                                                                        <td class="content-block text-center">
-                                                                            We sincerely appreciate your promptness regarding all payments from your side.
-                                                                        </td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <div class="footer">
-                                                <table width="100%">
-                                                    <tbody>
-                                                        <tr>
-                                                            <td class="aligncenter content-block"><button class="btn btn-danger" onclick="window.print()"><i class="fas fa-print"></i> Print</button></td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                <div class="thermal-footer">
+                                    <p>*** THANK YOU! ***</p>
+                                    <p>Official Receipt - Power by M*A</p>
+                                    <p><?php echo date("d/m/Y H:i:s"); ?></p>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center d-print-none" style="margin-top: 20px;">
+                                <button type="button" class="btn btn-danger" onclick="window.print()"><i class="fas fa-print"></i> [ PRINT SLIP ]</button>
+                                <button type="button" class="btn btn-primary" onclick="generatePOSPDF('POS_Receipt_<?php echo $invoice_no; ?>')"><i class="fas fa-download"></i> [ DOWNLOAD PDF ]</button>
+                            </div>
+                        </div>
 
                     <?php } else { ?>
 
@@ -263,7 +297,7 @@ if (!isset($_SESSION['user_id'])) {
     <!--Footer-part-->
 
     <div class="row-fluid">
-        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
     </div>
 
     <style>
@@ -271,137 +305,12 @@ if (!isset($_SESSION['user_id'])) {
             color: white;
         }
 
-
         body {
             -webkit-font-smoothing: antialiased;
             -webkit-text-size-adjust: none;
             width: 100% !important;
             height: 100%;
             line-height: 1.6;
-        }
-
-        /* Let's make sure all tables have defaults */
-        table td {
-            vertical-align: top;
-        }
-
-        /* -------------------------------------
-    BODY & CONTAINER
-------------------------------------- */
-
-
-        .body-wrap {
-            background-color: #f6f6f6;
-            width: 100%;
-        }
-
-        .container {
-            display: block !important;
-            max-width: 600px !important;
-            margin: 0 auto !important;
-            /* makes it centered */
-            clear: both !important;
-        }
-
-        .content {
-            max-width: 600px;
-            margin: 0 auto;
-            display: block;
-            padding: 20px;
-        }
-
-        /* -------------------------------------
-    HEADER, FOOTER, MAIN
-------------------------------------- */
-        .main {
-            background: #fff;
-            border: 1px solid #e9e9e9;
-            border-radius: 3px;
-        }
-
-        .content-wrap {
-            padding: 20px;
-        }
-
-
-
-        .footer {
-            width: 100%;
-            clear: both;
-            color: #999;
-            padding: 20px;
-        }
-
-
-        /* -------------------------------------
-    INVOICE
-    Styles for the billing table
-------------------------------------- */
-        .invoice {
-            margin: 22px auto;
-            text-align: left;
-            width: 80%;
-        }
-
-        .invoice td {
-            padding: 7px 0;
-        }
-
-        .invoice .invoice-items {
-            width: 100%;
-        }
-
-        .invoice .invoice-items td {
-            border-top: #eee 1px solid;
-        }
-
-        .invoice .invoice-items .total td {
-            border-top: 2px solid #333;
-            border-bottom: 2px solid #333;
-            font-weight: 700;
-        }
-
-        /* -------------------------------------
-    RESPONSIVE AND MOBILE FRIENDLY STYLES
-------------------------------------- */
-        @media only screen and (max-width: 640px) {
-
-
-            h2 {
-                font-size: 18px !important;
-            }
-
-
-            .container {
-                width: 100% !important;
-            }
-
-            .content,
-            .content-wrap {
-                padding: 10px !important;
-            }
-
-            .invoice {
-                width: 100% !important;
-            }
-        }
-
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-
-            .print-container,
-            .print-container * {
-                visibility: visible;
-            }
-
-            .print-container {
-                position: absolute;
-                left: 0px;
-                top: 0px;
-                right: 0px;
-            }
         }
     </style>
 
@@ -452,7 +361,23 @@ if (!isset($_SESSION['user_id'])) {
         function resetMenu() {
             document.gomenu.selector.selectedIndex = 2;
         }
+
+        function generatePOSPDF(filename) {
+            var element = document.getElementById('print-area');
+            var opt = {
+                margin:       0,
+                filename:     filename + '.pdf',
+                image:        { type: 'jpeg', quality: 1 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'in', format: [3.15, 12], orientation: 'portrait' }
+            };
+            document.body.classList.add('generating-pdf');
+            html2pdf().from(element).set(opt).save().then(function() {
+                document.body.classList.remove('generating-pdf');
+            });
+        }
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </body>
 
 </html>

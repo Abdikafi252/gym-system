@@ -82,29 +82,64 @@ function sendExpiryAlert($name, $to)
     return sendSMS($to, $message);
 }
 
-function sendWhatsApp($to, $message)
+function sendWhatsApp($to, $message_or_template = 'hello_world', $language_code = 'en_US', $template_params = [])
 {
     require_once __DIR__ . '/sms_config.php';
 
-    // Check if cURL is enabled
     if (!function_exists('curl_init')) {
         file_put_contents(__DIR__ . '/wa_error.txt', date('Y-m-d H:i:s') . " | WA ERROR: cURL extension not enabled.\n", FILE_APPEND);
         return false;
     }
 
-    // Clean number
     $to = preg_replace('/[^0-9]/', '', $to);
-    if (strlen($to) == 9) $to = '252' . $to; // Somalia Prefix default
+    if (strlen($to) == 9 && substr($to, 0, 1) == '6') {
+        $to = '252' . $to;
+    }
 
-    $params = array(
-        'token' => WA_TOKEN,
-        'to' => $to,
-        'body' => $message
-    );
+    // Meta API requires approved templates for business-initiated messages.
+    // We fall back to 'hello_world' (the default) if a raw text message is passed.
+    $template_name = (strpos($message_or_template, ' ') !== false) ? 'hello_world' : $message_or_template;
+
+    $url = "https://graph.facebook.com/v22.0/" . WA_META_PHONE_ID . "/messages";
+
+    $template_data = [
+        "name" => $template_name,
+        "language" => [
+            "code" => $language_code
+        ]
+    ];
+
+    if (!empty($template_params)) {
+        $parameters = [];
+        foreach ($template_params as $param) {
+            $parameters[] = [
+                "type" => "text",
+                "text" => (string)$param
+            ];
+        }
+        $template_data["components"] = [
+            [
+                "type" => "body",
+                "parameters" => $parameters
+            ]
+        ];
+    }
+
+    $data = [
+        "messaging_product" => "whatsapp",
+        "to" => $to,
+        "type" => "template",
+        "template" => $template_data
+    ];
+
+    $headers = [
+        "Authorization: Bearer " . WA_META_TOKEN,
+        "Content-Type: application/json"
+    ];
 
     $curl = curl_init();
     curl_setopt_array($curl, array(
-        CURLOPT_URL => WA_API_URL . WA_INSTANCE_ID . "/messages/chat",
+        CURLOPT_URL => $url,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => "",
         CURLOPT_MAXREDIRS => 10,
@@ -113,19 +148,18 @@ function sendWhatsApp($to, $message)
         CURLOPT_SSL_VERIFYPEER => 0,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => "POST",
-        CURLOPT_POSTFIELDS => http_build_query($params),
-        CURLOPT_HTTPHEADER => array(
-            "content-type: application/x-www-form-urlencoded"
-        ),
+        CURLOPT_POSTFIELDS => json_encode($data),
+        CURLOPT_HTTPHEADER => $headers,
     ));
 
     $response = curl_exec($curl);
     $err = curl_error($curl);
+    $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
     curl_close($curl);
 
-    if ($err) {
-        $error_log = date('Y-m-d H:i:s') . " | WA ERROR: " . $err . "\n";
+    if ($err || $http_code >= 400) {
+        $error_log = date('Y-m-d H:i:s') . " | WA ERROR: " . ($err ? $err : $response) . "\n";
         file_put_contents(__DIR__ . '/wa_error.txt', $error_log, FILE_APPEND);
         return false;
     } else {

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -44,53 +44,6 @@ if (!isset($_SESSION['user_id'])) {
 </div> -->
   <!--close-top-serch-->
   <!--sidebar-menu-->
-  <?php $page = "equipment";
-  include '../includes/sidebar.php' ?>
-  <!--sidebar-menu-->
-
-  <div id="content">
-    <div id="content-header">
-      <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="icon-home"></i> Bogga Hore</a> <a href="#" class="current">Liiska Qalabka</a> </div>
-      <h1 class="text-center">Liiska Qalabka GYM System <i class="icon icon-cogs"></i></h1>
-    </div>
-    <div class="container-fluid">
-      <hr>
-      <div class="row-fluid">
-        <div class="span12">
-
-          <div class='widget-box'>
-            <div class='widget-title'> <span class='icon'> <i class='icon-cogs'></i> </span>
-              <h5>Jadwalka Qalabka</h5>
-            </div>
-            <div class='widget-content nopadding'>
-
-              <?php
-
-              include "dbcon.php";
-              $qry = "select * from equipment";
-              $cnt = 1;
-              $result = mysqli_query($conn, $qry);
-
-
-              echo "<table class='table table-bordered table-striped'>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Qalabka</th>
-                  <th>Sharaxaadda</th>
-                  <th>Tirada</th>
-                  <th>Lacagta</th>
-                  <th>Iibiyaha</th>
-                  <th>Cinwaanka</th>
-                  <th>Xiriirka</th>
-                  <th>Taariikhda Iibka</th>
-                  <th>Falka</th>
-                </tr>
-              </thead>";
-
-              while ($row = mysqli_fetch_array($result)) {
-
-                echo "<tbody> 
                
                 <td><div class='text-center'>" . $cnt . "</div></td>
                 <td><div class='text-center'>" . $row['name'] . "</div></td>
@@ -101,7 +54,7 @@ if (!isset($_SESSION['user_id'])) {
                 <td><div class='text-center'>" . $row['address'] . "</div></td>
                 <td><div class='text-center'>" . $row['contact'] . "</div></td>
                 <td><div class='text-center'>" . $row['date'] . "</div></td>
-                <td><div class='text-center'><a href='edit-equipmentform.php?id=" . $row['id'] . "'><i class='icon icon-pencil'></i> Tafatir</a></div></td>
+                <td><div class='text-center'><a href='edit-equipmentform.php?id=" . $row['id'] . "'><i class='icon icon-pencil'></i> Edit</a></div></td>
                 
               </tbody>";
                 $cnt++;
@@ -124,7 +77,7 @@ if (!isset($_SESSION['user_id'])) {
   <!--Footer-part-->
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
   </div>
 
   <style>

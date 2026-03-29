@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user_id'])) {
     header('location:../index.php');
@@ -143,6 +143,8 @@ if (!isset($_SESSION['user_id'])) {
 
                     <?php
                     include 'dbcon.php';
+                    require_once __DIR__ . '/includes/accounting_engine.php';
+                    acc_bootstrap_tables($con);
                     mysqli_query($con, "ALTER TABLE expenses ADD COLUMN IF NOT EXISTS category VARCHAR(50) DEFAULT 'General'");
                     mysqli_query($con, "ALTER TABLE expenses ADD COLUMN IF NOT EXISTS salary_for_staff_id INT NULL");
                     mysqli_query($con, "ALTER TABLE expenses ADD COLUMN IF NOT EXISTS salary_for_name VARCHAR(255) NULL");
@@ -228,7 +230,7 @@ if (!isset($_SESSION['user_id'])) {
                                                 }
                                                 ?>
                                             </select>
-                                            <span class='help-block'>Optional: haddii expense-ku yahay Salaries, dooro staff-ka la siiyay lacagta.</span>
+                                            <span class='help-block'>Optional: if the expense is Salaries, select the staff member who received the payment.</span>
                                         </div>
                                     </div>
                                 </div>
@@ -246,6 +248,20 @@ if (!isset($_SESSION['user_id'])) {
                                     <label class='control-label'>Date :</label>
                                     <div class='controls'>
                                         <input type='date' class='span11' name='date' value="<?php echo date('Y-m-d'); ?>" required />
+                                    </div>
+                                </div>
+                                <div class='control-group'>
+                                    <label class='control-label'>Branch :</label>
+                                    <div class='controls'>
+                                        <select name="branch_id" class="span11" required>
+                                            <option value="" disabled selected>Select Branch</option>
+                                            <?php 
+                                            $br_res = mysqli_query($con, "SELECT * FROM branches");
+                                            while($b = mysqli_fetch_assoc($br_res)) {
+                                                echo "<option value='".$b['id']."'>".htmlspecialchars($b['branch_name'])."</option>";
+                                            }
+                                            ?>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class='form-actions text-center'>
@@ -273,10 +289,49 @@ if (!isset($_SESSION['user_id'])) {
 
                             $salary_for_name_sql = $salary_for_name ? "'" . mysqli_real_escape_string($con, $salary_for_name) . "'" : "NULL";
                             $salary_for_staff_sql = $salary_for_staff_id ? "'" . $salary_for_staff_id . "'" : "NULL";
-                            $qry = "INSERT INTO expenses (name, category, amount, date, salary_for_staff_id, salary_for_name) VALUES ('" . mysqli_real_escape_string($con, $name) . "', '" . mysqli_real_escape_string($con, $category) . "', '" . mysqli_real_escape_string($con, $amount) . "', '" . mysqli_real_escape_string($con, $date) . "', $salary_for_staff_sql, $salary_for_name_sql)";
+                            $branch_id_val = isset($_POST['branch_id']) ? (int)$_POST['branch_id'] : (isset($_SESSION['branch_id']) ? (int)$_SESSION['branch_id'] : 0);
+                            $qry = "INSERT INTO expenses (name, category, amount, date, salary_for_staff_id, salary_for_name, branch_id) VALUES ('" . mysqli_real_escape_string($con, $name) . "', '" . mysqli_real_escape_string($con, $category) . "', '" . mysqli_real_escape_string($con, $amount) . "', '" . mysqli_real_escape_string($con, $date) . "', $salary_for_staff_sql, $salary_for_name_sql, $branch_id_val)";
                             $result = mysqli_query($con, $qry);
 
                             if ($result) {
+                                $expense_id = mysqli_insert_id($con);
+                                $expense_acc_code = acc_expense_account_code_from_category($category);
+                                $accMemo = 'Expense: ' . $name . ' (' . $category . ')';
+                                // If Salaries and not marked as paid, record as liability (Salaries Payable)
+                                if ($category === 'Salaries' && empty($_POST['salary_paid'])) {
+                                    acc_create_entry_once(
+                                        $con,
+                                        $date,
+                                        $accMemo . ' (Accrued)',
+                                        'expense',
+                                        (string)$expense_id,
+                                        [
+                                            ['account_code' => '5000', 'debit' => (float)$amount, 'credit' => 0, 'line_memo' => $accMemo . ' (Accrued)'],
+                                            ['account_code' => '2100', 'debit' => 0, 'credit' => (float)$amount, 'line_memo' => $accMemo . ' (Accrued Liability)']
+                                        ],
+                                        0,
+                                        $branch_id_val,
+                                        0,
+                                        'Admin'
+                                    );
+                                } else {
+                                    acc_create_entry_once(
+                                        $con,
+                                        $date,
+                                        $accMemo,
+                                        'expense',
+                                        (string)$expense_id,
+                                        [
+                                            ['account_code' => $expense_acc_code, 'debit' => (float)$amount, 'credit' => 0, 'line_memo' => $accMemo],
+                                            ['account_code' => '1000', 'debit' => 0, 'credit' => (float)$amount, 'line_memo' => $accMemo]
+                                        ],
+                                        0,
+                                        $branch_id_val,
+                                        0,
+                                        'Admin'
+                                    );
+                                }
+
                                 if ($category === 'Salaries' && !empty($salary_for_name)) {
                                     $salary_note = "Salary paid to " . $salary_for_name . " (" . ($staff_designation ?? 'Staff') . ") - Amount: $" . $amount . " on " . $date;
                                     mysqli_query($con, "CREATE TABLE IF NOT EXISTS announcements (
@@ -295,7 +350,7 @@ if (!isset($_SESSION['user_id'])) {
                                 echo "<h4 class='alert-heading'>Success!</h4>";
                                 echo "Expense added successfully.";
                                 if ($category === 'Salaries' && !empty($salary_for_name)) {
-                                    echo "<br><strong>Fariin waa la diray:</strong> " . htmlspecialchars($salary_for_name) . " salary-ga ayaa la siiyay.";
+                                    echo "<br><strong>Message sent:</strong> " . htmlspecialchars($salary_for_name) . " has been paid the salary.";
                                 }
                                 echo "</div></div></div></div>";
                             } else {
@@ -324,6 +379,7 @@ if (!isset($_SESSION['user_id'])) {
                                         <th>Category</th>
                                         <th>Date</th>
                                         <th>Paid To (Staff)</th>
+                                        <th>Branch</th>
                                         <th>Amount</th>
                                         <th>Actions</th>
                                     </tr>
@@ -331,7 +387,9 @@ if (!isset($_SESSION['user_id'])) {
                                 <tbody>
                                     <?php
                                     include "dbcon.php";
-                                    $qry = "SELECT * FROM expenses ORDER BY date DESC";
+                                    $branch_id = isset($_SESSION['branch_id']) ? (int)$_SESSION['branch_id'] : 0;
+                                    $branch_where = $branch_id > 0 ? " WHERE branch_id = " . $branch_id : "";
+                                    $qry = "SELECT * FROM expenses" . $branch_where . " ORDER BY date DESC";
                                     $result = mysqli_query($con, $qry);
                                     $cnt = 1;
                                     while ($row = mysqli_fetch_array($result)) {
@@ -342,6 +400,10 @@ if (!isset($_SESSION['user_id'])) {
                                         echo "<td>" . $row['date'] . "</td>";
                                         $paid_to = !empty($row['salary_for_name']) ? htmlspecialchars($row['salary_for_name']) : '-';
                                         echo "<td>" . $paid_to . "</td>";
+                                        $bid = (int)$row['branch_id'];
+                                        $br_n = mysqli_query($con, "SELECT branch_name FROM branches WHERE id='$bid'");
+                                        $br_r = mysqli_fetch_assoc($br_n);
+                                        echo "<td>" . htmlspecialchars($br_r ? $br_r['branch_name'] : 'System') . "</td>";
                                         echo "<td>$" . $row['amount'] . "</td>";
                                         echo "<td><div class='text-center'><a href='remove-expense.php?id=" . $row['id'] . "' style='color:#F66;' onclick='return confirm(\"Are you sure?\")'><i class='fas fa-trash'></i> Remove</a></div></td>";
                                         echo "</tr>";
@@ -359,7 +421,7 @@ if (!isset($_SESSION['user_id'])) {
 
     <!--Footer-part-->
     <div class="row-fluid">
-        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</div>
+        <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</div>
     </div>
 
     <style>

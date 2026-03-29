@@ -15,14 +15,14 @@ $result = mysqli_query($con, $qry);
 $row = mysqli_fetch_array($result);
 
 if (!$row) {
-  die("Xogtaada lama heli karo. Fadlan la xiriir Maamulka.");
+  die("Your data could not be found. Please contact administration.");
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <title>M * A GYM System - My Report</title>
+  <title>M*A GYM System - My Report</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -274,8 +274,9 @@ if (!$row) {
             <div class="widget-content">
               <div class="report-actions d-print-none">
                 <div class="pull-right">
-                  <a href="index.php" class="btn btn-large report-btn-back"><i class="fas fa-arrow-left"></i> Ku Noqo Menuga</a>
-                  <button onclick="window.print();" class="btn btn-large report-btn-print"><i class="fas fa-print"></i> Daabac</button>
+                  <a href="index.php" class="btn btn-large report-btn-back"><i class="fas fa-arrow-left"></i> Back to Menu</a>
+                  <button onclick="window.print();" class="btn btn-large report-btn-print"><i class="fas fa-print"></i> Print</button>
+                  <button onclick="generatePremiumPDF('My_Report_<?php echo $uid; ?>');" class="btn btn-large report-btn-print" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important; border: 1px solid #059669 !important;"><i class="fas fa-download"></i> Download PDF</button>
                 </div>
               </div>
 
@@ -399,16 +400,16 @@ if (!$row) {
                                     $bmi = $row['curr_weight'] / ($heightM * $heightM);
 
                                     if ($bmi < 18.5) {
-                                      $bmiText = "Miisaan yar (Underweight)";
+                                      $bmiText = "Underweight";
                                       $bmiColor = "#ea580c";
                                     } else if ($bmi >= 18.5 && $bmi <= 24.9) {
-                                      $bmiText = "Miisaan caadi (Normal)";
+                                      $bmiText = "Normal Weight";
                                       $bmiColor = "#16a34a";
                                     } else if ($bmi >= 25 && $bmi <= 29.9) {
-                                      $bmiText = "Miisaan dheeraad (Overweight)";
+                                      $bmiText = "Overweight";
                                       $bmiColor = "#ca8a04";
                                     } else {
-                                      $bmiText = "Cayil (Obese)";
+                                      $bmiText = "Obese";
                                       $bmiColor = "#dc2626";
                                     }
                                     echo "<span style='font-size:16px; font-weight:bold; color:#333;'>" . number_format($bmi, 1) . "</span><br>";
@@ -471,8 +472,8 @@ if (!$row) {
 
               <div class="row-fluid report-bottom">
                 <div class="span6">
-                  <h4 style="color:#334155;">Xaaladda Xubinnimada: <span style="color:<?php echo $row['status'] == 'Active' ? '#16a34a' : '#dc2626'; ?>;"><?php echo $row['status'] == 'Active' ? 'Shaqaynaysaa' : 'Waqtigu ka dhacay'; ?></span></h4>
-                  <p style="color:#64748b;">Waad ku mahadsantahay doorashada adeegyadayada M * A GYM.</p>
+                  <h4 style="color:#334155;">Membership Status: <span style="color:<?php echo $row['status'] == 'Active' ? '#16a34a' : '#dc2626'; ?>;"><?php echo $row['status'] == 'Active' ? 'Active' : 'Expired'; ?></span></h4>
+                  <p style="color:#64748b;">Thank you for choosing M*A GYM services.</p>
                 </div>
                 <div class="span6 text-right">
                   <div class="report-stamp">
@@ -496,7 +497,7 @@ if (!$row) {
   <!--Footer-part-->
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
   </div>
 
   <style>
@@ -574,7 +575,24 @@ if (!$row) {
     function resetMenu() {
       document.gomenu.selector.selectedIndex = 2;
     }
+
+    function generatePremiumPDF(filename) {
+        var element = document.querySelector('.report-shell');
+        var opt = {
+            margin:       0.2,
+            filename:     filename + '.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2 },
+            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+        // Add a class to body while generating to help hide buttons safely
+        document.body.classList.add('generating-pdf');
+        html2pdf().from(element).set(opt).save().then(() => {
+            document.body.classList.remove('generating-pdf');
+        });
+    }
   </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </body>
 
 </html>

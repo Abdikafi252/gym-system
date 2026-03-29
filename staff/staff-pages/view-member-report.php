@@ -5,12 +5,12 @@ if (!isset($_SESSION['user_id'])) {
   header('location:../index.php');
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../../css/bootstrap.min.css" />
@@ -23,6 +23,7 @@ if (!isset($_SESSION['user_id'])) {
   <link href="../../font-awesome/css/all.css" rel="stylesheet" />
   <link rel="stylesheet" href="../../css/jquery.gritter.css" />
   <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,800' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="../../css/premium-print.css" />
 </head>
 
 <body>
@@ -52,7 +53,7 @@ if (!isset($_SESSION['user_id'])) {
       <div id="breadcrumb"> <a href="index.php" title="Go to Home" class="tip-bottom"><i class="fas fa-home"></i> Home</a> <a href="member-report.php" class="current">Member Reports</a> </div>
       <h1 class="text-center">Member's Report <i class="fas fa-file"></i></h1>
     </div>
-    <div class="container-fluid print-container">
+    <div class="container-fluid print-container" id="print-area">
       <div class="row-fluid">
         <div class="span12">
           <div class="widget-box">
@@ -60,133 +61,135 @@ if (!isset($_SESSION['user_id'])) {
             include '../dbcon.php';
             $id = $_GET['id'];
             $qry = "select * from members where user_id='$id'";
-            $result = mysqli_query($conn, $qry);
+            $result = mysqli_query($con, $qry);
             while ($row = mysqli_fetch_array($result)) {
             ?>
 
-              <div class="widget-content">
-                <div class="row-fluid">
-                  <div class="span4">
-                    <table class="">
-                      <tbody>
-                        <tr>
-                          <td>
-                            <h4>M * A</h4>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>Busley, Bondheere, Mogadishu, Somalia</td>
-                        </tr>
+              <div class="print-container">
+                  <div id="print-area" class="premium-document">
+                      <div class="premium-header">
+                          <div class="premium-brand">
+                              <h1>M*A GYM</h1>
+                              <p>Busley, Bondheere, Mogadishu, Somalia</p>
+                              <p>Tel: 252-610-000-000 | Email: support@M*Agym.com</p>
+                          </div>
+                          <div class="premium-meta">
+                              <h2>MEMBER REPORT</h2>
+                              <p><strong>Member Name:</strong> <?php echo $row['fullname']; ?></p>
+                              <p><strong>Member ID:</strong> PGC-SS-<?php echo $row['user_id']; ?></p>
+                              <p><strong>Generated On:</strong> <?php echo date("F j, Y"); ?></p>
+                          </div>
+                      </div>
 
-                        <tr>
-                          <td>Tel: 252-610-000-000</td>
-                        </tr>
-                        <tr>
-                          <td>Email: support@M*Agym.com</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
+                      <h3 style="color:#0f172a; margin-bottom:15px; font-size:18px; font-weight:700;">Subscription Details</h3>
+                      <table class="premium-table">
+                          <thead>
+                              <tr>
+                                  <th>Services Taken</th>
+                                  <th>Duration</th>
+                                  <th>Address</th>
+                                  <th class="right">Attendance</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <tr>
+                                  <td><strong><?php echo $row['services']; ?></strong></td>
+                                  <td><?php echo $row['plan'] == 0 ? 'NONE' : $row['plan'] . ' Month(s)'; ?></td>
+                                  <td><?php echo $row['address']; ?></td>
+                                  <td class="right highlight"><?php echo $row['attendance_count']; ?> Day(s)</td>
+                              </tr>
+                          </tbody>
+                      </table>
 
-                  <div class="span8">
-                    <table class="table table-bordered table-invoice-full">
-                      <thead>
-                        <tr>
-                          <th class="head0">Membership ID</th>
-                          <th class="head1">Services Taken</th>
-                          <th class="head0 right">My Plans (Upto)</th>
-                          <th class="head1 right">Address</th>
-                          <th class="head0 right">Charge</th>
-                          <th class="head0 right">Attendance Count</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>
-                            <div class="text-center">PGC-SS-<?php echo $row['user_id']; ?></div>
-                          </td>
-                          <td>
-                            <div class="text-center"><?php echo $row['services']; ?></div>
-                          </td>
-                          <td>
-                            <div class="text-center"><?php if ($row['plan'] == 0) {
-                                                        echo 'NONE';
-                                                      } else {
-                                                        echo $row['plan'] . ' Month/s';
-                                                      } ?></div>
-                          </td>
-                          <td>
-                            <div class="text-center"><?php echo $row['address']; ?></div>
-                          </td>
-                          <td>
-                            <div class="text-center"><?php echo '$' . $row['amount']; ?></div>
-                          </td>
-                          <td>
-                            <div class="text-center"><?php echo $row['attendance_count']; ?> Day/s</div>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    <?php
-                    // Calculation of Base amount
-                    $base_amount = $row['amount'];
-                    if (isset($row['discount_type']) && $row['discount_type'] == 'percent') {
-                      if (isset($row['discount_amount']) && $row['discount_amount'] > 0 && $row['discount_amount'] < 100) {
-                        $base_amount = $row['amount'] / (1 - ($row['discount_amount'] / 100));
+                      <?php
+                      // Calculation of Base amount
+                      $base_amount = $row['amount'];
+                      if (isset($row['discount_type']) && $row['discount_type'] == 'percent') {
+                        if (isset($row['discount_amount']) && $row['discount_amount'] > 0 && $row['discount_amount'] < 100) {
+                          $base_amount = $row['amount'] / (1 - ($row['discount_amount'] / 100));
+                        }
+                      } else {
+                        $base_amount = $row['amount'] + (isset($row['discount_amount']) ? $row['discount_amount'] : 0);
                       }
-                    } else {
-                      $base_amount = $row['amount'] + (isset($row['discount_amount']) ? $row['discount_amount'] : 0);
-                    }
-                    $discount_in_dollars = $base_amount - $row['amount'];
-                    $paid = isset($row['paid_amount']) ? $row['paid_amount'] : $row['amount'];
-                    $remaining = max(0, $row['amount'] - $paid);
-                    ?>
-                    <table class="table table-bordered table-invoice-full">
-                      <thead>
-                        <tr>
-                          <th class="head0 right">Total Amount</th>
-                          <th class="head1 right">Discount</th>
-                          <th class="head0 right">Paid Amount</th>
-                          <th class="head1 right">Remaining Balance</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>
-                            <div class="text-center">$<?php echo number_format($base_amount, 2); ?></div>
-                          </td>
-                          <td>
-                            <div class="text-center">$<?php echo number_format($discount_in_dollars, 2); ?></div>
-                          </td>
-                          <td>
-                            <div class="text-center">$<?php echo number_format($paid, 2); ?></div>
-                          </td>
-                          <td>
-                            <div class="text-center">$<?php echo number_format($remaining, 2); ?></div>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                      $discount_in_dollars = $base_amount - $row['amount'];
+                      $paid = isset($row['paid_amount']) ? $row['paid_amount'] : $row['amount'];
+                      $remaining = max(0, $row['amount'] - $paid);
+                      ?>
+                      
+                      <div class="premium-summary-container">
+                          <table class="premium-summary-table">
+                              <tr>
+                                  <td>Base Amount</td>
+                                  <td>$<?php echo number_format($base_amount, 2); ?></td>
+                              </tr>
+                              <tr>
+                                  <td>Discount</td>
+                                  <td style="color:#ca8a04;">-$<?php echo number_format($discount_in_dollars, 2); ?></td>
+                              </tr>
+                              <tr>
+                                  <td>Amount Paid</td>
+                                  <td style="color:#16a34a;">$<?php echo number_format($paid, 2); ?></td>
+                              </tr>
+                              <tr class="total balance-due">
+                                  <td>Balance Due</td>
+                                  <td>$<?php echo number_format($remaining, 2); ?></td>
+                              </tr>
+                          </table>
+                      </div>
 
-                    <div class="text-center" style="margin-top: 15px;">
-                      <em><a href="#" class="tip-bottom" title="Registration Date" style="font-size:15px; color:#555;">Member Since: <?php echo $row['dor']; ?> </a></em>
-                    </div>
-                  </div> <!-- end of span 12 -->
+                      <div class="premium-footer">
+                          <div class="premium-notes">
+                              <h3>Status: <span style="color: <?php echo $row['status'] == 'Active' ? '#16a34a' : '#dc2626'; ?>"><?php echo $row['status'] == 'Active' ? 'ACTIVE' : 'EXPIRED'; ?></span></h3>
+                              <p>Member Since: <?php echo date("F j, Y", strtotime($row['dor'])); ?></p>
+                              <p>Thank you for choosing our services.</p>
+                          </div>
+                      </div>
 
-                </div>
+                      <!-- New Payment History Section -->
+                      <h3 style="color:#0f172a; margin-top:30px; margin-bottom:15px; font-size:18px; font-weight:700;">Transaction History</h3>
+                      <table class="premium-table">
+                          <thead>
+                              <tr>
+                                  <th>Date</th>
+                                  <th>Invoice #</th>
+                                  <th>Service</th>
+                                  <th>Plan</th>
+                                  <th class="right">Amount Paid</th>
+                                  <th class="right d-print-none">Action</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <?php
+                              $history_res = mysqli_query($conn, "SELECT * FROM payment_history WHERE user_id='$id' ORDER BY paid_date DESC");
+                              if (mysqli_num_rows($history_res) > 0) {
+                                  while ($hrow = mysqli_fetch_assoc($history_res)) {
+                              ?>
+                                  <tr>
+                                      <td><?php echo date("d/m/Y", strtotime($hrow['paid_date'])); ?></td>
+                                      <td><?php echo !empty($hrow['invoice_no']) ? $hrow['invoice_no'] : '-'; ?></td>
+                                      <td><?php echo $hrow['services']; ?></td>
+                                      <td><?php echo $hrow['plan']; ?> Month(s)</td>
+                                      <td class="right"><strong>$<?php echo number_format($hrow['paid_amount'], 2); ?></strong></td>
+                                      <td class="right d-print-none">
+                                          <a href="print-receipt.php?id=<?php echo $hrow['id']; ?>" class="btn btn-mini btn-info" target="_blank"><i class="fas fa-print"></i> Slip</a>
+                                      </td>
+                                  </tr>
+                              <?php
+                                  }
+                              } else {
+                                  echo '<tr><td colspan="6" style="text-align:center;">No payment records found.</td></tr>';
+                              }
+                              ?>
+                          </tbody>
+                      </table>
 
-                <div class="row-fluid">
-                  <div class="pull-left">
-                    <h4>Xubinta <?php echo $row['fullname']; ?>,<br /> <br /> Xubinnimadu hadda waa <?php echo $row['status'] == 'Active' ? 'Shaqaynaysaa' : 'Waqtigu ka dhacay'; ?>! <br /></h4>
-                    <p>Waad ku mahadsantahay doorashada adeegyadayada.</p>
+                      <div class="premium-footer">
+                          <div class="premium-signature">
+                              <img src="../../img/report/stamp-sample.png" alt="Official Stamp">
+                              <p>Official Record</p>
+                          </div>
+                      </div>
                   </div>
-                  <div class="pull-right">
-                    <h4><span>Approved By:</span></h4>
-                    <img src="../../img/report/stamp-sample.png" style="width: 124px;" alt="Stamp">
-                    <p class="text-center">Note: AutoGenerated</p>
-                  </div>
-
-                </div>
               </div>
 
           </div>
@@ -200,8 +203,9 @@ if (!isset($_SESSION['user_id'])) {
     </div>
 
     <div class="text-center d-print-none">
-      <a href="members-report.php" class="btn btn-info"><i class="fas fa-arrow-left"></i> Ku Noqo Menuga</a>
-      <button class="btn btn-danger" onclick="window.print()"><i class="fas fa-print"></i> Daabac</button>
+      <a href="members-report.php" class="btn btn-info"><i class="fas fa-arrow-left"></i> Back to Menu</a>
+      <button type="button" class="btn btn-danger" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+      <button type="button" class="btn btn-primary" onclick="generatePremiumPDF('Member_Report_<?php echo $id; ?>')"><i class="fas fa-download"></i> Download PDF</button>
     </div>
 
   </div>
@@ -211,7 +215,7 @@ if (!isset($_SESSION['user_id'])) {
   <!--Footer-part-->
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
   </div>
 
   <style>
@@ -234,6 +238,10 @@ if (!isset($_SESSION['user_id'])) {
         left: 0px;
         top: 0px;
         right: 0px;
+      }
+      
+      .d-print-none {
+        display: none !important;
       }
     }
   </style>
@@ -285,7 +293,23 @@ if (!isset($_SESSION['user_id'])) {
     function resetMenu() {
       document.gomenu.selector.selectedIndex = 2;
     }
+
+    function generatePremiumPDF(filename) {
+        var element = document.getElementById('print-area');
+        var opt = {
+            margin:       0,
+            filename:     filename + '.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+        document.body.classList.add('generating-pdf');
+        html2pdf().from(element).set(opt).save().then(function() {
+            document.body.classList.remove('generating-pdf');
+        });
+    }
   </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </body>
 
 </html>

@@ -1,0 +1,234 @@
+/* Premium Print & PDF Layout */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+.premium-document {
+    background: #fff;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: #1e293b;
+    padding: 50px 40px;
+    max-width: 800px;
+    margin: 20px auto;
+    box-sizing: border-box;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-radius: 12px;
+}
+
+.premium-document * {
+    box-sizing: border-box;
+}
+
+.premium-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 25px;
+    margin-bottom: 35px;
+}
+
+.premium-brand h1 {
+    font-size: 36px;
+    font-weight: 800;
+    margin: 0 0 8px 0;
+    color: #0f172a;
+    letter-spacing: 2px;
+}
+
+.premium-brand p {
+    margin: 0;
+    color: #475569;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.premium-meta {
+    text-align: right;
+}
+
+.premium-meta h2 {
+    font-size: 28px;
+    margin: 0 0 12px 0;
+    color: #2563eb;
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.premium-meta p {
+    margin: 4px 0;
+    font-size: 14px;
+    color: #334155;
+}
+
+.premium-meta p strong {
+    color: #0f172a;
+}
+
+.premium-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+    font-size: 15px;
+}
+
+.premium-table th {
+    background-color: #f8fafc;
+    color: #64748b;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 1px;
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 2px solid #e2e8f0;
+    border-top: 1px solid #e2e8f0;
+}
+
+.premium-table th.right {
+    text-align: right;
+}
+
+.premium-table td {
+    padding: 18px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #1e293b;
+    vertical-align: top;
+}
+
+.premium-table td.right {
+    text-align: right;
+}
+
+.premium-table td.highlight {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.premium-summary-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 40px;
+}
+
+.premium-summary-table {
+    width: 320px;
+    border-collapse: collapse;
+}
+
+.premium-summary-table td {
+    padding: 10px 16px;
+    border-bottom: 1px dashed #e2e8f0;
+    font-size: 15px;
+    color: #475569;
+}
+
+.premium-summary-table td:last-child {
+    text-align: right;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.premium-summary-table tr.total td {
+    font-size: 20px;
+    color: #16a34a;
+    border-top: 3px solid #e2e8f0;
+    border-bottom: none;
+    font-weight: 800;
+    padding-top: 18px;
+}
+
+.premium-summary-table tr.balance-due td {
+    color: #dc2626;
+}
+
+.premium-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 40px;
+    padding-top: 25px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.premium-notes h3 {
+    font-size: 16px;
+    color: #0f172a;
+    margin: 0 0 10px 0;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.premium-notes p {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+    max-width: 400px;
+    line-height: 1.6;
+}
+
+.premium-signature {
+    text-align: center;
+    width: 220px;
+}
+
+.premium-signature img {
+    max-width: 140px;
+    height: auto;
+    margin-bottom: 8px;
+    mix-blend-mode: multiply;
+}
+
+.premium-signature p {
+    margin: 0;
+    border-top: 1px solid #cbd5e1;
+    padding-top: 8px;
+    font-size: 12px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+/* Enhancing specifically for html2pdf generation */
+.generating-pdf .premium-document {
+    box-shadow: none !important;
+    border: none !important;
+    max-width: 100% !important;
+    padding: 20px 40px !important;
+    margin: 0 !important;
+}
+
+/* Normal Print */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    
+    .print-container,
+    .print-container * {
+        visibility: visible;
+    }
+    
+    .print-container {
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        right: 0px;
+        width: 100%;
+    }
+    
+    .premium-document {
+        padding: 0 20px;
+        box-shadow: none;
+        border: none;
+        max-width: 100%;
+        margin: 0;
+        width: 100%;
+    }
+    
+    .d-print-none {
+        display: none !important;
+    }
+}

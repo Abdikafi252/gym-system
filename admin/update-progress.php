@@ -1,16 +1,16 @@
-<?php
+﻿<?php
 session_start();
 //the isset function to check username is already loged in and stored on the session
 if (!isset($_SESSION['user_id'])) {
   header('location:../index.php');
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -29,7 +29,7 @@ if (!isset($_SESSION['user_id'])) {
   <!--Header-part-->
   <?php include 'includes/header-content.php'; ?>
   <!--close-Header-part-->
-  <!-- Visit codeastro.com for more projects -->
+  
 
   <!--top-Header-menu-->
   <?php include 'includes/topheader.php' ?>
@@ -121,7 +121,7 @@ if (!isset($_SESSION['user_id'])) {
 
                           <div class="control-group" style="padding:15px; background:#f8fafc; margin:10px 15px; border-radius:6px; text-align:center; border:1px dashed #cbd5e1;">
                             <h5 style="margin:0; color:#334155;">BMI: <span id="bmiDisplay">0.0</span></h5>
-                            <span id="bmiStatus" style="font-weight:bold; padding:4px 10px; border-radius:4px; margin-top:8px; display:inline-block; color:#64748b; background:#e2e8f0;">Waxaa la sugayaa Miisaanka & Dhererka...</span>
+                            <span id="bmiStatus" style="font-weight:bold; padding:4px 10px; border-radius:4px; margin-top:8px; display:inline-block; color:#64748b; background:#e2e8f0;">Waiting for Weight & Height...</span>
                           </div>
 
                         </div>
@@ -155,7 +155,7 @@ if (!isset($_SESSION['user_id'])) {
                             </div>
                           </div>
                           <div class="control-group" style="border-bottom:1px solid #f8fafc;">
-                            <label class="control-label" style="font-weight:600; color:#475569;">Hip (Dumar) :</label>
+                            <label class="control-label" style="font-weight:600; color:#475569;">Hip (Female) :</label>
                             <div class="controls">
                               <input type="number" step="0.1" name="hip" value='<?php echo isset($row['hip']) ? $row['hip'] : ''; ?>' class="span11" style="border-radius:4px; border:1px solid #cbd5e1;" placeholder="e.g., 90" />
                             </div>
@@ -209,7 +209,7 @@ if (!isset($_SESSION['user_id'])) {
     <!--Footer-part-->
 
     <div class="row-fluid">
-      <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+      <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
     </div>
 
     <style>
@@ -310,47 +310,47 @@ if (!isset($_SESSION['user_id'])) {
 
               if (numGender === 1) { // Male
                 if (bodyFat >= 6 && bodyFat <= 13) {
-                  fatCategory = "Ciyaaryahan (Athlete)";
+                  fatCategory = "Athlete";
                   fatColor = "#16a34a";
                 } else if (bodyFat > 13 && bodyFat <= 17) {
-                  fatCategory = "Caato/Fit (Fitness)";
+                  fatCategory = "Fitness";
                   fatColor = "#0284c7";
                 } else if (bodyFat > 17 && bodyFat <= 24) {
-                  fatCategory = "Caadi (Normal)";
+                  fatCategory = "Normal";
                   fatColor = "#ca8a04";
                 } else if (bodyFat > 24) {
-                  fatCategory = "Cayil (Overfat)";
+                  fatCategory = "Overfat";
                   fatColor = "#dc2626";
                 } else {
-                  fatCategory = "Aad u hooseeya";
+                  fatCategory = "Very Low";
                   fatColor = "#ea580c";
                 }
               } else { // Female
                 if (bodyFat >= 14 && bodyFat <= 20) {
-                  fatCategory = "Ciyaaryahan (Athlete)";
+                  fatCategory = "Athlete";
                   fatColor = "#16a34a";
                 } else if (bodyFat > 20 && bodyFat <= 24) {
-                  fatCategory = "Caato/Fit (Fitness)";
+                  fatCategory = "Fitness";
                   fatColor = "#0284c7";
                 } else if (bodyFat > 24 && bodyFat <= 31) {
-                  fatCategory = "Caadi (Normal)";
+                  fatCategory = "Normal";
                   fatColor = "#ca8a04";
                 } else if (bodyFat > 31) {
-                  fatCategory = "Cayil (Overfat)";
+                  fatCategory = "Overfat";
                   fatColor = "#dc2626";
                 } else {
-                  fatCategory = "Aad u hooseeya";
+                  fatCategory = "Very Low";
                   fatColor = "#ea580c";
                 }
               }
 
               if (fatStatus) {
-                fatStatus.innerHTML = "(Cabirka Dufanka: <span style='color:" + fatColor + ";'>" + fatCategory + "</span>)";
+                fatStatus.innerHTML = "(Body Fat Category: <span style='color:" + fatColor + ";'>" + fatCategory + "</span>)";
               }
             } else {
               // fatInput.value = ""; // Don't clear if user manual entry
               if (fatStatus) {
-                fatStatus.innerHTML = "<span style='color:#ca8a04; font-size:11px;'>(Geli Cabirka Jirka...)</span>";
+                fatStatus.innerHTML = "<span style='color:#ca8a04; font-size:11px;'>(Enter body measurements...)</span>";
               }
             }
 
@@ -362,19 +362,19 @@ if (!isset($_SESSION['user_id'])) {
               let bmiBg = "";
 
               if (bmi < 18.5) {
-                bmiText = "Miisaan yar (Underweight)";
+                bmiText = "Underweight";
                 bmiColor = "#ea580c";
                 bmiBg = "#ffedd5";
               } else if (bmi >= 18.5 && bmi <= 24.9) {
-                bmiText = "Miisaan caadi (Normal)";
+                bmiText = "Normal";
                 bmiColor = "#16a34a";
                 bmiBg = "#dcfce7";
               } else if (bmi >= 25 && bmi <= 29.9) {
-                bmiText = "Miisaan dheeraad (Overweight)";
+                bmiText = "Overweight";
                 bmiColor = "#ca8a04";
                 bmiBg = "#fef9c3";
               } else {
-                bmiText = "Cayil aad u badan (Obese)";
+                bmiText = "Obese";
                 bmiColor = "#dc2626";
                 bmiBg = "#fee2e2";
               }
@@ -387,7 +387,7 @@ if (!isset($_SESSION['user_id'])) {
             if (fatStatus) fatStatus.textContent = "";
             if (bmiDisplay && bmiStatus) {
               bmiDisplay.textContent = "0.0";
-              bmiStatus.textContent = "Waxaa la sugayaa Miisaanka & Dhererka...";
+              bmiStatus.textContent = "Waiting for Weight & Height...";
               bmiStatus.style.color = "#64748b";
               bmiStatus.style.backgroundColor = "#e2e8f0";
             }

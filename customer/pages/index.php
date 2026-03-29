@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 include "dbcon.php";
 include "session.php";
@@ -12,7 +12,7 @@ if (!isset($_SESSION['user_id'])) {
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -363,7 +363,7 @@ if (!isset($_SESSION['user_id'])) {
             <!-- Welcome Hero -->
             <div class="welcome-hero">
               <div class="hero-content">
-                <h1>👋 Kusoo Dhawow, <?php echo strtok($row_stats['fullname'], " "); ?>!</h1>
+                <h1>👋 Welcome, <?php echo strtok($row_stats['fullname'], " "); ?>!</h1>
                 <div class="hero-date"><?php echo date('l, d M Y'); ?></div>
               </div>
             </div>
@@ -374,11 +374,11 @@ if (!isset($_SESSION['user_id'])) {
               <a href="my-plan.php" class="m-card large" style="position:relative; overflow:hidden;">
                 <div style="position:absolute;top:-15px;right:-15px;font-size:110px;opacity:0.08;line-height:1;pointer-events:none;">🏅</div>
                 <div class="m-card-icon"><i class="fas fa-medal"></i></div>
-                <h4 class="m-card-title">👑 Qorshaha Xubinnimada (Plan)</h4>
+                <h4 class="m-card-title">👑 Membership Plan</h4>
                 <h3 class="m-card-value"><?php echo $row_stats['services']; ?> — <?php echo strtoupper($plan_type); ?></h3>
                 <div class="m-card-sub">
-                  ⏰ Waqtiga dhicitaanka: <strong style="color:white;"><?php echo date('d M Y', strtotime($row_stats['expiry_date'])); ?></strong>
-                  (<?php echo $days_left_text; ?> maalmood baa harsan)
+                  ⏰ Expiry Date: <strong style="color:white;"><?php echo date('d M Y', strtotime($row_stats['expiry_date'])); ?></strong>
+                  (<?php echo $days_left_text; ?> days left)
                 </div>
               </a>
 
@@ -386,34 +386,34 @@ if (!isset($_SESSION['user_id'])) {
               <a href="my-report.php" class="m-card" style="position:relative; overflow:hidden;">
                 <div style="position:absolute;top:-15px;right:-15px;font-size:100px;opacity:0.07;line-height:1;pointer-events:none;">🔥</div>
                 <div class="m-card-icon icon-orange"><i class="fas fa-fire"></i></div>
-                <h4 class="m-card-title">🔥 Imaanshaha Bishaan</h4>
-                <h3 class="m-card-value"><?php echo $monthly_attendance; ?> <span style="font-size:16px; color:#94a3b8;">Maalin</span></h3>
-                <div class="m-card-sub">Horumarka bisha hadda socota</div>
+                <h4 class="m-card-title">🔥 Monthly Attendance</h4>
+                <h3 class="m-card-value"><?php echo $monthly_attendance; ?> <span style="font-size:16px; color:#94a3b8;">Days</span></h3>
+                <div class="m-card-sub">Progress for the current month</div>
               </a>
 
               <!-- Card 3: Total Attendance -->
               <a href="my-report.php" class="m-card" style="position:relative; overflow:hidden;">
                 <div style="position:absolute;top:-15px;right:-15px;font-size:100px;opacity:0.07;line-height:1;pointer-events:none;">📅</div>
                 <div class="m-card-icon icon-purple"><i class="fas fa-calendar-check"></i></div>
-                <h4 class="m-card-title">📅 Wadarta Imaanshaha</h4>
-                <h3 class="m-card-value"><?php echo $total_attendance; ?> <span style="font-size:16px; color:#94a3b8;">Jeer</span></h3>
-                <div class="m-card-sub">Imaanshaha guud abid</div>
+                <h4 class="m-card-title">📅 Total Attendance</h4>
+                <h3 class="m-card-value"><?php echo $total_attendance; ?> <span style="font-size:16px; color:#94a3b8;">Times</span></h3>
+                <div class="m-card-sub">Overall attendance record</div>
               </a>
 
               <!-- Card 4: Payments Link -->
               <a href="my-payments.php" class="m-card" style="position:relative; overflow:hidden;">
                 <div style="position:absolute;top:-15px;right:-15px;font-size:100px;opacity:0.07;line-height:1;pointer-events:none;">🧾</div>
                 <div class="m-card-icon icon-green"><i class="fas fa-file-invoice-dollar"></i></div>
-                <h4 class="m-card-title">🧾 Rasiidka & Lacagta</h4>
-                <h3 class="m-card-value" style="color: #22c55e;">Eeg Taariikhda</h3>
-                <div class="m-card-sub">💳 Lacag bixinta ($<?php echo $row_stats['paid_amount']; ?> Total) & Rasiidka</div>
+                <h4 class="m-card-title">🧾 Receipts & Payments</h4>
+                <h3 class="m-card-value" style="color: #22c55e;">View History</h3>
+                <div class="m-card-sub">💳 Payments ($<?php echo $row_stats['paid_amount']; ?> Total) & Receipts</div>
               </a>
 
               <!-- Card 5: Finance Details -->
               <a href="my-payments.php" class="m-card" style="position:relative; overflow:hidden;">
                 <div style="position:absolute;top:-15px;right:-15px;font-size:100px;opacity:0.07;line-height:1;pointer-events:none;"><?php echo $balance > 0 ? '⚠️' : '💰'; ?></div>
                 <div class="m-card-icon <?php echo $balance > 0 ? 'icon-pink' : 'icon-blue'; ?>"><i class="fas fa-wallet"></i></div>
-                <h4 class="m-card-title"><?php echo $balance > 0 ? '⚠️' : '✅'; ?> Baaqiga / Haraaga</h4>
+                <h4 class="m-card-title"><?php echo $balance > 0 ? '⚠️' : '✅'; ?> Balance / Outstanding</h4>
                 <h3 class="m-card-value" style="color: <?php echo $balance > 0 ? '#e11d48' : '#0f172a'; ?>;">
                   <?php
                   if ($balance < 0) {
@@ -423,16 +423,16 @@ if (!isset($_SESSION['user_id'])) {
                   }
                   ?>
                 </h3>
-                <div class="m-card-sub">Lacagta kugu dhiman</div>
+                <div class="m-card-sub">Your remaining balance</div>
               </a>
 
               <!-- Card 6: Report Link -->
               <a href="my-report.php" class="m-card" style="position:relative; overflow:hidden;">
                 <div style="position:absolute;top:-15px;right:-15px;font-size:100px;opacity:0.07;line-height:1;pointer-events:none;">📊</div>
                 <div class="m-card-icon icon-yellow"><i class="fas fa-chart-line"></i></div>
-                <h4 class="m-card-title">📊 Warbixintaada</h4>
+                <h4 class="m-card-title">📊 My Report</h4>
                 <h3 class="m-card-value" style="color: #eab308;">My Report</h3>
-                <div class="m-card-sub">Faahfaahinta horumarkaaga</div>
+                <div class="m-card-sub">Details of your progress</div>
               </a>
 
             </div> <!-- End modern-grid -->
@@ -446,7 +446,7 @@ if (!isset($_SESSION['user_id'])) {
 
           <div class="widget-box todo-card">
             <div class="widget-title todo-header"> <span class="icon"><i class="icon-list" style="color: #28b779;"></i></span>
-              <h5>Liiska Shaqooyinka (To-Do List)</h5>
+              <h5>To-Do List</h5>
             </div>
             <div class="widget-content nopadding">
 
@@ -457,9 +457,9 @@ if (!isset($_SESSION['user_id'])) {
               echo "<table class='table table-striped table-bordered todo-table'>
               <thead>
                 <tr>
-                  <th>FAAHFAAHINTA</th>
-                  <th>XALADA</th>
-                  <th style='width: 80px;'>OPTS</th>
+                  <th style='color: white;'>DESCRIPTION</th>
+                  <th style='color: white;'>STATUS</th>
+                  <th style='width: 80px; color: white;'>OPTS</th>
                 </tr>
               </thead>";
               while ($row = mysqli_fetch_array($result)) {
@@ -489,7 +489,7 @@ if (!isset($_SESSION['user_id'])) {
           <div class="widget-box todo-card">
             <div class="widget-title todo-header" data-toggle="collapse" href="#collapseG2">
               <span class="icon"><i class="icon-bullhorn" style="color: #e67e22;"></i></span>
-              <h5>Ogeysiisyada Gym-ka (Announcements)</h5>
+              <h5>Gym Announcements</h5>
             </div>
             <div class="widget-content nopadding collapse in" id="collapseG2" style="max-height: 400px; overflow-y: auto;">
               <ul class="recent-posts">
@@ -509,7 +509,7 @@ if (!isset($_SESSION['user_id'])) {
                     echo "</li>";
                   }
                 } else {
-                  echo "<li style='padding: 20px; text-align: center; color: #94a3b8;'>Ma jiraan ogeysiisyo hadda.</li>";
+                  echo "<li style='padding: 20px; text-align: center; color: #94a3b8;'>No announcements at the moment.</li>";
                 }
                 ?>
 
@@ -530,7 +530,7 @@ if (!isset($_SESSION['user_id'])) {
   <!--Footer-part-->
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
   </div>
 
 

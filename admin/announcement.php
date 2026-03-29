@@ -1,16 +1,16 @@
-<?php
+﻿<?php
 session_start();
 //the isset function to check username is already loged in and stored on the session
 if (!isset($_SESSION['user_id'])) {
   header('location:../index.php');
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -30,7 +30,7 @@ if (!isset($_SESSION['user_id'])) {
   <?php include 'includes/header-content.php'; ?>
   <!--close-Header-part-->
 
-  <!-- Visit codeastro.com for more projects -->
+  
   <!--top-Header-menu-->
   <?php include 'includes/topheader.php' ?>
   <!--close-top-Header-menu-->
@@ -47,29 +47,29 @@ if (!isset($_SESSION['user_id'])) {
   <!--sidebar-menu-->
   <div id="content">
     <div id="content-header">
-      <div id="breadcrumb"> <a href="index.php" title="Tag Bogga Hore" class="tip-bottom"><i class="fas fa-home"></i> Bogga Hore</a><a href="announcement.php" class="current">Ogeysiisyada</a> </div>
-      <h1>Ogeysiiska</h1>
+      <div id="breadcrumb"> <a href="index.php" title="Go to Home" class="tip-bottom"><i class="fas fa-home"></i> Home</a><a href="announcement.php" class="current">Announcements</a> </div>
+      <h1>Announcement</h1>
     </div>
     <div class="container-fluid">
       <hr>
-      <a href="manage-announcement.php"><button class="btn btn-danger" type="button">Maamul Ogeysiisyadaada</button></a>
+      <a href="manage-announcement.php"><button class="btn btn-danger" type="button">Manage Announcements</button></a>
       <div class="row-fluid">
         <div class="widget-box">
           <div class="widget-title"> <span class="icon"> <i class="fas fa-align-justify"></i> </span>
-            <h5>Samee Ogeysiisyo</h5>
+            <h5>Create Announcement</h5>
           </div>
           <div class="widget-content">
             <div class="control-group">
               <form action="post-announcement.php" method="POST">
                 <div class="controls">
-                  <textarea class="span12" name="message" rows="6" placeholder="Halkan ku qor qoraalka ..."></textarea>
+                  <textarea class="span12" name="message" rows="6" placeholder="Write message here..."></textarea>
                 </div>
                 <div class="controls">
-                  <h5><label for="Announce Date">Taariikhda:
+                  <h5><label for="Announce Date">Date:
                       <input type="date" name="date"></h5> </label>
                 </div>
                 <div class="text-center">
-                  <button type="submit" class="btn btn-info btn-large">Faafi Hadda</button>
+                   <button type="submit" class="btn btn-info btn-large">Publish Now</button>
                 </div>
               </form>
             </div>
@@ -87,7 +87,7 @@ if (!isset($_SESSION['user_id'])) {
   <!--Footer-part-->
 
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi </div>
   </div>
 
   <style>

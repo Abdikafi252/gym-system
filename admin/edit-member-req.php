@@ -5,12 +5,12 @@ if (!isset($_SESSION['user_id'])) {
   header('location:../index.php');
 }
 ?>
-<!-- Visit codeastro.com for more projects -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <title>M * A GYM System</title>
+  <title>M*A GYM System</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -30,7 +30,7 @@ if (!isset($_SESSION['user_id'])) {
   <?php include 'includes/header-content.php'; ?>
   <!--close-Header-part-->
 
-  <!-- Visit codeastro.com for more projects -->
+  
   <!--top-Header-menu-->
   <?php include 'includes/topheader.php' ?>
   <!--close-top-Header-menu-->
@@ -82,25 +82,43 @@ if (!isset($_SESSION['user_id'])) {
 
         include 'dbcon.php';
 
-        // Handle Photo Update
+        // Handle Photo Update (File or Webcam)
         $photo_query_part = "";
-        if (isset($_FILES['photo']) && $_FILES['photo']['error'] == 0) {
+        $target_dir = "../img/members/";
+
+        if ((isset($_FILES['photo']) && $_FILES['photo']['error'] == 0) || !empty($_POST['webcam_image'])) {
           // Get old photo to delete
           $old_photo_qry = "SELECT photo FROM members WHERE user_id='$id'";
           $old_photo_res = mysqli_query($con, $old_photo_qry);
           $old_photo_row = mysqli_fetch_array($old_photo_res);
           $old_photo = $old_photo_row['photo'];
 
-          $target_dir = "../img/members/";
-          $file_ext = pathinfo($_FILES["photo"]["name"], PATHINFO_EXTENSION);
-          $photo_name = "member_" . time() . "_" . $biometric_id . "." . $file_ext;
-          $target_file = $target_dir . $photo_name;
-
-          if (move_uploaded_file($_FILES["photo"]["tmp_name"], $target_file)) {
-            $photo_query_part = ", photo='$photo_name'";
-            // Delete old photo file if it exists
-            if (!empty($old_photo) && file_exists($target_dir . $old_photo)) {
-              unlink($target_dir . $old_photo);
+          if (isset($_FILES['photo']) && $_FILES['photo']['error'] == 0) {
+            // File Upload
+            $file_ext = pathinfo($_FILES["photo"]["name"], PATHINFO_EXTENSION);
+            $photo_name = "member_" . time() . "_" . $biometric_id . "." . $file_ext;
+            $target_file = $target_dir . $photo_name;
+            if (move_uploaded_file($_FILES["photo"]["tmp_name"], $target_file)) {
+              $photo_query_part = ", photo='$photo_name'";
+              if (!empty($old_photo) && file_exists($target_dir . $old_photo)) {
+                unlink($target_dir . $old_photo);
+              }
+            }
+          } elseif (!empty($_POST['webcam_image'])) {
+            // Webcam Capture
+            $base64_img = $_POST['webcam_image'];
+            if (strpos($base64_img, 'data:image/jpeg;base64,') === 0) {
+              $base64_img = str_replace('data:image/jpeg;base64,', '', $base64_img);
+              $base64_img = str_replace(' ', '+', $base64_img);
+              $data = base64_decode($base64_img);
+              $photo_name = "member_cam_" . time() . "_" . $biometric_id . ".jpg";
+              $file_path = $target_dir . $photo_name;
+              if (file_put_contents($file_path, $data)) {
+                $photo_query_part = ", photo='$photo_name'";
+                if (!empty($old_photo) && file_exists($target_dir . $old_photo)) {
+                  unlink($target_dir . $old_photo);
+                }
+              }
             }
           }
         }
@@ -144,6 +162,13 @@ if (!isset($_SESSION['user_id'])) {
         $qry = "update members set fullname='$fullname', username='$username',dor='$dor', gender='$gender', services='$services', amount='$totalamount', plan='$plan', address='$address', contact='$contact', biometric_id='$biometric_id', expiry_date='$expiry_date', batch='$batch', email='$email', aadhar='$aadhar', pan='$pan', discount_type='$discount_type', discount_amount='$discount_amount', paid_amount='$paid_amount', comments='$comments', trainer_type='$trainer_type', branch_id='$branch_id' $photo_query_part $id_doc_query_part where user_id='$id'";
         $result = mysqli_query($con, $qry); //query executes
 
+        // Sync to payment history to keep Ledger and UI aligned
+        if ($result) {
+            $upQ = "UPDATE payment_history 
+                    SET amount='$totalamount', plan='$plan', paid_amount='$paid_amount', discount_amount='$discount_amount', discount_type='$discount_type'
+                    WHERE user_id='$id' ORDER BY id DESC LIMIT 1";
+            mysqli_query($con, $upQ);
+        }
         if (!$result) {
           echo "<div class='container-fluid'>";
           echo "<div class='row-fluid'>";
@@ -164,6 +189,20 @@ if (!isset($_SESSION['user_id'])) {
           echo "</div>";
           echo "</div>";
         } else {
+          // Face Terminal Sync (DA-T12 / WL-P72)
+          if (!empty($photo_query_part)) { // Only sync if photo was updated or requested
+              require_once __DIR__ . '/../includes/FaceTerminal.php';
+              $ft = new FaceTerminal($con);
+              if ($ft->isEnabled()) {
+                  $photo_to_sync = !empty($photo_name) ? $target_dir . $photo_name : '';
+                  if ($photo_to_sync && file_exists($photo_to_sync)) {
+                      $sync_res = $ft->syncPerson($biometric_id, $fullname, $photo_to_sync);
+                      if (isset($sync_res['status']) && $sync_res['status'] === 'success') {
+                          echo "<div class='alert alert-info' style='margin: 20px;'><strong>Terminal Sync:</strong> Face Terminal updated successfully.</div>";
+                      }
+                  }
+              }
+          }
 
           echo "<div class='container-fluid'>";
           echo "<div class='row-fluid'>";
@@ -199,9 +238,9 @@ if (!isset($_SESSION['user_id'])) {
   <!--end-main-container-part-->
 
   <!--Footer-part-->
-  <!-- Visit codeastro.com for more projects -->
+  
   <div class="row-fluid">
-    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</a> </div>
+    <div id="footer" class="span12"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</a> </div>
   </div>
 
   <style>

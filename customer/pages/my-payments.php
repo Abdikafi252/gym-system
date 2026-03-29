@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 include "dbcon.php";
 include "session.php";
@@ -14,14 +14,14 @@ $result = mysqli_query($con, $qry);
 $row = mysqli_fetch_array($result);
 
 if (!$row) {
-    die("Xogtaada lama heli karo. Fadlan la xiriir Maamulka.");
+    die("Your data could not be found. Please contact administration.");
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <title>M * A GYM System - My Payments</title>
+    <title>M*A GYM System - My Payments</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="../css/bootstrap.min.css" />
@@ -62,13 +62,13 @@ if (!$row) {
                 <div class="span12">
                     <?php if ($row['status'] != 'Active') { ?>
                         <div class="alert alert-warning" style="margin-bottom: 15px; border-radius: 8px;">
-                            Xisaabtaadu hadda waa <strong><?php echo htmlspecialchars($row['status']); ?></strong>, laakiin wali waad arki kartaa taariikhda lacag bixintaada oo waad daabacan kartaa rasiidka bil kasta.
+                            Your account is currently <strong><?php echo htmlspecialchars($row['status']); ?></strong>, but you can still view your payment history and print receipts each month.
                         </div>
                     <?php } ?>
                         <div class="widget-box" style="border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); overflow:hidden;">
                             <div class="widget-title" style="background:#f8fafc; padding: 15px 20px;">
                                 <span class="icon" style="margin-right: 15px; color:#16a34a;"> <i class="fas fa-history" style="font-size: 20px;"></i> </span>
-                                <h4 style="margin: 0; color: #0f172a; font-weight:800; display: inline-block;">Taariikhda Lacag Bixinta (Payment History)</h4>
+                                <h4 style="margin: 0; color: #0f172a; font-weight:800; display: inline-block;">Payment History</h4>
 
                                 <form method="GET" action="my-payments.php" class="pull-right" style="margin: 0; display: flex; gap: 10px; align-items: center;">
                                     <?php
@@ -76,7 +76,7 @@ if (!$row) {
                                     $filter_year = isset($_GET['year']) ? $_GET['year'] : '';
                                     ?>
                                     <select name="month" style="width: 140px; margin-bottom: 0; border-radius: 6px;">
-                                        <option value="">Dooro Bisha</option>
+                                        <option value="">Select Month</option>
                                         <?php
                                         $months = array(
                                             '01' => 'January',
@@ -99,7 +99,7 @@ if (!$row) {
                                         ?>
                                     </select>
                                     <select name="year" style="width: 100px; margin-bottom: 0; border-radius: 6px;">
-                                        <option value="">Sanadka</option>
+                                        <option value="">Year</option>
                                         <?php
                                         $current_year = date('Y');
                                         for ($y = $current_year; $y >= $current_year - 5; $y--) {
@@ -108,7 +108,7 @@ if (!$row) {
                                         }
                                         ?>
                                     </select>
-                                    <button type="submit" class="btn btn-success" style="border-radius: 6px; font-weight:bold;">Raadi</button>
+                                    <button type="submit" class="btn btn-success" style="border-radius: 6px; font-weight:bold;">Search</button>
                                 </form>
                             </div>
                             <div class="widget-content nopadding">
@@ -116,12 +116,12 @@ if (!$row) {
                                     <thead>
                                         <tr style="background:#f1f5f9;">
                                             <th style="padding: 15px; text-align: left; color:#475569;"># Invoice</th>
-                                            <th style="padding: 15px; text-align: left; color:#475569;">Taariikhda</th>
-                                            <th style="padding: 15px; text-align: left; color:#475569;">Adeegga</th>
-                                            <th style="padding: 15px; text-align: left; color:#475569;">Qorshaha (Plan)</th>
-                                            <th style="padding: 15px; text-align: left; color:#475569;">Bilooyinka (Covered)</th>
-                                            <th style="padding: 15px; text-align: right; color:#475569;">Lacagta</th>
-                                            <th style="padding: 15px; text-align: center; color:#475569;">Falka</th>
+                                            <th style="padding: 15px; text-align: left; color:#475569;">Date</th>
+                                            <th style="padding: 15px; text-align: left; color:#475569;">Service</th>
+                                            <th style="padding: 15px; text-align: left; color:#475569;">Plan</th>
+                                            <th style="padding: 15px; text-align: left; color:#475569;">Covered Months</th>
+                                            <th style="padding: 15px; text-align: right; color:#475569;">Amount</th>
+                                            <th style="padding: 15px; text-align: center; color:#475569;">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -169,14 +169,14 @@ if (!$row) {
                                                     <td style="padding: 15px; vertical-align: middle;"><strong>#<?php echo $invoice_num; ?></strong></td>
                                                     <td style="padding: 15px; vertical-align: middle;"><?php echo date("d M Y", strtotime($hist['paid_date'])); ?></td>
                                                     <td style="padding: 15px; vertical-align: middle;"><?php echo $hist['services']; ?></td>
-                                                    <td style="padding: 15px; vertical-align: middle;"><?php echo $hist['plan']; ?> Bil</td>
+                                                    <td style="padding: 15px; vertical-align: middle;"><?php echo $hist['plan']; ?> Month/s</td>
                                                     <td style="padding: 15px; vertical-align: middle;"><?php echo implode(" ", $covered_months); ?></td>
                                                     <td style="padding: 15px; vertical-align: middle; text-align: right; font-weight: bold; color: #16a34a;">
                                                         $<?php echo number_format($hist['paid_amount'], 2); ?>
                                                     </td>
                                                     <td style="padding: 15px; vertical-align: middle; text-align: center;">
                                                         <a href="print-receipt.php?id=<?php echo $hist['id']; ?>" class="btn btn-primary btn-sm" style="border-radius: 6px; font-weight:bold; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);" target="_blank">
-                                                            <i class="fas fa-print"></i> Daabac
+                                                            <i class="fas fa-print"></i> Print
                                                         </a>
                                                     </td>
                                                 </tr>
@@ -189,7 +189,7 @@ if (!$row) {
                                             <tr>
                                                 <td colspan="7" style="padding: 30px; text-align: center; color: #64748b;">
                                                     <i class="fas fa-folder-open" style="font-size: 40px; color:#cbd5e1; margin-bottom: 15px; display:block;"></i>
-                                                    Wali ma jirto taariikh lacag bixin ah (No payment history found).
+                                                    No payment history found.
                                                 </td>
                                             </tr>
                                         <?php
@@ -206,7 +206,7 @@ if (!$row) {
 
     <!--Footer-part-->
     <div class="row-fluid d-print-none">
-        <div id="footer" class="span12" style="color:white;"> <?php echo date("Y"); ?> &copy; M * A GYM System Developed By Abdikafi</div>
+        <div id="footer" class="span12" style="color:white;"> <?php echo date("Y"); ?> &copy; M*A GYM System Developed By Abdikafi</div>
     </div>
 
     <style>

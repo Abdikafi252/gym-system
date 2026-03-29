@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id'])) {
 $uid = $_SESSION['user_id'];
 
 if (!isset($_GET['id'])) {
-    die("Fadlan dooro rasiid.");
+    die("Please select a receipt.");
 }
 
 $history_id = intval($_GET['id']);
@@ -21,7 +21,7 @@ $result = mysqli_query($con, $qry);
 $member_row = mysqli_fetch_array($result);
 
 if (!$member_row) {
-    die("Xogtaada lama heli karo. Fadlan la xiriir Maamulka.");
+    die("Your data could not be found. Please contact administration.");
 }
 
 $hist_qry = "SELECT * FROM payment_history WHERE id='$history_id' AND user_id='$uid'";
@@ -29,7 +29,7 @@ $hist_res = mysqli_query($con, $hist_qry);
 $hist_row = mysqli_fetch_array($hist_res);
 
 if (!$hist_row) {
-    die("Rasiidkan lama heli karo ama adiga iska ma lihid.");
+    die("This receipt is not available or does not belong to you.");
 }
 
 $invoice_no = !empty($hist_row['invoice_no']) ? $hist_row['invoice_no'] : ('GMS_' . $hist_row['user_id'] . date('Ym', strtotime($hist_row['paid_date'])) . $hist_row['id']);
@@ -42,260 +42,278 @@ $qr_url = "https://quickchart.io/qr?size=120&text=$verify_payload";
 <html lang="en">
 
 <head>
-    <title>M * A GYM System - Print Receipt</title>
+    <title>M*A GYM System - POS Receipt</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="../css/bootstrap.min.css" />
-    <link rel="stylesheet" href="../css/bootstrap-responsive.min.css" />
     <link href="../font-awesome/css/all.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     <style>
         body {
-            background-color: #f6f6f6;
-            font-family: 'Open Sans', sans-serif;
-            -webkit-font-smoothing: antialiased;
+            background-color: #333; /* Dark background to make receipt pop */
+            font-family: 'Courier Prime', monospace;
             margin: 0;
-            padding: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
         }
 
         .receipt-container {
-            max-width: 600px;
-            margin: 40px auto;
+            width: 320px; /* 80mm thermal paper width */
             background: #fff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            padding: 30px;
+            padding: 10px;
+            color: #000;
+            margin: 0 auto;
+            box-sizing: border-box;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
 
         .header {
             text-align: center;
-            padding-bottom: 25px;
-            border-bottom: 2px dashed #e2e8f0;
-            margin-bottom: 25px;
+            margin-bottom: 12px;
         }
 
         .header h2 {
-            margin: 0;
-            color: #0f172a;
-            font-weight: 900;
+            margin: 0 0 5px 0;
+            font-size: 24px;
+            font-weight: 700;
         }
 
         .header p {
-            margin: 5px 0 0 0;
-            color: #64748b;
+            margin: 0;
             font-size: 14px;
         }
 
-        .invoice-details {
-            margin: 10px 0 20px 0;
-            display: flex;
-            justify-content: space-between;
+        .divider {
+            border-top: 1.5px dashed #000;
+            margin: 12px 0;
         }
 
-        .member-info {
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            color: #0f172a;
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 6px;
         }
 
         .items-table {
             width: 100%;
+            font-size: 14px;
             border-collapse: collapse;
+            margin: 12px 0;
         }
 
         .items-table th {
-            border-bottom: 2px solid #e2e8f0;
-            padding: 10px 0;
+            border-top: 1.5px dashed #000;
+            border-bottom: 1.5px dashed #000;
+            padding: 6px 0;
             text-align: left;
-            color: #64748b;
+            font-weight: 700;
         }
-
-        .items-table th.right {
+        
+        .items-table th.right, .items-table td.right {
             text-align: right;
         }
 
         .items-table td {
-            padding: 15px 0;
-            border-bottom: 1px solid #f1f5f9;
-            color: #0f172a;
-            font-weight: 600;
+            padding: 8px 0;
+            vertical-align: top;
         }
 
-        .items-table td.right {
-            text-align: right;
+        .totals {
+            margin-top: 12px;
+            border-top: 1.5px dashed #000;
+            padding-top: 12px;
         }
 
-        .items-table td.light {
-            color: #475569;
-            font-weight: normal;
-        }
-
-        .items-table td.discount {
-            color: #ca8a04;
-        }
-
-        .items-table td.total-label {
-            padding: 20px 0 0 0;
-            font-size: 18px;
-            font-weight: 900;
-            border-bottom: none;
-        }
-
-        .items-table td.total-value {
-            padding: 20px 0 0 0;
-            font-size: 22px;
-            font-weight: 900;
-            color: #16a34a;
-            border-bottom: none;
-        }
-
-        .footer-note {
-            text-align: center;
-            padding-top: 40px;
-            color: #94a3b8;
-            font-size: 13px;
-        }
-
-        .verify-box {
-            margin-top: 18px;
-            border: 1px dashed #94a3b8;
-            border-radius: 10px;
-            padding: 10px;
+        .total-row {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            gap: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 6px;
         }
 
-        .stamp-box {
-            width: 120px;
-            height: 120px;
-            border: 2px dashed #334155;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #334155;
-            font-size: 11px;
-            font-weight: 800;
-            transform: rotate(-10deg);
+        .total-row.grand-total {
+            font-size: 20px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1.5px dashed #000;
         }
 
-        .print-btn-container {
+        .qr-section {
             text-align: center;
-            padding-top: 30px;
+            margin-top: 20px;
         }
 
-        .btn-print {
-            background: #2563eb;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            padding: 12px 30px;
-            font-size: 16px;
+        .qr-section img {
+            width: 140px;
+            height: 140px;
+        }
+
+        .qr-section p {
+            font-size: 12px;
+            margin: 8px 0 0 0;
+            word-wrap: break-word;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            border-top: 1.5px dashed #000;
+            padding-top: 12px;
+        }
+
+        .print-actions {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            font-family: 'Courier Prime', monospace;
+            padding: 8px 15px;
+            margin: 0 5px;
             cursor: pointer;
-            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+            border: 1px solid #000;
+            background: #fff;
+            font-weight: 700;
+            font-size: 12px;
+            border-radius: 4px;
             transition: all 0.2s;
         }
 
-        .btn-print:hover {
-            background: #1d4ed8;
-            box-shadow: 0 6px 8px -1px rgba(37, 99, 235, 0.3);
+        .btn:hover {
+            background: #000;
+            color: #fff;
         }
 
         @media print {
             body {
-                background: #fff;
+                background-color: #fff;
+                padding: 0;
+                display: block;
             }
-
             .receipt-container {
                 box-shadow: none;
-                border: none;
-                margin: 0;
+                width: 100%;
+                max-width: 320px;
                 padding: 0;
+                margin: 0;
             }
-
             .d-print-none {
                 display: none !important;
+            }
+            @page {
+                margin: 0;
+                size: 80mm auto;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="receipt-container">
-        <div class="header">
-            <h2>M * A GYM</h2>
-            <p>Busley, Bondheere, Mogadishu</p>
-        </div>
-
-        <div style="overflow: hidden; margin-bottom: 20px;">
-            <div style="float:left; color:#475569;">
-                <strong style="color:#0f172a;">Rasiid #<?php echo $invoice_no; ?></strong><br>
-                Taariikhda: <?php echo date("F j, Y", strtotime($hist_row['paid_date'])); ?>
+    <div class="receipt-wrap">
+        <div class="receipt-container" id="receipt">
+            <div class="header">
+                <h2>M*A GYM</h2>
+                <p>Busley, Bondheere</p>
+                <p>Mogadishu, Somalia</p>
+                <p>Tel: 252-610-000-000</p>
             </div>
-            <div style="float:right;">
-                <span class="badge" style="background:#dcfce7; color:#16a34a; padding:5px 12px; border-radius:20px; font-weight:bold; font-size:12px; display:inline-block;"><i class="fas fa-check-circle"></i> PAID</span>
+
+            <div class="divider"></div>
+
+            <div class="info-row">
+                <span>Receipt #:</span>
+                <span><?php echo $invoice_no; ?></span>
             </div>
-        </div>
+            <div class="info-row">
+                <span>Date:</span>
+                <span><?php echo date("Y-m-d H:i", strtotime($hist_row['paid_date'])); ?></span>
+            </div>
+            <div class="info-row">
+                <span>Member:</span>
+                <span><?php echo $hist_row['fullname']; ?></span>
+            </div>
+            <div class="info-row">
+                <span>ID:</span>
+                <span>PGC-<?php echo $hist_row['user_id']; ?></span>
+            </div>
 
-        <div class="member-info">
-            <b>Xubinta: <?php echo $hist_row['fullname']; ?></b> <br>
-            ID: PGC-<?php echo $hist_row['user_id']; ?>
-        </div>
-
-        <table class="items-table">
-            <thead>
-                <tr>
-                    <th>Adeegga</th>
-                    <th class="right">Qorshaha</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><?php echo $hist_row['services']; ?></td>
-                    <td class="right"><?php echo $hist_row['plan']; ?> Bilood</td>
-                </tr>
-                <tr>
-                    <td class="light">Lacagta Guud</td>
-                    <td class="right light">$<?php echo $hist_row['amount'] + $hist_row['discount_amount']; ?></td>
-                </tr>
-                <?php if ($hist_row['discount_amount'] > 0) { ?>
+            <table class="items-table">
+                <thead>
                     <tr>
-                        <td class="discount">Sicir-dhimis (Discount)</td>
-                        <td class="right discount">-$<?php echo $hist_row['discount_amount']; ?></td>
+                        <th>ITEM / PLAN</th>
+                        <th class="right">AMT</th>
                     </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <?php echo $hist_row['services']; ?><br>
+                            <small>(<?php echo $hist_row['plan']; ?> Month/s)</small>
+                        </td>
+                        <td class="right">$<?php echo number_format($hist_row['amount'] + $hist_row['discount_amount'], 2); ?></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="totals">
+                <div class="total-row">
+                    <span>SUBTOTAL:</span>
+                    <span>$<?php echo number_format($hist_row['amount'] + $hist_row['discount_amount'], 2); ?></span>
+                </div>
+                <?php if ($hist_row['discount_amount'] > 0) { ?>
+                <div class="total-row">
+                    <span>DISCOUNT:</span>
+                    <span>-$<?php echo number_format($hist_row['discount_amount'], 2); ?></span>
+                </div>
                 <?php } ?>
-                <tr>
-                    <td class="total-label">Wadarta La Bixiyay</td>
-                    <td class="right total-value">$<?php echo $hist_row['paid_amount']; ?></td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div class="verify-box">
-            <div>
-                <div style="font-size:11px;color:#64748b;font-weight:700;">Verification Code</div>
-                <div style="font-size:16px;font-weight:900;color:#0f172a;letter-spacing:1px;"><?php echo $verify_code; ?></div>
-                <div style="font-size:11px;color:#64748b;">Invoice: <?php echo $invoice_no; ?></div>
+                <div class="total-row grand-total">
+                    <span>TOTAL PAID:</span>
+                    <span>$<?php echo number_format($hist_row['paid_amount'], 2); ?></span>
+                </div>
             </div>
-            <div>
-                <img src="<?php echo $qr_url; ?>" alt="Verification QR" style="width:80px;height:80px;border:1px solid #e2e8f0;border-radius:8px;">
+
+            <div class="divider"></div>
+
+            <div class="qr-section">
+                <img src="<?php echo $qr_url; ?>" alt="QR Code">
+                <p>VERIFY: <?php echo $verify_code; ?></p>
             </div>
-            <div class="stamp-box">M*A GYM<br>VERIFIED</div>
-        </div>
 
-        <div class="footer-note">
-            <i class="fas fa-heart" style="color:#ef4444;"></i> Waad ku mahadsantahay inaad nala macaamisho!
+            <div class="footer">
+                <p>*** THANK YOU! ***</p>
+                <p>For inquiries, contact support.</p>
+                <p><?php echo date("d/m/Y H:i:s"); ?></p>
+            </div>
         </div>
-
-        <div class="print-btn-container d-print-none">
-            <button class="btn-print" onclick="window.print()"><i class="fas fa-print"></i> Daabac Rasiidka</button>
+        
+        <div class="print-actions d-print-none">
+            <button class="btn" onclick="window.print()">[ PRINT ]</button>
+            <button class="btn" onclick="generateThermalPDF('POS_<?php echo $invoice_no; ?>')">[ PDF ]</button>
         </div>
     </div>
-</body>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        function generateThermalPDF(filename) {
+            var element = document.getElementById('receipt');
+            var opt = {
+                margin:       0, // 0 margin for POS
+                filename:     filename + '.pdf',
+                image:        { type: 'jpeg', quality: 1 },
+                html2canvas:  { scale: 2, useCORS: true },
+                // Roughly 3.15 inches (80mm) by 7 inches, format array in inches [width, height]
+                jsPDF:        { unit: 'in', format: [3.15, 12], orientation: 'portrait' } 
+            };
+            document.body.classList.add('generating-pdf');
+            html2pdf().from(element).set(opt).save().then(() => {
+                document.body.classList.remove('generating-pdf');
+            });
+        }
+    </script>
+</body>
 </html>
